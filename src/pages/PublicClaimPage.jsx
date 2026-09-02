@@ -306,7 +306,7 @@ export default function PublicClaimPage() {
         </form>
 
         <p className="text-center text-[10px] text-dark-muted">
-          Secured by <strong className="text-slate-300">Sprinkl.biz GiveHub Engine</strong> • 1 Claim Per Destination
+          Secured by <strong className="text-slate-300">Sprinkl Engine</strong> • 1 Claim Per Destination
         </p>
       </div>
     </div>

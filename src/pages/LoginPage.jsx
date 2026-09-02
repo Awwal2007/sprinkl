@@ -37,7 +37,7 @@ export default function LoginPage() {
             <Gift className="w-6 h-6 stroke-[2.5]" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Sign In to GiveHub</h2>
+            <h2 className="text-xl font-bold text-white">Sign In to Sprinkl</h2>
             <p className="text-xs text-dark-muted">Manage host wallets & giveaway drops</p>
           </div>
         </div>

@@ -26,7 +26,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-dark-muted mb-8 leading-relaxed">
-            GiveHub lets creators, brands, and communities fund an in-app wallet in <strong className="text-white">NGN (Paystack)</strong> or <strong className="text-white">USDT (Crypto)</strong>, configure instant payouts, and distribute money to recipients automatically.
+            Sprinkl lets creators, brands, and communities fund an in-app wallet in <strong className="text-white">NGN (Flutterwave)</strong> or <strong className="text-white">USDT (Crypto)</strong>, configure instant payouts, and distribute money to recipients automatically.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -112,9 +112,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4 text-brand-500" />
-            <span className="font-semibold text-slate-300">Sprinkl.biz Platform Network</span>
+            <span className="font-semibold text-slate-300">Sprinkl.biz Platform</span>
           </div>
-          <p>© 2026 GiveHub on Sprinkl.biz. All rights reserved.</p>
+          <p>© 2026 Sprinkl.biz. All rights reserved.</p>
         </div>
       </footer>
     </div>

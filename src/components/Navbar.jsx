@@ -22,12 +22,12 @@ export default function Navbar() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-xl tracking-tight text-white">GiveHub</span>
+              <span className="font-extrabold text-xl tracking-tight text-white">Sprinkl</span>
               <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-brand-500/10 text-brand-500 border border-brand-500/20">
                 PRO
               </span>
             </div>
-            <p className="text-[10px] text-dark-muted font-medium -mt-0.5">by Sprinkl.biz</p>
+            <p className="text-[10px] text-dark-muted font-medium -mt-0.5">Sprinkl.biz</p>
           </div>
         </Link>
 

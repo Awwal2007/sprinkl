@@ -82,7 +82,7 @@ export default function ClaimSuccessPage() {
             className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 flex items-center justify-center gap-2 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Return to GiveHub Home</span>
+            <span>Return to Sprinkl Home</span>
           </Link>
         </div>
 
