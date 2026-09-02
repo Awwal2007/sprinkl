@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Gift, Lock, Mail, User, Phone, ArrowRight } from 'lucide-react';
+import { Gift, Lock, Mail, User, Phone, ArrowRight, CheckCircle2 } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -11,6 +11,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   const setAuth = useAuthStore((state) => state.setAuth);
   const navigate = useNavigate();
@@ -18,23 +19,50 @@ export default function SignupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
 
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await api.post('/auth/signup', {
-        fullName,
-        email,
-        phone,
-        password,
-      });
-      setAuth(res.data.user, res.data.accessToken);
-      navigate('/dashboard');
+      const res = await api.post('/auth/signup', { fullName, email, phone, password });
+      setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
+      setEmailSent(true);
     } catch (err) {
-      setError(err.response?.data?.error || 'Signup failed. Please check details.');
+      setError(err.response?.data?.error || 'Signup failed. Please check your details.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (emailSent) {
+    return (
+      <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl text-center">
+          <div className="w-14 h-14 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-extrabold text-white mb-2">Check Your Email!</h2>
+          <p className="text-xs text-dark-muted leading-relaxed mb-4">
+            We sent a verification link to <strong className="text-slate-200">{email}</strong>.
+            Click the link to activate your Sprinkl host account.
+          </p>
+          <p className="text-[11px] text-dark-muted mb-6">
+            The link expires in 24 hours. Check your spam folder if you don't see it.
+          </p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all"
+          >
+            <span>Continue to Dashboard</span>
+            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
@@ -107,12 +135,14 @@ export default function SignupPage() {
               <input
                 type="password"
                 required
+                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-dark-bg border border-dark-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
-                placeholder="••••••••"
+                placeholder="Min. 8 characters"
               />
             </div>
+            <p className="text-[10px] text-dark-muted mt-1">At least 8 characters required</p>
           </div>
 
           <button

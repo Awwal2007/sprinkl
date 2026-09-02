@@ -127,7 +127,7 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
                   INSTANT CREDIT
                 </span>
               </div>
-              <p className="text-sm font-bold text-slate-200">{dva?.bankName || 'Wema Bank (GiveHub DVA)'}</p>
+              <p className="text-sm font-bold text-slate-200">{dva?.bankName || 'Wema Bank (Sprinkl DVA)'}</p>
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-dark-border">
                 <span className="text-lg font-mono font-black text-brand-400 tracking-wider">
                   {dva?.accountNumber || '9928471092'}

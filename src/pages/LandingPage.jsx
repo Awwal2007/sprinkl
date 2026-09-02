@@ -26,7 +26,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-dark-muted mb-8 leading-relaxed">
-            Sprinkl lets creators, brands, and communities fund an in-app wallet in <strong className="text-white">NGN (Flutterwave)</strong> or <strong className="text-white">USDT (Crypto)</strong>, configure instant payouts, and distribute money to recipients automatically.
+            Sprinkl lets creators, brands, and communities fund an in-app wallet in <strong className="text-white">NGN</strong> or <strong className="text-white">USDT (Crypto)</strong>, configure instant payouts, and distribute money to recipients automatically.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

@@ -9,6 +9,7 @@ import GiveawayDetailPage from './pages/GiveawayDetailPage';
 import PublicClaimPage from './pages/PublicClaimPage';
 import ClaimSuccessPage from './pages/ClaimSuccessPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 import { useAuthStore } from './store/useAuthStore';
 
 function ProtectedRoute({ children }) {
@@ -60,6 +61,9 @@ export default function App() {
       {/* Public Giveaway Claim Routes */}
       <Route path="/g/:slug" element={<PublicClaimPage />} />
       <Route path="/g/:slug/claim/:claimId/success" element={<ClaimSuccessPage />} />
+
+      {/* Email Verification */}
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
