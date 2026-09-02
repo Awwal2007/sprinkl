@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Wallet, Plus, Building2, Coins, ArrowUpRight, ArrowDownLeft, Gift, Share2, Eye } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Wallet, Plus, Building2, Coins, ArrowUpRight, ArrowDownLeft, Gift, Share2, Eye, RotateCcw } from 'lucide-react';
 import api from '../api/client';
 import Navbar from '../components/Navbar';
 import FundWalletModal from '../components/FundWalletModal';
@@ -11,6 +11,10 @@ import StatusBadge from '../components/StatusBadge';
 export default function DashboardPage() {
   const [isFundModalOpen, setIsFundModalOpen] = useState(false);
   const [shareData, setShareData] = useState(null);
+  const [releasingCurrency, setReleasingCurrency] = useState(null);
+  const [releaseNotice, setReleaseNotice] = useState(null);
+
+  const queryClient = useQueryClient();
 
   const { data: walletData, refetch: refetchWallet } = useQuery({
     queryKey: ['wallet'],
@@ -36,11 +40,49 @@ export default function DashboardPage() {
     }
   };
 
+  const handleReleaseReserved = async (currency) => {
+    const rawAmt = walletData?.balances?.[currency]?.reserved || 0;
+    if (rawAmt <= 0) return;
+
+    const formattedAmt = formatCurrency(rawAmt, currency);
+    const confirmed = window.confirm(
+      `Transfer all reserved ${currency} funds (${formattedAmt}) back to your main available balance? Any active/open giveaways in ${currency} will be closed.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setReleasingCurrency(currency);
+      setReleaseNotice(null);
+      const res = await api.post('/wallet/release-reserved', { currency });
+      setReleaseNotice(res.data.message);
+      queryClient.invalidateQueries({ queryKey: ['wallet'] });
+      queryClient.invalidateQueries({ queryKey: ['giveaways'] });
+      setTimeout(() => setReleaseNotice(null), 8000);
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to transfer reserved funds');
+    } finally {
+      setReleasingCurrency(null);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+        {/* Release Success Notice */}
+        {releaseNotice && (
+          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold flex items-center justify-between shadow-lg shadow-emerald-500/5 animate-in fade-in">
+            <span>{releaseNotice}</span>
+            <button
+              onClick={() => setReleaseNotice(null)}
+              className="px-2 py-0.5 rounded text-emerald-400 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Header Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -91,15 +133,28 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="pt-4 border-t border-dark-border flex items-center justify-between text-xs">
-              <div>
-                <span className="text-dark-muted">Reserved in Giveaways: </span>
-                <span className="font-semibold text-slate-300">
-                  {formatCurrency(walletData?.balances?.NGN?.reserved || 0, 'NGN')}
-                </span>
+            <div className="pt-4 border-t border-dark-border space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-dark-muted">Reserved in Giveaways: </span>
+                  <span className="font-semibold text-slate-300">
+                    {formatCurrency(walletData?.balances?.NGN?.reserved || 0, 'NGN')}
+                  </span>
+                </div>
+                {(walletData?.balances?.NGN?.reserved || 0) > 0 && (
+                  <button
+                    onClick={() => handleReleaseReserved('NGN')}
+                    disabled={releasingCurrency === 'NGN'}
+                    className="px-2.5 py-1 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 border border-brand-500/30 text-brand-400 font-bold text-[11px] transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    title="Transfer reserved funds back to your main available balance"
+                  >
+                    <RotateCcw className={`w-3 h-3 ${releasingCurrency === 'NGN' ? 'animate-spin' : ''}`} />
+                    <span>{releasingCurrency === 'NGN' ? 'Transferring...' : 'Transfer to Main Balance'}</span>
+                  </button>
+                )}
               </div>
-              <div className="text-right">
-                <span className="text-dark-muted">DVA Account: </span>
+              <div className="flex items-center justify-between text-dark-muted pt-1">
+                <span>DVA Account:</span>
                 <span className="font-mono font-bold text-brand-400">
                   {walletData?.dva?.accountNumber || 'Assigned on Fund'}
                 </span>
@@ -131,19 +186,35 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="pt-4 border-t border-dark-border flex items-center justify-between text-xs">
-              <div>
-                <span className="text-dark-muted">Reserved in Giveaways: </span>
-                <span className="font-semibold text-slate-300">
-                  {formatCurrency(walletData?.balances?.USDT?.reserved || 0, 'USDT')}
-                </span>
+            <div className="pt-4 border-t border-dark-border space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-dark-muted">Reserved in Giveaways: </span>
+                  <span className="font-semibold text-slate-300">
+                    {formatCurrency(walletData?.balances?.USDT?.reserved || 0, 'USDT')}
+                  </span>
+                </div>
+                {(walletData?.balances?.USDT?.reserved || 0) > 0 && (
+                  <button
+                    onClick={() => handleReleaseReserved('USDT')}
+                    disabled={releasingCurrency === 'USDT'}
+                    className="px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 font-bold text-[11px] transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    title="Transfer reserved funds back to your main available balance"
+                  >
+                    <RotateCcw className={`w-3 h-3 ${releasingCurrency === 'USDT' ? 'animate-spin' : ''}`} />
+                    <span>{releasingCurrency === 'USDT' ? 'Transferring...' : 'Transfer to Main Balance'}</span>
+                  </button>
+                )}
               </div>
-              <button
-                onClick={() => setIsFundModalOpen(true)}
-                className="text-brand-400 hover:underline font-semibold"
-              >
-                Deposit USDT →
-              </button>
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-dark-muted">Top Up:</span>
+                <button
+                  onClick={() => setIsFundModalOpen(true)}
+                  className="text-brand-400 hover:underline font-semibold"
+                >
+                  Deposit USDT →
+                </button>
+              </div>
             </div>
           </div>
         </div>
