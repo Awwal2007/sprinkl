@@ -47,8 +47,17 @@ export default function LandingPage() {
 
   // Pre-configured recipient presets
   const recipientPresets = [10, 25, 50, 100, 250];
-  const ngnAmountPresets = [1000, 2500, 5000, 10000];
-  const usdtAmountPresets = [5, 10, 25, 50];
+  const ngnAmountPresets = [500, 1000, 2500, 5000, 10000];
+  const usdtAmountPresets = [2, 5, 10, 25, 50];
+
+  const isWhaleCalc =
+    (calcCurrency === 'NGN' && totalBudget >= 1000000) ||
+    (calcCurrency === 'USDT' && totalBudget >= 1000);
+
+  let calculatedPromoFee = totalBudget * (isWhaleCalc ? 0.03 : 0.025);
+  const minPromoFloor = calcCurrency === 'NGN' ? 250 : 0.50;
+  const maxWhaleCap = isWhaleCalc ? (calcCurrency === 'NGN' ? 35000 : 35) : Infinity;
+  const promoFee = Math.min(maxWhaleCap, Math.max(minPromoFloor, calculatedPromoFee));
 
   const handleCurrencyChange = (curr) => {
     setCalcCurrency(curr);
@@ -410,10 +419,12 @@ export default function LandingPage() {
                     <p className="text-xs text-dark-muted font-medium">Platform Fee</p>
                     <p className="text-xl font-black text-brand-400">
                       {calcCurrency === 'NGN'
-                        ? `₦${Math.round(totalBudget * 0.025).toLocaleString()}`
-                        : `$${(totalBudget * 0.025).toFixed(2)}`}
+                        ? `₦${Math.round(promoFee).toLocaleString()}`
+                        : `$${promoFee.toFixed(2)}`}
                     </p>
-                    <p className="text-[10px] text-emerald-400 font-semibold">2.5% (First 3 Drops Promo)</p>
+                    <p className="text-[10px] text-emerald-400 font-semibold">
+                      {isWhaleCalc ? '3.0% Whale Cap' : '2.5% New Host Promo'}
+                    </p>
                   </div>
                   <div>
                     <p className="text-xs text-dark-muted font-medium">Payout Latency</p>
@@ -427,8 +438,10 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-dark-border/60 flex items-center justify-between text-xs text-dark-muted">
-                  <span>Standard platform fee after first 3 giveaways: <strong>5.0%</strong></span>
+                <div className="mt-4 pt-3 border-t border-dark-border/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-dark-muted">
+                  <span>
+                    Min payout: <strong>₦500 / $2 USDT</strong> per winner &bull; Standard fee: <strong>5.0%</strong> (3% on drops &gt;₦1M / $1k)
+                  </span>
                   <span className="text-brand-400 font-bold">Unclaimed funds automatically refunded</span>
                 </div>
               </div>

@@ -233,46 +233,71 @@ export default function DashboardPage() {
         </section>
 
         {/* Ledger History Audit Table */}
-        <section className="bg-dark-card border border-dark-border rounded-2xl p-6">
+        <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6">
           <h2 className="text-lg font-bold text-white mb-1">Immutable Ledger History</h2>
           <p className="text-xs text-dark-muted mb-4">Complete append-only audit trail of wallet entries</p>
 
           {walletData?.ledgerHistory && walletData.ledgerHistory.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
-                    <th className="py-2.5 px-3">Date</th>
-                    <th className="py-2.5 px-3">Type</th>
-                    <th className="py-2.5 px-3">Currency</th>
-                    <th className="py-2.5 px-3">Amount</th>
-                    <th className="py-2.5 px-3 text-right">Balance After</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-dark-border text-xs">
-                  {walletData.ledgerHistory.map((item) => (
-                    <tr key={item._id} className="hover:bg-slate-800/30">
-                      <td className="py-3 px-3 text-dark-muted">
-                        {new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </td>
-                      <td className="py-3 px-3 capitalize font-medium text-slate-200">
-                        <span className={`inline-flex items-center gap-1 ${item.direction === 'credit' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                          {item.direction === 'credit' ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
-                          {item.type}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 font-semibold text-slate-300">{item.currency}</td>
-                      <td className="py-3 px-3 font-mono font-bold">
+            <>
+              {/* Mobile Cards */}
+              <div className="sm:hidden space-y-2">
+                {walletData.ledgerHistory.map((item) => (
+                  <div key={item._id} className="bg-dark-bg rounded-xl border border-dark-border p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className={`inline-flex items-center gap-1 text-xs font-bold capitalize ${
+                        item.direction === 'credit' ? 'text-emerald-400' : 'text-rose-400'
+                      }`}>
+                        {item.direction === 'credit' ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
+                        {item.type}
+                      </span>
+                      <span className="text-xs font-mono font-bold text-white">
                         {item.direction === 'credit' ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono text-dark-muted">
-                        {formatCurrency(item.balanceAfter, item.currency)}
-                      </td>
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-dark-muted">
+                      <span>{new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span>Bal: {formatCurrency(item.balanceAfter, item.currency)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Desktop Table */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <th className="py-2.5 px-3">Date</th>
+                      <th className="py-2.5 px-3">Type</th>
+                      <th className="py-2.5 px-3">Currency</th>
+                      <th className="py-2.5 px-3">Amount</th>
+                      <th className="py-2.5 px-3 text-right">Balance After</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-dark-border text-xs">
+                    {walletData.ledgerHistory.map((item) => (
+                      <tr key={item._id} className="hover:bg-slate-800/30">
+                        <td className="py-3 px-3 text-dark-muted">
+                          {new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </td>
+                        <td className="py-3 px-3 capitalize font-medium text-slate-200">
+                          <span className={`inline-flex items-center gap-1 ${item.direction === 'credit' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {item.direction === 'credit' ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
+                            {item.type}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 font-semibold text-slate-300">{item.currency}</td>
+                        <td className="py-3 px-3 font-mono font-bold">
+                          {item.direction === 'credit' ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono text-dark-muted">
+                          {formatCurrency(item.balanceAfter, item.currency)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           ) : (
             <p className="text-xs text-dark-muted py-4 text-center">No ledger entries recorded yet.</p>
           )}

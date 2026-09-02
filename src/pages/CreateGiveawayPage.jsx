@@ -31,15 +31,38 @@ export default function CreateGiveawayPage() {
 
   const isPromo = walletData?.feeTier ? walletData.feeTier.isPromo : true;
   const remainingPromoCount = walletData?.feeTier ? walletData.feeTier.remainingPromoCount : 3;
-  const feeRate = isPromo ? 0.025 : 0.05;
 
+  const minPayout = currency === 'NGN' ? 500 : 2;
   const giftPool = (parseFloat(amountPerRecipient) || 0) * (parseInt(totalSlots) || 0);
-  const platformFee = Math.round(giftPool * feeRate * 100) / 100;
+
+  // Check Whale Tier: >= ₦1,000,000 NGN or >= $1,000 USDT
+  const isWhale = (currency === 'NGN' && giftPool >= 1000000) || (currency === 'USDT' && giftPool >= 1000);
+
+  let feeRate = isWhale ? 0.03 : (isPromo ? 0.025 : 0.05);
+  const minFloor = currency === 'NGN' ? (isPromo ? 250 : 500) : (isPromo ? 0.50 : 1.00);
+  const maxCap = isWhale ? (currency === 'NGN' ? 35000 : 35) : Infinity;
+
+  let calculatedFee = giftPool * feeRate;
+  const isFloorApplied = giftPool > 0 && calculatedFee < minFloor;
+  calculatedFee = Math.max(minFloor, calculatedFee);
+  calculatedFee = Math.min(maxCap, calculatedFee);
+
+  const platformFee = giftPool > 0 ? Math.round(calculatedFee * 100) / 100 : 0;
   const totalCost = giftPool + platformFee;
   const isInsufficient = totalCost > availableBalance;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (currency === 'NGN' && parseFloat(amountPerRecipient) < 500) {
+      setError('Minimum payout per winner is ₦500 NGN to ensure transfer costs are fully covered.');
+      return;
+    }
+    if (currency === 'USDT' && parseFloat(amountPerRecipient) < 2) {
+      setError('Minimum payout per winner is $2 USDT to cover blockchain transfer gas.');
+      return;
+    }
+
     if (isInsufficient) {
       setError(
         `Insufficient ${currency} wallet balance. You need ${totalCost.toLocaleString()} ${currency} (Gift: ${giftPool.toLocaleString()} + Fee: ${platformFee.toLocaleString()})`
@@ -75,7 +98,7 @@ export default function CreateGiveawayPage() {
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
       <Navbar />
 
-      <main className="max-w-3xl mx-auto px-4 py-8 flex-1 w-full space-y-6">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-5 sm:space-y-6">
         <Link
           to="/dashboard"
           className="inline-flex items-center gap-1.5 text-xs text-dark-muted hover:text-slate-200 transition-colors"
@@ -84,7 +107,7 @@ export default function CreateGiveawayPage() {
           <span>Back to Dashboard</span>
         </Link>
 
-        <div className="bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl">
+        <div className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
               <Gift className="w-6 h-6" />
@@ -165,22 +188,27 @@ export default function CreateGiveawayPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Amount per Person ({currency})</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    Amount per Person ({currency})
+                  </label>
                   <input
                     type="number"
-                    min="1"
+                    min={minPayout}
                     step="any"
                     required
                     value={amountPerRecipient}
                     onChange={(e) => setAmountPerRecipient(e.target.value)}
                     className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono"
                   />
+                  <p className="text-[10px] text-dark-muted mt-1">
+                    Min: {currency === 'NGN' ? '₦500' : '$2 USDT'} per winner
+                  </p>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Number of Winners (Slots)</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Number of Winners</label>
                   <input
                     type="number"
                     min="1"
@@ -189,6 +217,7 @@ export default function CreateGiveawayPage() {
                     onChange={(e) => setTotalSlots(e.target.value)}
                     className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono"
                   />
+                  <p className="text-[10px] text-dark-muted mt-1">Minimum: 1 slot</p>
                 </div>
               </div>
             </div>
@@ -213,7 +242,24 @@ export default function CreateGiveawayPage() {
             </div>
 
             {/* Fee Privilege Status */}
-            {isPromo ? (
+            {isWhale ? (
+              <div className="bg-gradient-to-r from-purple-500/10 via-brand-500/10 to-teal-500/10 p-4 rounded-xl border border-purple-500/30 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-white">Whale Tier Discount Active</span>
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-purple-500 text-white">
+                      3.0% (Capped at {currency === 'NGN' ? '₦35,000' : '$35 USDT'})
+                    </span>
+                  </div>
+                  <p className="text-xs text-dark-muted mt-0.5">
+                    High-volume campaign privilege: Reduced 3.0% platform fee with a maximum cap to maximize your return.
+                  </p>
+                </div>
+              </div>
+            ) : isPromo ? (
               <div className="bg-gradient-to-r from-brand-500/10 via-emerald-500/10 to-teal-500/10 p-4 rounded-xl border border-brand-500/30 flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center shrink-0 mt-0.5">
                   <Sparkles className="w-4 h-4" />
@@ -255,7 +301,12 @@ export default function CreateGiveawayPage() {
               </div>
               <div className="flex justify-between text-xs text-dark-muted">
                 <span>
-                  Platform Fee ({isPromo ? '2.5% Promo' : '5.0%'}):
+                  Platform Fee ({isWhale ? '3% Whale Cap' : isPromo ? '2.5% Promo' : '5% Standard'}):
+                  {isFloorApplied && (
+                    <span className="text-[10px] text-amber-400 font-medium ml-1.5">
+                      (Minimum floor fee)
+                    </span>
+                  )}
                 </span>
                 <span className="font-semibold text-brand-400 font-mono">
                   {platformFee.toLocaleString()} {currency}
