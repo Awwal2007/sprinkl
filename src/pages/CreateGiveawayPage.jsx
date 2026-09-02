@@ -32,7 +32,7 @@ export default function CreateGiveawayPage() {
   const isPromo = walletData?.feeTier ? walletData.feeTier.isPromo : true;
   const remainingPromoCount = walletData?.feeTier ? walletData.feeTier.remainingPromoCount : 3;
 
-  const minPayout = currency === 'NGN' ? 500 : 2;
+  const minPayout = currency === 'NGN' ? 500 : 0.2;
   const giftPool = (parseFloat(amountPerRecipient) || 0) * (parseInt(totalSlots) || 0);
 
   // Check Whale Tier: >= ₦1,000,000 NGN or >= $1,000 USDT
@@ -58,8 +58,8 @@ export default function CreateGiveawayPage() {
       setError('Minimum payout per winner is ₦500 NGN to ensure transfer costs are fully covered.');
       return;
     }
-    if (currency === 'USDT' && parseFloat(amountPerRecipient) < 2) {
-      setError('Minimum payout per winner is $2 USDT to cover blockchain transfer gas.');
+    if (currency === 'USDT' && parseFloat(amountPerRecipient) < 0.2) {
+      setError('Minimum payout per winner is $0.20 USDT to cover blockchain transfer gas.');
       return;
     }
 
@@ -203,7 +203,7 @@ export default function CreateGiveawayPage() {
                     className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono"
                   />
                   <p className="text-[10px] text-dark-muted mt-1">
-                    Min: {currency === 'NGN' ? '₦500' : '$2 USDT'} per winner
+                    Min: {currency === 'NGN' ? '₦500' : '$0.20 USDT'} per winner
                   </p>
                 </div>
 

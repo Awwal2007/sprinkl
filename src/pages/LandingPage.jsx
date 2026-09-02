@@ -48,7 +48,7 @@ export default function LandingPage() {
   // Pre-configured recipient presets
   const recipientPresets = [10, 25, 50, 100, 250];
   const ngnAmountPresets = [500, 1000, 2500, 5000, 10000];
-  const usdtAmountPresets = [2, 5, 10, 25, 50];
+  const usdtAmountPresets = [0.2, 0.5, 1, 5, 10];
 
   const isWhaleCalc =
     (calcCurrency === 'NGN' && totalBudget >= 1000000) ||
@@ -74,8 +74,12 @@ export default function LandingPage() {
       a: 'We support Nigerian Naira (NGN) via Paystack automated bank transfers to all Nigerian commercial and microfinance banks (OPay, Kuda, Moniepoint, PalmPay, GTBank, Zenith, etc.) and Tether USD (USDT) on TRC-20 (Tron) and BEP-20 (Binance Smart Chain).'
     },
     {
+      q: 'What are the minimum amounts?',
+      a: 'For NGN giveaways, the minimum payout per winner is ₦500 and the minimum wallet deposit is ₦3,000. For USDT giveaways, the minimum payout per winner is $0.20 USDT and the minimum wallet deposit is $2 USDT. These floors protect your margins by ensuring transfer fees are always covered.'
+    },
+    {
       q: 'How fast do winners receive their funds?',
-      a: 'Payouts are executed instantly via background queuing engines the moment the recipient clicks "Claim". Nigerian bank transfers typically credit in under 2 seconds, and USDT on-chain payouts broadcast immediately to the network.'
+      a: 'Payouts are executed instantly via background queuing engines the moment the recipient clicks “Claim”. Nigerian bank transfers typically credit in under 2 seconds, and USDT on-chain payouts broadcast immediately to the network.'
     },
     {
       q: 'What happens to leftover funds if a giveaway expires?',
@@ -87,7 +91,7 @@ export default function LandingPage() {
     },
     {
       q: 'How do I fund my host wallet to start?',
-      a: 'Every host receives a dedicated virtual bank account (DVA) powered by Paystack for instant NGN bank transfer funding, as well as a dedicated crypto deposit address for USDT.'
+      a: 'Every host receives a dedicated virtual bank account (DVA) powered by Paystack for instant NGN bank transfer funding (minimum ₦3,000), as well as a dedicated crypto deposit address for USDT (minimum $2).'
     }
   ];
 
