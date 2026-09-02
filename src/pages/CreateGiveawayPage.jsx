@@ -29,13 +29,21 @@ export default function CreateGiveawayPage() {
     ? (walletData?.balances?.NGN?.available || 0) / 100
     : (walletData?.balances?.USDT?.available || 0) / 1000000;
 
-  const totalCost = (parseFloat(amountPerRecipient) || 0) * (parseInt(totalSlots) || 0);
+  const isPromo = walletData?.feeTier ? walletData.feeTier.isPromo : true;
+  const remainingPromoCount = walletData?.feeTier ? walletData.feeTier.remainingPromoCount : 3;
+  const feeRate = isPromo ? 0.025 : 0.05;
+
+  const giftPool = (parseFloat(amountPerRecipient) || 0) * (parseInt(totalSlots) || 0);
+  const platformFee = Math.round(giftPool * feeRate * 100) / 100;
+  const totalCost = giftPool + platformFee;
   const isInsufficient = totalCost > availableBalance;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isInsufficient) {
-      setError(`Insufficient ${currency} wallet balance. You need ${totalCost.toLocaleString()} ${currency}`);
+      setError(
+        `Insufficient ${currency} wallet balance. You need ${totalCost.toLocaleString()} ${currency} (Gift: ${giftPool.toLocaleString()} + Fee: ${platformFee.toLocaleString()})`
+      );
       return;
     }
 
@@ -204,6 +212,33 @@ export default function CreateGiveawayPage() {
               </label>
             </div>
 
+            {/* Fee Privilege Status */}
+            {isPromo ? (
+              <div className="bg-gradient-to-r from-brand-500/10 via-emerald-500/10 to-teal-500/10 p-4 rounded-xl border border-brand-500/30 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-white">New Creator Privilege Active</span>
+                    <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-brand-500 text-slate-950">
+                      2.5% Fee
+                    </span>
+                  </div>
+                  <p className="text-xs text-dark-muted mt-0.5">
+                    Enjoy a discounted 2.5% platform fee for your first 3 giveaways ({remainingPromoCount} promo giveaway{remainingPromoCount === 1 ? '' : 's'} remaining). Standard rate is 5.0%.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-slate-900/60 p-3.5 rounded-xl border border-dark-border flex items-center justify-between text-xs">
+                <span className="text-slate-300 font-semibold">Platform Fee:</span>
+                <span className="font-bold text-white bg-slate-800 px-2 py-0.5 rounded border border-dark-border">
+                  5.0% Standard
+                </span>
+              </div>
+            )}
+
             {/* Total Calculation Box */}
             <div className="bg-slate-900/80 p-4 rounded-xl border border-dark-border space-y-2">
               <div className="flex justify-between text-xs text-dark-muted">
@@ -212,8 +247,22 @@ export default function CreateGiveawayPage() {
                   {availableBalance.toLocaleString()} {currency}
                 </span>
               </div>
+              <div className="flex justify-between text-xs text-dark-muted">
+                <span>Prize Pool (to {totalSlots} winners):</span>
+                <span className="font-semibold text-slate-200">
+                  {giftPool.toLocaleString()} {currency}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-dark-muted">
+                <span>
+                  Platform Fee ({isPromo ? '2.5% Promo' : '5.0%'}):
+                </span>
+                <span className="font-semibold text-brand-400 font-mono">
+                  {platformFee.toLocaleString()} {currency}
+                </span>
+              </div>
               <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-dark-border">
-                <span>Total Cost Locked:</span>
+                <span>Total Deducted from Wallet:</span>
                 <span className={`font-mono ${isInsufficient ? 'text-rose-400' : 'text-brand-400'}`}>
                   {totalCost.toLocaleString()} {currency}
                 </span>

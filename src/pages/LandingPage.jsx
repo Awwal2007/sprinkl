@@ -401,19 +401,35 @@ export default function LandingPage() {
 
               {/* Summary Card */}
               <div className="bg-slate-900/80 border border-dark-border rounded-2xl p-6 mb-6">
-                <div className="grid sm:grid-cols-3 gap-4 text-center sm:text-left">
+                <div className="grid sm:grid-cols-4 gap-4 text-center sm:text-left">
                   <div>
-                    <p className="text-xs text-dark-muted font-medium">Total Vault Budget</p>
-                    <p className="text-2xl font-black text-white">{formattedBudget}</p>
+                    <p className="text-xs text-dark-muted font-medium">Prize Pool</p>
+                    <p className="text-xl font-black text-white">{formattedBudget}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-dark-muted font-medium">Disbursement Speed</p>
-                    <p className="text-2xl font-black text-brand-400">&lt; 2 Seconds</p>
+                    <p className="text-xs text-dark-muted font-medium">Platform Fee</p>
+                    <p className="text-xl font-black text-brand-400">
+                      {calcCurrency === 'NGN'
+                        ? `₦${Math.round(totalBudget * 0.025).toLocaleString()}`
+                        : `$${(totalBudget * 0.025).toFixed(2)}`}
+                    </p>
+                    <p className="text-[10px] text-emerald-400 font-semibold">2.5% (First 3 Drops Promo)</p>
                   </div>
                   <div>
-                    <p className="text-xs text-dark-muted font-medium">Double-Claim Protection</p>
-                    <p className="text-2xl font-black text-emerald-400">100% Guaranteed</p>
+                    <p className="text-xs text-dark-muted font-medium">Payout Latency</p>
+                    <p className="text-xl font-black text-teal-300">&lt; 2 Seconds</p>
+                    <p className="text-[10px] text-dark-muted">Automated Settlement</p>
                   </div>
+                  <div>
+                    <p className="text-xs text-dark-muted font-medium">Anti-Duplicate</p>
+                    <p className="text-xl font-black text-emerald-400">100% Lock</p>
+                    <p className="text-[10px] text-dark-muted">0% Double-Claims</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-dark-border/60 flex items-center justify-between text-xs text-dark-muted">
+                  <span>Standard platform fee after first 3 giveaways: <strong>5.0%</strong></span>
+                  <span className="text-brand-400 font-bold">Unclaimed funds automatically refunded</span>
                 </div>
               </div>
 

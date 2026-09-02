@@ -21,6 +21,14 @@ export default function AdminDashboardPage() {
     },
   });
 
+  const { data: revenueData } = useQuery({
+    queryKey: ['adminRevenue'],
+    queryFn: async () => {
+      const res = await api.get('/admin/revenue');
+      return res.data;
+    },
+  });
+
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
       <Navbar />
@@ -31,10 +39,52 @@ export default function AdminDashboardPage() {
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-white">Internal Admin & KYC Audit Dashboard</h1>
-            <p className="text-xs text-dark-muted">Platform transaction monitoring & AML threshold compliance review</p>
+            <h1 className="text-2xl font-extrabold text-white">Internal Admin & Platform Revenue Dashboard</h1>
+            <p className="text-xs text-dark-muted">Platform transaction monitoring, fee collection profits & AML threshold compliance review</p>
           </div>
         </div>
+
+        {/* Platform Revenue Metric Cards */}
+        <section className="grid sm:grid-cols-3 gap-6">
+          <div className="bg-dark-card border border-dark-border rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl pointer-events-none" />
+            <p className="text-xs uppercase tracking-wider text-dark-muted font-bold mb-1">
+              Collected Platform Profit (NGN)
+            </p>
+            <p className="text-3xl font-extrabold text-emerald-400">
+              ₦{((revenueData?.revenue?.NGN || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </p>
+            <p className="text-[11px] text-dark-muted mt-2">
+              From 2.5% new creator promos and 5.0% standard fees
+            </p>
+          </div>
+
+          <div className="bg-dark-card border border-dark-border rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 blur-3xl pointer-events-none" />
+            <p className="text-xs uppercase tracking-wider text-dark-muted font-bold mb-1">
+              Collected Platform Profit (USDT)
+            </p>
+            <p className="text-3xl font-extrabold text-teal-300">
+              ${((revenueData?.revenue?.USDT || 0) / 1000000).toLocaleString(undefined, { minimumFractionDigits: 2 })} USDT
+            </p>
+            <p className="text-[11px] text-dark-muted mt-2">
+              TRC-20 & BEP-20 crypto fee revenue
+            </p>
+          </div>
+
+          <div className="bg-dark-card border border-dark-border rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 blur-3xl pointer-events-none" />
+            <p className="text-xs uppercase tracking-wider text-dark-muted font-bold mb-1">
+              Platform Campaigns
+            </p>
+            <p className="text-3xl font-extrabold text-white">
+              {revenueData?.stats?.totalGiveaways || 0}
+            </p>
+            <p className="text-[11px] text-brand-400 mt-2 font-medium">
+              {revenueData?.stats?.activeGiveaways || 0} currently active
+            </p>
+          </div>
+        </section>
 
         {/* Flagged Accounts Card */}
         <section className="bg-dark-card border border-dark-border rounded-2xl p-6 space-y-4">
