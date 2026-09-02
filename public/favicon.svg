@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="sprinkl-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#10b981" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Rounded Base Card -->
+  <rect width="64" height="64" rx="16" fill="#0b0f17" />
+  <rect x="1" y="1" width="62" height="62" rx="15" stroke="#1e293b" stroke-width="2" />
+  
+  <!-- Glowing Gift Box Symbol with Sprinkl Droplets -->
+  <g filter="url(#glow)">
+    <!-- Main Box -->
+    <rect x="15" y="27" width="34" height="24" rx="4" fill="url(#sprinkl-grad)" />
+    <!-- Lid -->
+    <rect x="12" y="21" width="40" height="8" rx="2.5" fill="#34d399" />
+    
+    <!-- Vertical Ribbon -->
+    <rect x="29" y="21" width="6" height="30" fill="#064e3b" />
+    
+    <!-- Bow Loops -->
+    <path d="M32 21 C28 14 19 14 23 21 Z" fill="#34d399" />
+    <path d="M32 21 C36 14 45 14 41 21 Z" fill="#34d399" />
+    
+    <!-- Sprinkl Sparkles/Droplets -->
+    <circle cx="49" cy="15" r="2.5" fill="#34d399" />
+    <circle cx="15" cy="17" r="1.5" fill="#10b981" />
+    <circle cx="51" cy="48" r="1.5" fill="#34d399" opacity="0.8" />
+  </g>
+</svg>
