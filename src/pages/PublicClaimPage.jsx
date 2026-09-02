@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Gift, ShieldCheck, CheckCircle2, AlertCircle, Building2, Coins, ArrowRight, Sparkles, Search } from 'lucide-react';
@@ -45,22 +45,34 @@ export default function PublicClaimPage() {
     enabled: giveawayData?.currency === 'NGN',
   });
 
-  // Handle Account Resolution for NGN
-  const handleAccountBlur = async () => {
+  // Auto-verify bank account with Flutterwave as soon as 10 digits are typed and bank is selected
+  useEffect(() => {
+    let active = true;
     if (accountNumber.length === 10 && bankCode) {
-      try {
-        setResolving(true);
-        setResolveErr(null);
-        const res = await api.post(`/g/${slug}/resolve-bank`, { accountNumber, bankCode });
-        setResolvedName(res.data.resolved.account_name);
-      } catch (err) {
-        setResolveErr(err.response?.data?.error || 'Could not verify account name');
-        setResolvedName('');
-      } finally {
-        setResolving(false);
-      }
+      setResolving(true);
+      setResolveErr(null);
+      api.post(`/g/${slug}/resolve-bank`, { accountNumber, bankCode })
+        .then((res) => {
+          if (active) {
+            setResolvedName(res.data.resolved.account_name);
+            setResolveErr(null);
+          }
+        })
+        .catch((err) => {
+          if (active) {
+            setResolveErr(err.response?.data?.error || 'Could not verify account name with this bank');
+            setResolvedName('');
+          }
+        })
+        .finally(() => {
+          if (active) setResolving(false);
+        });
+    } else {
+      setResolvedName('');
+      setResolveErr(null);
     }
-  };
+    return () => { active = false; };
+  }, [accountNumber, bankCode, slug]);
 
   const formatCurrency = (amount, currency) => {
     if (currency === 'NGN') return `₦${(amount / 100).toLocaleString()}`;
@@ -71,6 +83,12 @@ export default function PublicClaimPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
+    if (giveawayData.currency === 'NGN' && !resolvedName) {
+      setError('Please select your bank and enter a valid 10-digit account number to verify your bank account first.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const payload = {
@@ -142,20 +160,14 @@ export default function PublicClaimPage() {
           )}
         </div>
 
-        {/* Amount & Slots Card */}
-        <div className="bg-dark-bg p-4 rounded-2xl border border-dark-border flex items-center justify-between">
-          <div>
-            <span className="text-[10px] text-dark-muted uppercase font-bold tracking-wider">Amount You Receive</span>
-            <p className="text-2xl font-black text-brand-400 font-mono">
-              {formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)}
-            </p>
-          </div>
-          <div className="text-right">
-            <span className="text-[10px] text-dark-muted uppercase font-bold tracking-wider">Slots Left</span>
-            <p className="text-base font-bold text-white">
-              <span className="text-brand-400">{giveawayData.slotsRemaining}</span> / {giveawayData.totalSlots}
-            </p>
-          </div>
+        {/* Amount Card (No slots shown as requested) */}
+        <div className="bg-dark-bg p-5 rounded-2xl border border-dark-border text-center">
+          <span className="text-[10px] text-dark-muted uppercase font-bold tracking-wider block mb-1">
+            Amount You Receive
+          </span>
+          <p className="text-3xl sm:text-4xl font-black text-brand-400 font-mono">
+            {formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)}
+          </p>
         </div>
 
         {error && (
@@ -222,29 +234,38 @@ export default function PublicClaimPage() {
                   required
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
-                  onBlur={handleAccountBlur}
                   className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono tracking-wider"
                   placeholder="0123456789"
                 />
               </div>
 
-              {/* Resolved Name Box */}
+              {/* Bank Verification Status & Display */}
               {resolving && (
-                <div className="text-xs text-brand-400 flex items-center gap-1.5 animate-pulse">
-                  <div className="w-3 h-3 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
-                  <span>Verifying bank account name with Flutterwave...</span>
+                <div className="text-xs text-brand-400 flex items-center gap-2 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20 animate-pulse">
+                  <div className="w-3.5 h-3.5 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
+                  <span>Verifying account details with Flutterwave...</span>
                 </div>
               )}
 
               {resolvedName && (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center justify-between">
-                  <span>Verified Name: <strong>{resolvedName}</strong></span>
-                  <CheckCircle2 className="w-4 h-4" />
+                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs space-y-1 shadow-inner">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400">
+                      Verified Bank Account
+                    </span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <p className="text-base font-extrabold text-white tracking-wide">{resolvedName}</p>
+                  <p className="text-xs font-medium text-emerald-300/80">
+                    {bankName || 'Bank'} &bull; <span className="font-mono">{accountNumber}</span>
+                  </p>
                 </div>
               )}
 
               {resolveErr && (
-                <div className="text-xs text-rose-400 font-medium">{resolveErr}</div>
+                <div className="text-xs text-rose-400 font-medium p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                  {resolveErr}
+                </div>
               )}
             </>
           )}
@@ -295,11 +316,17 @@ export default function PublicClaimPage() {
           <div className="pt-2">
             <button
               type="submit"
-              disabled={loading || giveawayData.slotsRemaining <= 0}
+              disabled={loading || resolving || (giveawayData.currency === 'NGN' && !resolvedName)}
               className="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-2xl shadow-xl shadow-brand-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
             >
               <Sparkles className="w-4 h-4" />
-              <span>{loading ? 'Processing Claim...' : `Claim ${formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)} Now`}</span>
+              <span>
+                {resolving
+                  ? 'Verifying Bank Account...'
+                  : loading
+                  ? 'Processing Claim...'
+                  : `Claim ${formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)} Now`}
+              </span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </button>
           </div>
