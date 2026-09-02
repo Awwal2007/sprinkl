@@ -8,12 +8,11 @@ export default function PublicClaimPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  // Form State
-  const [claimantName, setClaimantName] = useState('');
-  const [claimantEmail, setClaimantEmail] = useState('');
   // NGN state
   const [bankCode, setBankCode] = useState('');
   const [bankName, setBankName] = useState('');
+  const [bankQuery, setBankQuery] = useState('');
+  const [showBankDropdown, setShowBankDropdown] = useState(false);
   const [accountNumber, setAccountNumber] = useState('');
   const [resolvedName, setResolvedName] = useState('');
   const [resolving, setResolving] = useState(false);
@@ -25,6 +24,16 @@ export default function PublicClaimPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const quickBanks = [
+    { name: 'OPay', code: '999992' },
+    { name: 'PalmPay', code: '50378' },
+    { name: 'Kuda Bank', code: '50211' },
+    { name: 'Moniepoint', code: '50515' },
+    { name: 'GTBank', code: '058' },
+    { name: 'Access Bank', code: '044' },
+    { name: 'Zenith Bank', code: '057' },
+  ];
 
   // Fetch Public Giveaway Details
   const { data: giveawayData, isLoading: loadingGiveaway } = useQuery({
@@ -44,6 +53,10 @@ export default function PublicClaimPage() {
     },
     enabled: giveawayData?.currency === 'NGN',
   });
+
+  const filteredBanks = bankQuery.trim()
+    ? banks?.filter((b) => b.name.toLowerCase().includes(bankQuery.toLowerCase())).slice(0, 15) || []
+    : [];
 
   // Auto-verify bank account with Flutterwave as soon as 10 digits are typed and bank is selected
   useEffect(() => {
@@ -92,12 +105,11 @@ export default function PublicClaimPage() {
 
     try {
       const payload = {
-        claimantName,
-        claimantEmail,
+        claimantName: resolvedName || (walletAddress ? `${chain} Winner` : 'Sprinkl Claimant'),
         bankCode,
         bankName,
         accountNumber,
-        resolvedAccountName: resolvedName || claimantName,
+        resolvedAccountName: resolvedName,
         chain,
         walletAddress,
       };
@@ -179,51 +191,100 @@ export default function PublicClaimPage() {
 
         {/* Claim Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Your Full Name</label>
-            <input
-              type="text"
-              required
-              value={claimantName}
-              onChange={(e) => setClaimantName(e.target.value)}
-              className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
-              placeholder="e.g. Blessing Nwosu"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address (for confirmation receipt)</label>
-            <input
-              type="email"
-              value={claimantEmail}
-              onChange={(e) => setClaimantEmail(e.target.value)}
-              className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
-              placeholder="blessing@example.com"
-            />
-          </div>
-
           {/* NGN Bank Destination */}
           {giveawayData.currency === 'NGN' && (
             <>
+              {/* Typeable / Searchable Bank Selector */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Select Your Bank</label>
-                <select
-                  required
-                  value={bankCode}
-                  onChange={(e) => {
-                    setBankCode(e.target.value);
-                    const selected = banks?.find((b) => b.code === e.target.value);
-                    setBankName(selected ? selected.name : '');
-                  }}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
-                >
-                  <option value="">-- Choose Nigerian Bank --</option>
-                  {banks?.map((b) => (
-                    <option key={b.code} value={b.code}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Select or Type Bank Name
+                </label>
+
+                {bankName ? (
+                  <div className="flex items-center justify-between p-3.5 rounded-xl bg-dark-bg border border-brand-500/50 text-white shadow-sm">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
+                        <Building2 className="w-4 h-4" />
+                      </div>
+                      <span className="text-sm font-bold text-slate-100">{bankName}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBankCode('');
+                        setBankName('');
+                        setResolvedName('');
+                        setBankQuery('');
+                      }}
+                      className="text-xs text-brand-400 hover:text-brand-300 font-semibold px-2.5 py-1 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 transition-colors"
+                    >
+                      Change Bank
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2 relative">
+                    <div className="relative">
+                      <Search className="w-4 h-4 text-dark-muted absolute left-3.5 top-3" />
+                      <input
+                        type="text"
+                        value={bankQuery}
+                        onChange={(e) => {
+                          setBankQuery(e.target.value);
+                          setShowBankDropdown(true);
+                        }}
+                        onFocus={() => setShowBankDropdown(true)}
+                        placeholder="Type bank name (e.g. OPay, PalmPay, GTBank)..."
+                        className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 placeholder:text-dark-muted"
+                      />
+                    </div>
+
+                    {/* Filtered Dropdown */}
+                    {showBankDropdown && filteredBanks.length > 0 && (
+                      <div className="absolute top-10 left-0 right-0 max-h-56 overflow-y-auto bg-dark-card border border-dark-border rounded-xl shadow-2xl z-30 divide-y divide-dark-border/50">
+                        {filteredBanks.map((b) => (
+                          <button
+                            key={b.code}
+                            type="button"
+                            onClick={() => {
+                              setBankCode(b.code);
+                              setBankName(b.name);
+                              setBankQuery('');
+                              setShowBankDropdown(false);
+                            }}
+                            className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-brand-500/10 hover:text-brand-400 transition-colors flex items-center justify-between"
+                          >
+                            <span className="font-semibold">{b.name}</span>
+                            <span className="text-[10px] text-dark-muted font-mono">{b.code}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Quick Popular Banks */}
+                    <div>
+                      <span className="text-[10px] text-dark-muted font-medium uppercase tracking-wider block mb-1">
+                        Popular Banks:
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {quickBanks.map((qb) => (
+                          <button
+                            key={qb.code}
+                            type="button"
+                            onClick={() => {
+                              setBankCode(qb.code);
+                              setBankName(qb.name);
+                              setBankQuery('');
+                              setShowBankDropdown(false);
+                            }}
+                            className="text-[11px] px-2.5 py-1 rounded-lg bg-dark-bg border border-dark-border text-slate-300 hover:border-brand-500 hover:text-brand-400 font-medium transition-all"
+                          >
+                            {qb.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
