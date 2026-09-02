@@ -26,10 +26,10 @@ export default function PublicClaimPage() {
   const [error, setError] = useState(null);
 
   const quickBanks = [
-    { name: 'OPay', code: '999992' },
-    { name: 'PalmPay', code: '50378' },
-    { name: 'Kuda Bank', code: '50211' },
-    { name: 'Moniepoint', code: '50515' },
+    { name: 'OPay', code: '100004' },
+    { name: 'PalmPay', code: '100033' },
+    { name: 'Kuda Bank', code: '090267' },
+    { name: 'Moniepoint', code: '090405' },
     { name: 'GTBank', code: '058' },
     { name: 'Access Bank', code: '044' },
     { name: 'Zenith Bank', code: '057' },
