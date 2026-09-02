@@ -136,7 +136,7 @@ export default function LandingPage() {
               >
                 Send Cash & Crypto Giveaways{' '}
                 <br className="hidden sm:inline" />
-                <span className="bg-gradient-to-r from-brand-400 via-emerald-300 to-teal-200 bg-clip-text text-transparent">
+                <span className="text-emerald-400 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200 bg-clip-text text-transparent font-extrabold inline-block drop-shadow-sm">
                   With Zero Double-Claims.
                 </span>
               </h1>
