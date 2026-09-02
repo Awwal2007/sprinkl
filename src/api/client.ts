@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://api.sprinkl.biz/api';
+const BASE_URL = (import.meta as any).env?.VITE_API_URL || 'https://api.sprinkl.biz/api';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -19,7 +19,13 @@ api.interceptors.request.use((config) => {
 
 // Auto refresh access token on 401, then retry once
 let isRefreshing = false;
-let failedQueue: any[] = [];
+
+interface FailedQueueItem {
+  resolve: (token: string | null) => void;
+  reject: (error: any) => void;
+}
+
+let failedQueue: FailedQueueItem[] = [];
 
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
@@ -34,12 +40,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    const isLoginRoute = originalRequest.url?.includes('/auth/login');
-    const isRefreshRoute = originalRequest.url?.includes('/auth/refresh');
+    const isLoginRoute = originalRequest?.url?.includes('/auth/login');
+    const isRefreshRoute = originalRequest?.url?.includes('/auth/refresh');
 
-    if (error.response?.status === 401 && !originalRequest._retry && !isLoginRoute && !isRefreshRoute) {
+    if (error.response?.status === 401 && !originalRequest?._retry && !isLoginRoute && !isRefreshRoute) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise<string | null>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
