@@ -2,14 +2,24 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Gift, Wallet, LogOut, ShieldCheck, Menu, X } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
+import { toast, confirmDialog } from '../store/useNotificationStore';
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const confirmed = await confirmDialog({
+      title: 'Sign Out of Sprinkl?',
+      message: 'Are you sure you want to end your session?',
+      confirmText: 'Sign Out',
+      confirmVariant: 'danger',
+    });
+    if (!confirmed) return;
+
     logout();
+    toast.info('You have been signed out successfully.', 'Signed Out');
     navigate('/login');
     setMobileOpen(false);
   };

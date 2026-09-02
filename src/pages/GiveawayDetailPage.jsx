@@ -6,6 +6,7 @@ import api from '../api/client';
 import Navbar from '../components/Navbar';
 import ShareModal from '../components/ShareModal';
 import StatusBadge from '../components/StatusBadge';
+import { toast, confirmDialog } from '../store/useNotificationStore';
 
 export default function GiveawayDetailPage() {
   const { id } = useParams();
@@ -39,13 +40,26 @@ export default function GiveawayDetailPage() {
   };
 
   const handleCancel = async () => {
-    if (!window.confirm('Cancel this giveaway? Unclaimed funds will be returned to your wallet.')) return;
+    const confirmed = await confirmDialog({
+      title: 'Cancel Giveaway?',
+      message:
+        'Are you sure you want to cancel this giveaway campaign? All remaining unclaimed slots will be closed and funds returned directly to your available wallet balance.',
+      confirmText: 'Yes, Cancel Giveaway',
+      cancelText: 'Keep Active',
+      confirmVariant: 'danger',
+    });
+    if (!confirmed) return;
+
     try {
       setCancelling(true);
-      await api.post(`/giveaways/${id}/cancel`);
+      const res = await api.post(`/giveaways/${id}/cancel`);
+      toast.success(
+        res.data.message || 'Giveaway cancelled and unspent funds released to your wallet.',
+        'Giveaway Cancelled'
+      );
       refetch();
     } catch (err) {
-      alert(err.response?.data?.error || 'Cancellation failed');
+      toast.error(err.response?.data?.error || 'Cancellation failed', 'Cancel Error');
     } finally {
       setCancelling(false);
     }

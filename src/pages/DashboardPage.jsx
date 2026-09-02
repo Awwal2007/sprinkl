@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar';
 import FundWalletModal from '../components/FundWalletModal';
 import ShareModal from '../components/ShareModal';
 import StatusBadge from '../components/StatusBadge';
+import { toast, confirmDialog } from '../store/useNotificationStore';
 
 export default function DashboardPage() {
   const [isFundModalOpen, setIsFundModalOpen] = useState(false);
@@ -45,21 +46,24 @@ export default function DashboardPage() {
     if (rawAmt <= 0) return;
 
     const formattedAmt = formatCurrency(rawAmt, currency);
-    const confirmed = window.confirm(
-      `Transfer all reserved ${currency} funds (${formattedAmt}) back to your main available balance? Any active/open giveaways in ${currency} will be closed.`
-    );
+    const confirmed = await confirmDialog({
+      title: `Transfer Reserved ${currency} to Main Balance?`,
+      message: `This will transfer all reserved ${currency} funds (${formattedAmt}) back to your available balance. Any active/open giveaways in ${currency} will be safely closed.`,
+      confirmText: 'Yes, Transfer Funds',
+      cancelText: 'Keep Giveaways Active',
+      confirmVariant: 'brand',
+    });
     if (!confirmed) return;
 
     try {
       setReleasingCurrency(currency);
       setReleaseNotice(null);
       const res = await api.post('/wallet/release-reserved', { currency });
-      setReleaseNotice(res.data.message);
+      toast.success(res.data.message, 'Funds Transferred');
       queryClient.invalidateQueries({ queryKey: ['wallet'] });
       queryClient.invalidateQueries({ queryKey: ['giveaways'] });
-      setTimeout(() => setReleaseNotice(null), 8000);
     } catch (err) {
-      alert(err.response?.data?.error || 'Failed to transfer reserved funds');
+      toast.error(err.response?.data?.error || 'Failed to transfer reserved funds', 'Transfer Failed');
     } finally {
       setReleasingCurrency(null);
     }

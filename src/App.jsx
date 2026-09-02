@@ -10,6 +10,7 @@ import PublicClaimPage from './pages/PublicClaimPage';
 import ClaimSuccessPage from './pages/ClaimSuccessPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
+import NotificationCenter from './components/NotificationCenter';
 import { useAuthStore } from './store/useAuthStore';
 
 function isTokenValid(token) {
@@ -62,8 +63,10 @@ function AdminRoute({ children }) {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
+    <>
+      <NotificationCenter />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
@@ -110,5 +113,6 @@ export default function App() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }

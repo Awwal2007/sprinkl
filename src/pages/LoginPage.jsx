@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Gift, Lock, Mail, ArrowRight } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
+import { toast } from '../store/useNotificationStore';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,12 @@ export default function LoginPage() {
   const setAuth = useAuthStore((state) => state.setAuth);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('expired=true')) {
+      toast.warning('Your session has expired. Please sign in again to continue.', 'Session Expired');
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -21,9 +28,13 @@ export default function LoginPage() {
     try {
       const res = await api.post('/auth/login', { email, password });
       setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
+      const userName = res.data.user?.fullName || res.data.user?.email?.split('@')[0] || 'Host';
+      toast.success(`Welcome back, ${userName}! Signed in successfully.`, 'Signed In');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed. Please check credentials.');
+      const errMsg = err.response?.data?.error || 'Login failed. Please check credentials.';
+      setError(errMsg);
+      toast.error(errMsg, 'Login Failed');
     } finally {
       setLoading(false);
     }
