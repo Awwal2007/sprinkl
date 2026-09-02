@@ -142,7 +142,7 @@ export default function CreateGiveawayPage() {
                   }`}
                 >
                   <div className="font-bold text-sm mb-1">Nigerian Naira (NGN)</div>
-                  <div className="text-xs text-dark-muted">Paid via Paystack Transfers to NG Bank Accounts</div>
+                  <div className="text-xs text-dark-muted">Paid via Flutterwave Transfers to NG Bank Accounts</div>
                 </button>
 
                 <button

@@ -76,7 +76,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white">Nigerian Naira (NGN)</h3>
-                  <p className="text-[10px] text-dark-muted">Paystack DVA Rail</p>
+                  <p className="text-[10px] text-dark-muted">Flutterwave Rail</p>
                 </div>
               </div>
               <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">

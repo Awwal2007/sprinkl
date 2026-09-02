@@ -232,7 +232,7 @@ export default function PublicClaimPage() {
               {resolving && (
                 <div className="text-xs text-brand-400 flex items-center gap-1.5 animate-pulse">
                   <div className="w-3 h-3 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
-                  <span>Verifying bank account name with Paystack...</span>
+                  <span>Verifying bank account name with Flutterwave...</span>
                 </div>
               )}
 

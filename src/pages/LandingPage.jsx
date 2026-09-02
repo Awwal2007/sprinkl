@@ -71,7 +71,7 @@ export default function LandingPage() {
     },
     {
       q: 'Which currencies and payment rails are supported?',
-      a: 'We support Nigerian Naira (NGN) via Paystack automated bank transfers to all Nigerian commercial and microfinance banks (OPay, Kuda, Moniepoint, PalmPay, GTBank, Zenith, etc.) and Tether USD (USDT) on TRC-20 (Tron) and BEP-20 (Binance Smart Chain).'
+      a: 'We support Nigerian Naira (NGN) via Flutterwave automated bank transfers to all Nigerian commercial and microfinance banks (OPay, Kuda, Moniepoint, PalmPay, GTBank, Zenith, etc.) and Tether USD (USDT) on TRC-20 (Tron) and BEP-20 (Binance Smart Chain).'
     },
     {
       q: 'What are the minimum amounts?',
@@ -91,7 +91,7 @@ export default function LandingPage() {
     },
     {
       q: 'How do I fund my host wallet to start?',
-      a: 'Every host receives a dedicated virtual bank account (DVA) powered by Paystack for instant NGN bank transfer funding (minimum ₦3,000), as well as a dedicated crypto deposit address for USDT (minimum $2).'
+      a: 'Hosts can instantly fund their NGN balance via Flutterwave (card or bank transfer with minimum ₦3,000), as well as dedicated crypto deposit addresses for USDT (minimum $2).'
     }
   ];
 
@@ -173,7 +173,7 @@ export default function LandingPage() {
               <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-dark-muted font-medium pt-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-brand-500" />
-                  <span>Instant Paystack Bank Transfers</span>
+                  <span>Instant Flutterwave Bank Transfers</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-brand-500" />
@@ -604,7 +604,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-base font-bold text-white mb-2">Automated Settlement</h3>
                 <p className="text-xs text-dark-muted leading-relaxed">
-                  Real-time disbursement queues powered by Paystack Transfer API and blockchain RPC nodes without manual interventions.
+                  Real-time disbursement queues powered by Flutterwave Transfer API and blockchain RPC nodes without manual interventions.
                 </p>
               </div>
 
@@ -797,7 +797,7 @@ export default function LandingPage() {
                   <span className="hover:text-slate-300 transition-colors">Tether USDT (BEP-20)</span>
                 </li>
                 <li>
-                  <span className="hover:text-slate-300 transition-colors">Paystack DVA Rails</span>
+                  <span className="hover:text-slate-300 transition-colors">Flutterwave NGN Rails</span>
                 </li>
               </ul>
             </div>
