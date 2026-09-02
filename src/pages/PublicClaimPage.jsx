@@ -304,7 +304,7 @@ export default function PublicClaimPage() {
               {resolving && (
                 <div className="text-xs text-brand-400 flex items-center gap-2 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20 animate-pulse">
                   <div className="w-3.5 h-3.5 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
-                  <span>Verifying account details with Flutterwave...</span>
+                  <span>Verifying account details...</span>
                 </div>
               )}
 
