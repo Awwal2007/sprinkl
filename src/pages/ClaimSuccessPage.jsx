@@ -38,19 +38,41 @@ export default function ClaimSuccessPage() {
     return `${(amount / 1000000).toLocaleString()} USDT`;
   };
 
+  const isFailed = claim?.status === 'failed';
+  const isPaid = claim?.status === 'paid';
+
   return (
     <div className="min-h-screen bg-dark-bg text-slate-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 animate-in fade-in zoom-in duration-300 relative overflow-hidden">
-        <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/10">
-          <CheckCircle2 className="w-10 h-10 stroke-[2.5]" />
-        </div>
+        {isFailed ? (
+          <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto shadow-xl shadow-rose-500/10">
+            <CheckCircle2 className="w-10 h-10 stroke-[2.5] hidden" />
+            <span className="text-2xl font-bold">✕</span>
+          </div>
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/10">
+            <CheckCircle2 className="w-10 h-10 stroke-[2.5]" />
+          </div>
+        )}
 
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Claim Submitted!</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+            {isFailed ? 'Payout Failed' : isPaid ? 'Claim Paid!' : 'Claim Submitted!'}
+          </h1>
           <p className="text-xs text-dark-muted">
-            {claim?.successMessage || 'Funds transfer initiated directly to your destination.'}
+            {isFailed
+              ? 'The payout transfer could not be completed by Flutterwave.'
+              : claim?.successMessage || 'Funds transfer initiated directly to your destination.'}
           </p>
         </div>
+
+        {/* Failure Detail Notice */}
+        {isFailed && claim?.failureReason && (
+          <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs text-left space-y-1">
+            <p className="font-bold">Error Reason:</p>
+            <p className="font-mono text-[11px] leading-relaxed break-words">{claim.failureReason}</p>
+          </div>
+        )}
 
         {/* Claim Info Box */}
         <div className="bg-dark-bg p-4 rounded-2xl border border-dark-border space-y-3">
