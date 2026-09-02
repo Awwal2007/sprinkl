@@ -89,7 +89,7 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
             }`}
           >
             <Building2 className="w-4 h-4" />
-            <span>NGN (Paystack)</span>
+            <span>NGN (Flutterwave)</span>
           </button>
           <button
             onClick={() => {
