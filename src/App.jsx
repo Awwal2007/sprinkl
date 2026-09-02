@@ -12,9 +12,52 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import { useAuthStore } from './store/useAuthStore';
 
+function isTokenValid(token) {
+  if (!token) return false;
+  try {
+    const payloadBase64 = token.split('.')[1];
+    if (!payloadBase64) return false;
+    const payload = JSON.parse(atob(payloadBase64));
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
+      return false; // Expired
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function ProtectedRoute({ children }) {
   const token = useAuthStore((state) => state.accessToken);
-  return token ? children : <Navigate to="/login" replace />;
+  const refreshToken = useAuthStore((state) => state.refreshToken);
+  const logout = useAuthStore((state) => state.logout);
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If token is expired and no refresh token is present, auto logout immediately
+  if (!isTokenValid(token) && !refreshToken) {
+    logout();
+    return <Navigate to="/login?expired=true" replace />;
+  }
+
+  return children;
+}
+
+function AdminRoute({ children }) {
+  const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.accessToken);
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
 }
 
 export default function App() {
@@ -52,9 +95,9 @@ export default function App() {
       <Route
         path="/admin"
         element={
-          <ProtectedRoute>
+          <AdminRoute>
             <AdminDashboardPage />
-          </ProtectedRoute>
+          </AdminRoute>
         }
       />
 

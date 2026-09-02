@@ -58,9 +58,20 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
+      const redirectToLogin = () => {
+        useAuthStore.getState().logout();
+        if (typeof window !== 'undefined') {
+          const path = window.location.pathname;
+          const isPublic = path === '/login' || path === '/signup' || path === '/' || path.startsWith('/g/');
+          if (!isPublic && !window.location.search.includes('expired=true')) {
+            window.location.href = '/login?expired=true';
+          }
+        }
+      };
+
       const refreshToken = useAuthStore.getState().refreshToken;
       if (!refreshToken) {
-        useAuthStore.getState().logout();
+        redirectToLogin();
         isRefreshing = false;
         return Promise.reject(error);
       }
@@ -76,7 +87,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshErr) {
         processQueue(refreshErr, null);
-        useAuthStore.getState().logout();
+        redirectToLogin();
         return Promise.reject(refreshErr);
       } finally {
         isRefreshing = false;

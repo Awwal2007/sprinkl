@@ -29,6 +29,8 @@ export default function LoginPage() {
     }
   };
 
+  const isExpired = typeof window !== 'undefined' && window.location.search.includes('expired=true');
+
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl">
@@ -41,6 +43,13 @@ export default function LoginPage() {
             <p className="text-xs text-dark-muted">Manage host wallets & giveaway drops</p>
           </div>
         </div>
+
+        {isExpired && !error && (
+          <div className="p-3 mb-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium flex items-center gap-2">
+            <Lock className="w-4 h-4 shrink-0" />
+            <span>Your session has expired. For your security, please sign in again.</span>
+          </div>
+        )}
 
         {error && (
           <div className="p-3 mb-4 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">

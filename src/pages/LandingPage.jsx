@@ -144,7 +144,7 @@ export default function LandingPage() {
               {/* Subheading */}
               <p className="max-w-2xl mx-auto text-base sm:text-lg text-dark-muted mb-8 leading-relaxed">
                 Sprinkl lets creators, brands, and communities fund an in-app vault in{' '}
-                <strong className="text-white font-semibold">NGN (Paystack)</strong> or{' '}
+                <strong className="text-white font-semibold">NGN (Flutterwave)</strong> or{' '}
                 <strong className="text-white font-semibold">USDT (TRC-20 / BEP-20)</strong>, generate a
                 single claim link, and disburse instant payouts directly to recipient accounts with mathematical fraud protection.
               </p>
