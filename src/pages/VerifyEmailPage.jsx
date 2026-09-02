@@ -11,7 +11,7 @@ export default function VerifyEmailPage() {
 
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
 
   const { user, setAuth, accessToken } = useAuthStore();
 
