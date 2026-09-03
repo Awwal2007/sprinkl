@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Gift, ArrowLeft, ArrowRight, ShieldCheck, Wallet, Sparkles, CheckCircle2 } from 'lucide-react';
 import api from '../api/client';
 import Navbar from '../components/Navbar';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function CreateGiveawayPage() {
   const navigate = useNavigate();
@@ -32,7 +33,10 @@ export default function CreateGiveawayPage() {
   const isPromo = walletData?.feeTier ? walletData.feeTier.isPromo : true;
   const remainingPromoCount = walletData?.feeTier ? walletData.feeTier.remainingPromoCount : 3;
 
-  const minPayout = currency === 'NGN' ? 300 : 0.2;
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 'admin';
+
+  const minPayout = currency === 'NGN' ? (isAdmin ? 100 : 300) : (isAdmin ? 0.1 : 0.2);
   const giftPool = (parseFloat(amountPerRecipient) || 0) * (parseInt(totalSlots) || 0);
 
   // Check Whale Tier: >= ₦1,000,000 NGN or >= $1,000 USDT
@@ -54,12 +58,12 @@ export default function CreateGiveawayPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (currency === 'NGN' && parseFloat(amountPerRecipient) < 300) {
-      setError('Minimum payout per winner is ₦300 NGN.');
+    if (currency === 'NGN' && parseFloat(amountPerRecipient) < (isAdmin ? 100 : 300)) {
+      setError(isAdmin ? 'Minimum payout per winner is ₦100 NGN (admin mode).' : 'Minimum payout per winner is ₦300 NGN.');
       return;
     }
-    if (currency === 'USDT' && parseFloat(amountPerRecipient) < 0.2) {
-      setError('Minimum payout per winner is $0.20 USDT to cover blockchain transfer gas.');
+    if (currency === 'USDT' && parseFloat(amountPerRecipient) < (isAdmin ? 0.1 : 0.2)) {
+      setError(isAdmin ? 'Minimum payout per winner is $0.10 USDT (admin mode).' : 'Minimum payout per winner is $0.20 USDT to cover blockchain transfer gas.');
       return;
     }
 
@@ -206,7 +210,7 @@ export default function CreateGiveawayPage() {
                   {/* Quick preset buttons */}
                   {currency === 'NGN' ? (
                     <div className="flex flex-wrap gap-1.5 mt-2">
-                      {[300, 500, 1000, 2000, 5000].map((amt) => (
+                      {(isAdmin ? [100, 200, 300, 500, 1000, 2000] : [300, 500, 1000, 2000, 5000]).map((amt) => (
                         <button
                           key={amt}
                           type="button"
@@ -223,7 +227,7 @@ export default function CreateGiveawayPage() {
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-1.5 mt-2">
-                      {[1, 5, 10, 25, 50].map((amt) => (
+                      {(isAdmin ? [0.1, 0.5, 1, 5, 10, 25] : [1, 5, 10, 25, 50]).map((amt) => (
                         <button
                           key={amt}
                           type="button"
@@ -240,7 +244,10 @@ export default function CreateGiveawayPage() {
                     </div>
                   )}
                   <p className="text-[10px] text-dark-muted mt-1">
-                    Min: {currency === 'NGN' ? '₦300' : '$0.20 USDT'} per winner
+                    Min: {currency === 'NGN'
+                      ? (isAdmin ? '₦100 (admin)' : '₦300')
+                      : (isAdmin ? '$0.10 USDT (admin)' : '$0.20 USDT')
+                    } per winner
                   </p>
                 </div>
 
