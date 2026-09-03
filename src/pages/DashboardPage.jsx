@@ -21,12 +21,15 @@ import FundWalletModal from '../components/FundWalletModal';
 import ShareModal from '../components/ShareModal';
 import StatusBadge from '../components/StatusBadge';
 import { toast, confirmDialog } from '../store/useNotificationStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function DashboardPage() {
   const [isFundModalOpen, setIsFundModalOpen] = useState(false);
   const [shareData, setShareData] = useState(null);
   const [releasingCurrency, setReleasingCurrency] = useState(null);
   const [releaseNotice, setReleaseNotice] = useState(null);
+
+  const { user } = useAuthStore();
 
   // Pagination states
   const [giveawayPage, setGiveawayPage] = useState(1);
@@ -709,6 +712,8 @@ export default function DashboardPage() {
         onClose={() => setIsFundModalOpen(false)}
         dva={walletData?.dva}
         cryptoAddresses={walletData?.cryptoAddresses}
+        kycThreshold={user?.kyc?.payoutReviewThreshold ?? 500000}
+        kycRequestStatus={user?.kyc?.requestStatus ?? 'none'}
         onFunded={() => {
           refetchWallet();
         }}

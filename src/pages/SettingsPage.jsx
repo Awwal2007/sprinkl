@@ -14,8 +14,10 @@ import {
   LogOut,
   Settings,
   KeyRound,
+  ArrowUpRight,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import PaymentThresholdModal from '../components/PaymentThresholdModal';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from '../store/useNotificationStore';
@@ -60,6 +62,7 @@ export default function SettingsPage() {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showThresholdModal, setShowThresholdModal] = useState(false);
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
@@ -263,19 +266,35 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  {/* KYC info */}
-                  <div className="p-3.5 rounded-xl bg-dark-bg border border-dark-border flex items-start gap-3">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-                    <div>
-                      <p className="text-xs font-semibold text-slate-300">
-                        KYC Status:{' '}
-                        <span className="capitalize text-emerald-400">{user?.kyc?.status || 'verified'}</span>
-                      </p>
-                      <p className="text-[11px] text-dark-muted mt-0.5">
-                        Payout review threshold: ₦
-                        {((user?.kyc?.payoutReviewThreshold || 0) / 100).toLocaleString()}
-                      </p>
+                  {/* Payment Threshold info */}
+                  <div className="p-4 rounded-xl bg-dark-bg border border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <ShieldCheck className="w-5 h-5 text-brand-400 mt-0.5 shrink-0" />
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-bold text-white">Payment Threshold</p>
+                          <span className="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-brand-500/10 text-brand-400 border border-brand-500/20">
+                            ₦{((user?.kyc?.payoutReviewThreshold || 50000000) / 100).toLocaleString()} / drop
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-dark-muted mt-1">
+                          Current single-giveaway payout limit. High-volume giveaways above this amount require a threshold upgrade.
+                        </p>
+                        {user?.kyc?.requestStatus === 'pending' && (
+                          <span className="inline-block mt-1.5 text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
+                            Pending request for ₦{((user?.kyc?.requestedThreshold || 0) / 100).toLocaleString()}
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowThresholdModal(true)}
+                      className="self-start sm:self-center px-3.5 py-2 rounded-xl bg-dark-card hover:bg-slate-800 border border-dark-border text-xs font-bold text-slate-200 flex items-center gap-1.5 transition-colors shrink-0"
+                    >
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                      <span>Request Increase</span>
+                    </button>
                   </div>
 
                   <div className="flex items-center justify-end gap-3 pt-1">
@@ -460,9 +479,9 @@ export default function SettingsPage() {
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span>KYC Status</span>
-                      <span className="capitalize font-semibold text-slate-300">
-                        {user?.kyc?.status || 'verified'}
+                      <span>Payment Threshold</span>
+                      <span className="font-mono font-semibold text-slate-300">
+                        ₦{((user?.kyc?.payoutReviewThreshold || 50000000) / 100).toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -482,6 +501,13 @@ export default function SettingsPage() {
           </div>
         </div>
       </main>
+
+      <PaymentThresholdModal
+        isOpen={showThresholdModal}
+        onClose={() => setShowThresholdModal(false)}
+        targetAmount={((user?.kyc?.payoutReviewThreshold || 50000000) / 100) * 2}
+        currency="NGN"
+      />
     </div>
   );
 }

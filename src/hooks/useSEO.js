@@ -66,6 +66,7 @@ export default function useSEO({ title, description, path = '', image, noIndex =
 
     // ── Open Graph ────────────────────────────────────────────────────────
     setMeta('meta[property="og:url"]', canonicalUrl);
+    setMeta('meta[property="og:site_name"]', 'Sprinkl');
     if (title) setMeta('meta[property="og:title"]', title);
     if (description) setMeta('meta[property="og:description"]', description);
     setMeta('meta[property="og:image"]', ogImage);

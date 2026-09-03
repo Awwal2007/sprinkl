@@ -1,14 +1,27 @@
-﻿User-agent: Googlebot
+User-agent: Googlebot
 Allow: /
 Allow: /privacy
 Allow: /privacy-policy
 Allow: /signup
 Allow: /login
 Allow: /g/
+Allow: /favicon*
+Allow: /*.png$
+Allow: /*.ico$
+Allow: /*.svg$
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /api/
 Disallow: /verify-email
+
+User-agent: Googlebot-Image
+Allow: /
+Allow: /favicon*
+Allow: /apple-touch-icon*
+Allow: /og-sprinkl.png
+Allow: /*.png$
+Allow: /*.ico$
+Allow: /*.svg$
 
 User-agent: Bingbot
 Allow: /

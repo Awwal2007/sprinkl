@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { X, Building2, Copy, Check, Coins, Zap, AlertCircle, ExternalLink, RefreshCw, Clock } from 'lucide-react';
+import { X, Building2, Copy, Check, Coins, Zap, AlertCircle, ExternalLink, RefreshCw, Clock, ShieldAlert, ArrowUpRight, CheckCircle2 } from 'lucide-react';
 import api from '../api/client';
 
 const IS_DEV = import.meta.env.DEV; // true locally, false in production build
 
-export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses, onFunded }) {
+export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses, kycThreshold = 500000, kycRequestStatus = 'none', onFunded }) {
   const [currency, setCurrency] = useState('NGN');
   const [ngnAmount, setNgnAmount] = useState('3000');
   const [usdtAmount, setUsdtAmount] = useState('2');
@@ -224,6 +224,7 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
                 ))}
               </div>
 
+              {/* Flutterwave Pay Button */}
               <button
                 onClick={async () => {
                   const amt = parseFloat(ngnAmount);

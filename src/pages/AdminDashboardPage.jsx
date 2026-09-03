@@ -31,6 +31,10 @@ import {
   Layers,
   Shield,
   HelpCircle,
+  ShieldAlert,
+  Edit3,
+  Check,
+  X,
 } from 'lucide-react';
 import api from '../api/client';
 import Navbar from '../components/Navbar';
@@ -44,7 +48,7 @@ export default function AdminDashboardPage() {
   const { user: currentUser } = useAuthStore();
 
   // Active Main Navigation Tab
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'support' | 'giveaways' | 'transactions' | 'claims' | 'users'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'support' | 'giveaways' | 'transactions' | 'claims' | 'users' | 'kyc'
 
   // ──────────────────────────────────────────────
   // 1. OVERVIEW & REPORTS DATA
@@ -327,6 +331,67 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // ──────────────────────────────────────────────
+  // 7. KYC REQUESTS STATE & QUERY
+  // ──────────────────────────────────────────────
+  const [kycStatusFilter, setKycStatusFilter] = useState('pending');
+  const [kycPage, setKycPage] = useState(1);
+  const [editingThresholdUserId, setEditingThresholdUserId] = useState(null);
+  const [editingThresholdValue, setEditingThresholdValue] = useState('');
+
+  const { data: kycRequestsData, refetch: refetchKycRequests } = useQuery({
+    queryKey: ['adminKycRequests', kycPage, kycStatusFilter],
+    queryFn: async () => {
+      const res = await api.get('/admin/kyc-requests', {
+        params: { page: kycPage, limit: 10, status: kycStatusFilter },
+      });
+      return res.data;
+    },
+    enabled: activeTab === 'kyc',
+  });
+
+  const handleKycReview = async (userId, action, newThreshold) => {
+    const label = action === 'approve' ? 'Approve' : 'Reject';
+    const confirmed = await confirmDialog({
+      title: `${label} Payment Threshold Request?`,
+      message:
+        action === 'approve'
+          ? `This will raise the user's single-giveaway payment threshold to ₦${((newThreshold || 0) / 100).toLocaleString()}.`
+          : 'This will reject the user\'s payment threshold upgrade request.',
+      confirmText: `Yes, ${label}`,
+      confirmVariant: action === 'approve' ? 'brand' : 'danger',
+    });
+    if (!confirmed) return;
+
+    try {
+      await api.patch(`/admin/users/${userId}/threshold-review`, { action, newThreshold });
+      toast.success(`Payment threshold request ${action === 'approve' ? 'approved' : 'rejected'}`, 'Threshold Updated');
+      refetchKycRequests();
+      refetchUsers();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to process request', 'Error');
+    }
+  };
+
+  const handleUpdateThresholdDirectly = async (userId) => {
+    const amt = parseFloat(editingThresholdValue);
+    if (!amt || amt <= 0) {
+      toast.error('Enter a valid threshold in Naira.', 'Validation');
+      return;
+    }
+    try {
+      // Convert naira to kobo
+      await api.patch(`/admin/users/${userId}/threshold`, { newThreshold: Math.round(amt * 100) });
+      toast.success('Payment threshold updated', 'Saved');
+      setEditingThresholdUserId(null);
+      setEditingThresholdValue('');
+      refetchUsers();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update threshold', 'Error');
+    }
+  };
+
+
   const formatCurrency = (amount, currency) => {
     if (currency === 'NGN') {
       return `₦${((amount || 0) / 100).toLocaleString(undefined, {
@@ -430,7 +495,13 @@ export default function AdminDashboardPage() {
             },
             { id: 'transactions', label: 'Provider Transactions', icon: Activity },
             { id: 'claims', label: 'Claims & Winners', icon: Award },
-            { id: 'users', label: 'Users & KYC', icon: Users },
+            { id: 'users', label: 'Users Directory', icon: Users },
+            {
+              id: 'kyc',
+              label: 'Payment Thresholds',
+              icon: ShieldAlert,
+              badge: kycRequestsData?.requests?.filter((r) => r.kyc?.requestStatus === 'pending')?.length || 0,
+            },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -1556,6 +1627,7 @@ export default function AdminDashboardPage() {
                         <th className="py-3 px-3">User</th>
                         <th className="py-3 px-3">Role</th>
                         <th className="py-3 px-3">Email Verified</th>
+                        <th className="py-3 px-3">Payment Limit</th>
                         <th className="py-3 px-3">NGN Balance</th>
                         <th className="py-3 px-3">USDT Balance</th>
                         <th className="py-3 px-3 text-right">Actions</th>
@@ -1587,6 +1659,44 @@ export default function AdminDashboardPage() {
                             >
                               {u.emailVerified ? 'VERIFIED' : 'PENDING'}
                             </span>
+                          </td>
+                          <td className="py-3 px-3">
+                            {editingThresholdUserId === u._id ? (
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  placeholder="₦ in Naira"
+                                  value={editingThresholdValue}
+                                  onChange={(e) => setEditingThresholdValue(e.target.value)}
+                                  className="w-24 bg-dark-bg border border-brand-500 rounded px-1.5 py-0.5 text-xs text-white font-mono"
+                                  autoFocus
+                                />
+                                <button
+                                  onClick={() => handleUpdateThresholdDirectly(u._id)}
+                                  className="text-[10px] bg-brand-500 text-slate-950 font-bold px-1.5 py-0.5 rounded"
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  onClick={() => setEditingThresholdUserId(null)}
+                                  className="text-[10px] text-slate-400 hover:text-white px-1"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setEditingThresholdUserId(u._id);
+                                  setEditingThresholdValue(String(((u.kyc?.payoutReviewThreshold || 50000000) / 100)));
+                                }}
+                                title="Click to edit payment threshold"
+                                className="font-mono font-bold text-amber-400 hover:underline flex items-center gap-1"
+                              >
+                                <span>₦{((u.kyc?.payoutReviewThreshold || 50000000) / 100).toLocaleString()}</span>
+                                <span className="text-[10px] text-dark-muted">✎</span>
+                              </button>
+                            )}
                           </td>
                           <td className="py-3 px-3 font-mono font-bold text-slate-200">
                             {formatCurrency(u.balances?.NGN?.available || 0, 'NGN')}
@@ -1653,6 +1763,181 @@ export default function AdminDashboardPage() {
               </div>
             ) : (
               <p className="text-xs text-dark-muted py-8 text-center">No users matching search.</p>
+            )}
+          </section>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════
+            TAB 7: PAYMENT THRESHOLD REQUESTS (Paginated)
+        ═══════════════════════════════════════════════════════════════ */}
+        {activeTab === 'kyc' && (
+          <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold text-white">Payment Threshold Upgrade Requests</h2>
+                <p className="text-xs text-dark-muted">
+                  Review and approve host requests to raise single-giveaway payout limits above ₦500,000
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <select
+                  value={kycStatusFilter}
+                  onChange={(e) => {
+                    setKycStatusFilter(e.target.value);
+                    setKycPage(1);
+                  }}
+                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                >
+                  <option value="pending">Pending Review</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="all">All Requests</option>
+                </select>
+                <button
+                  onClick={() => refetchKycRequests()}
+                  className="p-1.5 rounded-lg border border-dark-border hover:bg-slate-800 text-slate-300 hover:text-white"
+                  title="Refresh requests"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {kycRequestsData?.requests?.length > 0 ? (
+              <div className="space-y-4">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                        <th className="py-3 px-3">User</th>
+                        <th className="py-3 px-3">Current Limit</th>
+                        <th className="py-3 px-3">Requested Limit</th>
+                        <th className="py-3 px-3">Reason</th>
+                        <th className="py-3 px-3">Status</th>
+                        <th className="py-3 px-3">Date</th>
+                        <th className="py-3 px-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-dark-border text-xs">
+                      {kycRequestsData.requests.map((r) => {
+                        const status = r.kyc?.requestStatus || 'none';
+                        const currentNaira = ((r.kyc?.payoutReviewThreshold || 50000000) / 100).toLocaleString();
+                        const requestedNaira = ((r.kyc?.requestedThreshold || 0) / 100).toLocaleString();
+
+                        return (
+                          <tr key={r._id} className="hover:bg-slate-800/30">
+                            <td className="py-3 px-3">
+                              <p className="font-bold text-white">{r.fullName}</p>
+                              <p className="text-[10px] text-dark-muted">{r.email}</p>
+                            </td>
+                            <td className="py-3 px-3 font-mono text-slate-300">
+                              ₦{currentNaira}
+                            </td>
+                            <td className="py-3 px-3 font-mono font-bold text-amber-400">
+                              ₦{requestedNaira}
+                            </td>
+                            <td className="py-3 px-3 max-w-xs">
+                              <p className="text-xs text-slate-300 truncate" title={r.kyc?.requestReason}>
+                                {r.kyc?.requestReason || '—'}
+                              </p>
+                            </td>
+                            <td className="py-3 px-3">
+                              <span
+                                className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
+                                  status === 'approved'
+                                    ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                                    : status === 'rejected'
+                                    ? 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+                                    : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                                }`}
+                              >
+                                {status}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 text-[11px] text-dark-muted whitespace-nowrap">
+                              {r.kyc?.requestedAt
+                                ? new Date(r.kyc.requestedAt).toLocaleDateString()
+                                : '—'}
+                            </td>
+                            <td className="py-3 px-3 text-right">
+                              {status === 'pending' ? (
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    onClick={() => handleKycReview(r._id, 'approve', r.kyc.requestedThreshold)}
+                                    className="px-2.5 py-1 rounded-lg bg-brand-500 hover:bg-brand-600 text-slate-950 text-[11px] font-bold transition-all"
+                                  >
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() => handleKycReview(r._id, 'reject')}
+                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] font-bold transition-all"
+                                  >
+                                    Reject
+                                  </button>
+                                </div>
+                              ) : (
+                                <span className="text-[10px] text-dark-muted uppercase font-bold">
+                                  {r.kyc?.reviewedAt
+                                    ? `Reviewed ${new Date(r.kyc.reviewedAt).toLocaleDateString()}`
+                                    : 'Reviewed'}
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                {kycRequestsData.pagination?.totalPages > 1 && (
+                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-dark-muted border-t border-dark-border/70">
+                    <p>
+                      Showing {(kycPage - 1) * kycRequestsData.pagination.limit + 1} to{' '}
+                      {Math.min(kycPage * kycRequestsData.pagination.limit, kycRequestsData.pagination.total)} of{' '}
+                      {kycRequestsData.pagination.total} requests
+                    </p>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setKycPage((p) => Math.max(1, p - 1))}
+                        disabled={kycPage === 1}
+                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+
+                      {Array.from({ length: kycRequestsData.pagination.totalPages }, (_, i) => i + 1).map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => setKycPage(n)}
+                          className={`w-7 h-7 rounded-lg text-xs font-bold ${
+                            kycPage === n
+                              ? 'bg-brand-500 text-slate-950'
+                              : 'bg-dark-bg border border-dark-border text-slate-300 hover:bg-slate-800'
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+
+                      <button
+                        onClick={() => setKycPage((p) => Math.min(kycRequestsData.pagination.totalPages, p + 1))}
+                        disabled={kycPage === kycRequestsData.pagination.totalPages}
+                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-dark-muted py-8 text-center">
+                No payment threshold requests in this category.
+              </p>
             )}
           </section>
         )}

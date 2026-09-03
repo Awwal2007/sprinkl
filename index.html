@@ -2,13 +2,17 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <!-- Favicons & App Icons -->
+    <!-- Favicons & App Icons (Google Search requires >= 48x48 square multiple) -->
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
-    <meta name="msapplication-TileImage" content="https://www.sprinkl.biz/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="msapplication-TileImage" content="https://www.sprinkl.biz/favicon-192x192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b0f17" />
 
@@ -65,7 +69,7 @@
     <meta property="og:image:height" content="512" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:alt" content="Sprinkl — Nigeria's #1 Automated Giveaway Platform for Cash & Crypto Payouts" />
-    <meta property="og:site_name" content="Sprinkl.biz" />
+    <meta property="og:site_name" content="Sprinkl" />
     <meta property="og:locale" content="en_NG" />
     <meta property="og:locale:alternate" content="en_US" />
 
@@ -101,16 +105,16 @@
             "logo": {
               "@type": "ImageObject",
               "@id": "https://www.sprinkl.biz/#logo",
-              "url": "https://www.sprinkl.biz/apple-touch-icon.png",
-              "width": 180,
-              "height": 180,
+              "url": "https://www.sprinkl.biz/favicon-192x192.png",
+              "width": 192,
+              "height": 192,
               "caption": "Sprinkl — Automated Giveaway Platform Logo"
             },
             "image": {
               "@type": "ImageObject",
-              "url": "https://www.sprinkl.biz/apple-touch-icon.png",
-              "width": 180,
-              "height": 180
+              "url": "https://www.sprinkl.biz/favicon-192x192.png",
+              "width": 192,
+              "height": 192
             },
             "sameAs": [
               "https://twitter.com/sprinklbiz",
@@ -125,7 +129,8 @@
             "@type": "WebSite",
             "@id": "https://www.sprinkl.biz/#website",
             "url": "https://www.sprinkl.biz",
-            "name": "Sprinkl — Automated Giveaway Platform Nigeria",
+            "name": "Sprinkl",
+            "alternateName": ["Sprinkl.biz", "Sprinkl Biz", "Sprinkl Giveaway Platform", "Sprinkl Nigeria"],
             "description": "Nigeria's #1 automated cash and crypto giveaway distribution platform",
             "publisher": {
               "@id": "https://www.sprinkl.biz/#organization"

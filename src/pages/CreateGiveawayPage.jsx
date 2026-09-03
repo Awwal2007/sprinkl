@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Gift, ArrowLeft, ArrowRight, ShieldCheck, Wallet, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Gift, ArrowLeft, ArrowRight, ShieldCheck, Wallet, Sparkles, CheckCircle2, ShieldAlert, ArrowUpRight } from 'lucide-react';
 import api from '../api/client';
 import Navbar from '../components/Navbar';
+import PaymentThresholdModal from '../components/PaymentThresholdModal';
 import { useAuthStore } from '../store/useAuthStore';
 
 export default function CreateGiveawayPage() {
@@ -17,6 +18,7 @@ export default function CreateGiveawayPage() {
   const [successMsg, setSuccessMsg] = useState('Thank you for claiming! Hope this brightens your day.');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showThresholdModal, setShowThresholdModal] = useState(false);
 
   const { data: walletData } = useQuery({
     queryKey: ['wallet'],
@@ -38,6 +40,13 @@ export default function CreateGiveawayPage() {
 
   const minPayout = currency === 'NGN' ? (isAdmin ? 100 : 300) : (isAdmin ? 0.1 : 0.2);
   const giftPool = (parseFloat(amountPerRecipient) || 0) * (parseInt(totalSlots) || 0);
+
+  // Payment Threshold check (default ₦500,000 / $500 USDT)
+  const userThresholdKobo = user?.kyc?.payoutReviewThreshold ?? 50000000;
+  const userThresholdNaira = Math.round(userThresholdKobo / 100);
+  const exceedsThreshold = !isAdmin && (
+    currency === 'NGN' ? (giftPool > userThresholdNaira) : (giftPool > 500)
+  );
 
   // Check Whale Tier: >= ₦1,000,000 NGN or >= $1,000 USDT
   const isWhale = (currency === 'NGN' && giftPool >= 1000000) || (currency === 'USDT' && giftPool >= 1000);
@@ -74,6 +83,12 @@ export default function CreateGiveawayPage() {
       return;
     }
 
+    if (exceedsThreshold) {
+      setShowThresholdModal(true);
+      setError(`Your giveaway payout of ${currency === 'NGN' ? `₦${giftPool.toLocaleString()}` : `$${giftPool.toLocaleString()} USDT`} exceeds your Payment Threshold limit of ${currency === 'NGN' ? `₦${userThresholdNaira.toLocaleString()}` : '$500 USDT'}. Please request a Payment Threshold increase.`);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -92,6 +107,9 @@ export default function CreateGiveawayPage() {
 
       navigate(`/dashboard/giveaway/${res.data.giveaway.id}`);
     } catch (err) {
+      if (err.response?.data?.code === 'PAYMENT_THRESHOLD_EXCEEDED') {
+        setShowThresholdModal(true);
+      }
       setError(err.response?.data?.error || 'Failed to create giveaway');
     } finally {
       setLoading(false);
@@ -360,6 +378,32 @@ export default function CreateGiveawayPage() {
               </div>
             </div>
 
+            {/* Payment Threshold Alert Banner */}
+            {exceedsThreshold && (
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+                <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="text-xs space-y-1.5 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-amber-400">Payment Threshold Exceeded</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                      Limit: {currency === 'NGN' ? `₦${userThresholdNaira.toLocaleString()}` : '$500 USDT'}
+                    </span>
+                  </div>
+                  <p className="text-amber-200/90 leading-relaxed text-[11px]">
+                    This giveaway payout ({currency === 'NGN' ? `₦${giftPool.toLocaleString()}` : `$${giftPool.toLocaleString()} USDT`}) exceeds your current Payment Threshold limit. You can submit a quick limit increase request with our compliance team to proceed.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowThresholdModal(true)}
+                    className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition-colors shadow-md"
+                  >
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    Request Payment Threshold Increase
+                  </button>
+                </div>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading || isInsufficient}
@@ -371,6 +415,13 @@ export default function CreateGiveawayPage() {
           </form>
         </div>
       </main>
+
+      <PaymentThresholdModal
+        isOpen={showThresholdModal}
+        onClose={() => setShowThresholdModal(false)}
+        targetAmount={giftPool}
+        currency={currency}
+      />
     </div>
   );
 }
