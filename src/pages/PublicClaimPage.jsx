@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Gift, ShieldCheck, CheckCircle2, AlertCircle, Building2, Coins, ArrowRight, Sparkles, Search } from 'lucide-react';
 import api from '../api/client';
+import useSEO from '../hooks/useSEO';
 
 export default function PublicClaimPage() {
   const { slug } = useParams();
@@ -42,6 +43,18 @@ export default function PublicClaimPage() {
       const res = await api.get(`/g/${slug}`);
       return res.data.giveaway;
     },
+  });
+
+  // Dynamic SEO — updates once giveaway data is available so each claim
+  // page has a unique, keyword-rich title that can be shared on social media.
+  useSEO({
+    title: giveawayData
+      ? `Claim "${giveawayData.title}" Giveaway — Win Cash or Crypto | Sprinkl Nigeria`
+      : 'Claim Your Giveaway Prize — Instant Payout | Sprinkl Nigeria',
+    description: giveawayData
+      ? `You've been invited to claim a prize from "${giveawayData.title}" on Sprinkl! ${giveawayData.currency === 'NGN' ? 'Receive Nigerian Naira directly to your bank account.' : 'Receive USDT crypto to your wallet.'} 100% automated. No fraud. Powered by Sprinkl Nigeria.`
+      : 'Claim your giveaway prize instantly on Sprinkl. Receive Nigerian Naira to your bank account or USDT crypto to your wallet. 100% automated and fraud-proof.',
+    path: `/g/${slug}`,
   });
 
   // Fetch Banks for NGN

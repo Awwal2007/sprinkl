@@ -4,8 +4,14 @@ import { Gift, Lock, Mail, ArrowRight } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from '../store/useNotificationStore';
+import useSEO from '../hooks/useSEO';
 
 export default function LoginPage() {
+  useSEO({
+    title: 'Login to Sprinkl — Your Nigerian Giveaway Dashboard | NGN & USDT Payouts',
+    description: 'Sign in to your Sprinkl account to manage your giveaways, track payouts, and view your wallet balance. Nigeria\'s #1 automated giveaway platform for cash and crypto.',
+    path: '/login',
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);

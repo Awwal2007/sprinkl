@@ -3,8 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Gift, Lock, Mail, User, Phone, ArrowRight, CheckCircle2 } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
+import useSEO from '../hooks/useSEO';
 
 export default function SignupPage() {
+  useSEO({
+    title: 'Sign Up Free — Start Your First Giveaway on Sprinkl Nigeria | NGN & USDT',
+    description: 'Create a free Sprinkl account and launch your first giveaway in 60 seconds. Instantly pay winners to Nigerian bank accounts (NGN) or crypto wallets (USDT). No fraud. No double-claims. Nigeria\'s #1 giveaway platform.',
+    path: '/signup',
+  });
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');

@@ -23,8 +23,16 @@ import {
   ExternalLink
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import useSEO from '../hooks/useSEO';
 
 export default function LandingPage() {
+  useSEO({
+    title: 'Sprinkl — Nigeria\'s #1 Automated Cash & Crypto Giveaway Platform | NGN & USDT Instant Payouts',
+    description:
+      'Host fraud-proof giveaways in Nigeria. Sprinkl automatically pays winners directly to their bank accounts (NGN) or crypto wallets (USDT TRC20/BEP20). Zero double-claims. Launch in 60 seconds. Trusted by Nigerian creators, brands & communities.',
+    path: '/',
+  });
+
   // Calculator state
   const [calcCurrency, setCalcCurrency] = useState('NGN');
   const [recipientsCount, setRecipientsCount] = useState(50);

@@ -1,6 +1,28 @@
 User-agent: *
 Allow: /
+Allow: /signup
+Allow: /login
+Allow: /g/
 Disallow: /admin
 Disallow: /dashboard
+Disallow: /api/
+Disallow: /verify-email
 
-Sitemap: https://sprinkl.biz/sitemap.xml
+# Block AI training bots
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+# Sitemap location — always use canonical www URL
+Sitemap: https://www.sprinkl.biz/sitemap.xml
+
+# Crawl delay (be polite to servers)
+Crawl-delay: 10
