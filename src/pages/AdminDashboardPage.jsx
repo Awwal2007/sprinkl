@@ -345,29 +345,30 @@ export default function AdminDashboardPage() {
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-6 sm:space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 w-full space-y-4 sm:space-y-6">
         {/* Top Header & Admin Welcome */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-dark-border/70">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-500 to-emerald-400 text-slate-950 flex items-center justify-center font-black shadow-lg shadow-brand-500/20">
-              <ShieldCheck className="w-7 h-7 stroke-[2.5]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  Sprinkl Command Center
-                </h1>
-                <span className="text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                  Platform Admin
-                </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-dark-border/70">
+          <div className="flex items-start justify-between gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-brand-500 to-emerald-400 text-slate-950 flex items-center justify-center font-black shadow-lg shadow-brand-500/20 shrink-0">
+                <ShieldCheck className="w-5 h-5 sm:w-7 sm:h-7 stroke-[2.5]" />
               </div>
-              <p className="text-xs text-dark-muted mt-0.5">
-                Full platform tracking &bull; Live human chat desk &bull; AML &amp; Ledger audits
-              </p>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <h1 className="text-base sm:text-2xl font-black text-white tracking-tight truncate sm:whitespace-normal">
+                    Sprinkl Command Center
+                  </h1>
+                  <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
+                    Platform Admin
+                  </span>
+                </div>
+                <p className="text-[11px] sm:text-xs text-dark-muted mt-0.5 leading-relaxed hidden sm:block">
+                  Full platform tracking &bull; Live human chat desk &bull; AML &amp; Ledger audits
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2.5">
+            {/* Mobile Refresh Icon Button */}
             <button
               onClick={() => {
                 refetchReports();
@@ -378,10 +379,35 @@ export default function AdminDashboardPage() {
                 refetchUsers();
                 toast.success('Refreshed all platform feeds', 'Data Updated');
               }}
-              className="px-3 py-2 bg-dark-card hover:bg-slate-800 border border-dark-border rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center gap-1.5"
+              className="sm:hidden p-2.5 bg-dark-card hover:bg-slate-800 border border-dark-border rounded-xl text-slate-300 hover:text-white transition-all shadow-sm shrink-0 active:scale-95"
+              title="Refresh feeds"
+              aria-label="Refresh data"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Mobile subtext */}
+          <p className="text-[11px] text-dark-muted leading-relaxed sm:hidden -mt-1">
+            Full platform tracking &bull; Live human chat desk &bull; AML &amp; Ledger audits
+          </p>
+
+          {/* Desktop Refresh Button */}
+          <div className="hidden sm:flex items-center gap-2.5 shrink-0">
+            <button
+              onClick={() => {
+                refetchReports();
+                refetchSupportSessions();
+                refetchGiveaways();
+                refetchTx();
+                refetchClaims();
+                refetchUsers();
+                toast.success('Refreshed all platform feeds', 'Data Updated');
+              }}
+              className="px-3.5 py-2 bg-dark-card hover:bg-slate-800 border border-dark-border rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>Refresh</span>
+              <span>Refresh Feeds</span>
             </button>
           </div>
         </div>

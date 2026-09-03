@@ -14,15 +14,31 @@ export default function Navbar() {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false);
+    setAvatarOpen(false);
+  }, [location.pathname]);
+
+  // Close dropdown when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (avatarRef.current && !avatarRef.current.contains(e.target)) {
         setAvatarOpen(false);
       }
     };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setAvatarOpen(false);
+        setMobileOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const handleNavClick = (e, targetId) => {
@@ -206,86 +222,127 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Slide-down Menu */}
+      {/* Mobile Backdrop Overlay */}
       {mobileOpen && (
-        <div className="sm:hidden bg-dark-bg/95 backdrop-blur-md border-t border-dark-border px-4 py-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
+        <div
+          className="sm:hidden fixed inset-0 top-16 bg-slate-950/70 backdrop-blur-xs z-40 animate-in fade-in duration-200"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile Slide-down Sheet Menu */}
+      {mobileOpen && (
+        <div className="sm:hidden fixed inset-x-0 top-16 bg-dark-bg/98 backdrop-blur-2xl border-b border-dark-border shadow-2xl shadow-black/80 z-50 px-4 py-4 space-y-3 max-h-[calc(100vh-4rem)] overflow-y-auto animate-in slide-in-from-top-2 duration-200">
           {/* Quick Nav Links */}
-          <div className="grid grid-cols-3 gap-2 pb-3 mb-3 border-b border-dark-border">
+          <div className="grid grid-cols-3 gap-2 pb-3 border-b border-dark-border/80">
             <a
               href="/#about"
               onClick={(e) => handleNavClick(e, 'about')}
-              className="py-2 px-2 text-center rounded-xl bg-dark-card border border-dark-border text-xs font-semibold text-slate-300 hover:text-brand-400 flex items-center justify-center gap-1"
+              className="py-2.5 px-2 text-center rounded-xl bg-dark-card/90 border border-dark-border text-xs font-semibold text-slate-300 hover:text-brand-400 hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5 active:scale-95"
             >
-              <Info className="w-3.5 h-3.5 text-brand-400" />
+              <Info className="w-3.5 h-3.5 text-brand-400 shrink-0" />
               <span>About</span>
             </a>
             <a
               href="/#calculator"
               onClick={(e) => handleNavClick(e, 'calculator')}
-              className="py-2 px-2 text-center rounded-xl bg-dark-card border border-dark-border text-xs font-semibold text-slate-300 hover:text-brand-400 flex items-center justify-center gap-1"
+              className="py-2.5 px-2 text-center rounded-xl bg-dark-card/90 border border-dark-border text-xs font-semibold text-slate-300 hover:text-brand-400 hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5 active:scale-95"
             >
-              <Sliders className="w-3.5 h-3.5 text-teal-400" />
+              <Sliders className="w-3.5 h-3.5 text-teal-400 shrink-0" />
               <span>Calculator</span>
             </a>
             <button
               onClick={handleContactClick}
-              className="py-2 px-2 text-center rounded-xl bg-dark-card border border-dark-border text-xs font-semibold text-emerald-400 flex items-center justify-center gap-1"
+              className="py-2.5 px-2 text-center rounded-xl bg-dark-card/90 border border-dark-border text-xs font-semibold text-emerald-400 hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5 active:scale-95"
             >
-              <Headphones className="w-3.5 h-3.5 text-emerald-400" />
+              <Headphones className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>Contact</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
             </button>
           </div>
 
           {user ? (
-            <>
-              <div className="px-2 py-2 border-b border-dark-border mb-3">
-                <p className="text-sm font-bold text-white">{user.fullName}</p>
-                <p className="text-xs text-dark-muted">{user.email}</p>
+            <div className="space-y-2 pt-1">
+              {/* Profile Card */}
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-dark-card/90 border border-dark-border/80">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-sm shadow-md shrink-0">
+                  {user.fullName?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-bold text-white truncate">{user.fullName}</p>
+                    {user.role === 'admin' ? (
+                      <span className="text-[9px] uppercase font-black px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                        Admin
+                      </span>
+                    ) : (
+                      <span className="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-dark-border shrink-0">
+                        Host
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-dark-muted truncate">{user.email}</p>
+                </div>
               </div>
-              <Link
-                to="/dashboard"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 w-full px-3 py-3 rounded-xl bg-dark-card border border-dark-border text-sm font-medium text-slate-200"
-              >
-                <Wallet className="w-4 h-4 text-brand-500" />
-                Dashboard
-              </Link>
-              {user.role === 'admin' && (
+
+              {/* Action Links */}
+              <div className="space-y-1.5 pt-1">
                 <Link
-                  to="/admin"
+                  to="/dashboard"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 w-full px-3 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm font-semibold text-amber-400"
+                  className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl bg-dark-card hover:bg-slate-800 border border-dark-border text-sm font-semibold text-slate-200 transition-colors"
                 >
-                  <ShieldCheck className="w-4 h-4" />
-                  Admin Dashboard
+                  <Wallet className="w-4 h-4 text-brand-500 shrink-0" />
+                  <span>Dashboard</span>
                 </Link>
-              )}
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-rose-400 text-sm font-semibold bg-rose-500/5 border border-rose-500/20"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </button>
-            </>
+
+                {user.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/25 text-sm font-bold text-amber-400 transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
+
+                <Link
+                  to="/settings"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl bg-dark-card hover:bg-slate-800 border border-dark-border text-sm font-semibold text-slate-200 transition-colors"
+                >
+                  <Settings className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Settings & Profile</span>
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl text-rose-400 text-sm font-bold bg-rose-500/10 hover:bg-rose-500/15 border border-rose-500/20 transition-colors"
+                >
+                  <LogOut className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
           ) : (
-            <>
+            <div className="space-y-2 pt-1">
               <Link
                 to="/login"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center w-full py-3 rounded-xl border border-dark-border text-sm font-semibold text-slate-200 bg-dark-card"
+                className="flex items-center justify-center w-full py-2.5 rounded-xl border border-dark-border text-sm font-bold text-slate-200 bg-dark-card hover:bg-slate-800 transition-colors"
               >
                 Sign In
               </Link>
               <Link
                 to="/signup"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center w-full py-3 rounded-xl text-slate-950 bg-brand-500 font-extrabold text-sm shadow-lg shadow-brand-500/20"
+                className="flex items-center justify-center w-full py-2.5 rounded-xl text-slate-950 bg-brand-500 hover:bg-brand-400 font-black text-sm shadow-lg shadow-brand-500/20 transition-colors"
               >
                 Get Started — It's Free
               </Link>
-            </>
+            </div>
           )}
         </div>
       )}
