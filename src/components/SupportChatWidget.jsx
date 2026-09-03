@@ -286,7 +286,7 @@ export default function SupportChatWidget() {
             <Bot className="w-5 h-5 text-slate-950 stroke-[2.5]" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white rounded-full border-2 border-slate-950 animate-pulse" />
           </div>
-          <span>Support & Help</span>
+          <span>Support</span>
         </button>
       )}
 

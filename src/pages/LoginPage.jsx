@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Gift, Lock, Mail, ArrowRight } from 'lucide-react';
+import { Gift, Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from '../store/useNotificationStore';
@@ -9,11 +9,13 @@ import useSEO from '../hooks/useSEO';
 export default function LoginPage() {
   useSEO({
     title: 'Login to Sprinkl — Your Nigerian Giveaway Dashboard | NGN & USDT Payouts',
-    description: 'Sign in to your Sprinkl account to manage your giveaways, track payouts, and view your wallet balance. Nigeria\'s #1 automated giveaway platform for cash and crypto.',
+    description: "Sign in to your Sprinkl account to manage your giveaways, track payouts, and view your wallet balance. Nigeria's #1 automated giveaway platform for cash and crypto.",
     path: '/login',
   });
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -50,77 +52,120 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-slate-950 font-black">
-            <Gift className="w-6 h-6 stroke-[2.5]" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-white">Sign In to Sprinkl</h2>
-            <p className="text-xs text-dark-muted">Manage host wallets & giveaway drops</p>
-          </div>
+      {/* Background glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-brand-500/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative max-w-md w-full">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex items-center gap-2 group">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 shadow-xl shadow-brand-500/30 group-hover:scale-105 transition-transform">
+              <Gift className="w-6 h-6 stroke-[2.5]" />
+            </div>
+            <span className="text-2xl font-extrabold text-white tracking-tight">Sprinkl</span>
+          </Link>
+          <p className="mt-2 text-sm text-dark-muted">Sign in to your host account</p>
         </div>
 
-        {isExpired && !error && (
-          <div className="p-3 mb-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium flex items-center gap-2">
-            <Lock className="w-4 h-4 shrink-0" />
-            <span>Your session has expired. For your security, please sign in again.</span>
-          </div>
-        )}
-
-        {error && (
-          <div className="p-3 mb-4 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-dark-muted absolute left-3 top-3" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-dark-bg border border-dark-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
-                placeholder="host@example.com"
-              />
+        <div className="bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl">
+          {isExpired && !error && (
+            <div className="flex items-center gap-2 p-3 mb-5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium">
+              <Lock className="w-4 h-4 shrink-0" />
+              <span>Your session expired. Please sign in again for security.</span>
             </div>
-          </div>
+          )}
 
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Password</label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-dark-muted absolute left-3 top-3" />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-dark-bg border border-dark-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
-                placeholder="••••••••"
-              />
+          {error && (
+            <div className="p-3 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">
+              {error}
             </div>
-          </div>
+          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-          >
-            <span>{loading ? 'Signing in...' : 'Sign In'}</span>
-            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="login-email">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  id="login-email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  placeholder="host@example.com"
+                />
+              </div>
+            </div>
 
-        <p className="mt-6 text-center text-xs text-dark-muted">
-          Don't have a host account?{' '}
-          <Link to="/signup" className="text-brand-400 font-semibold hover:underline">
-            Create one in 60s
-          </Link>
-        </p>
+            {/* Password */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-slate-300" htmlFor="login-password">
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-brand-400 hover:text-brand-300 font-medium transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-muted hover:text-slate-300 transition-colors p-0.5"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-2 py-3 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" />
+                  <span>Signing in…</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign In</span>
+                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-xs text-dark-muted">
+            Don't have a host account?{' '}
+            <Link to="/signup" className="text-brand-400 font-semibold hover:text-brand-300 transition-colors">
+              Create one in 60s
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
