@@ -26,6 +26,16 @@ export default function PublicClaimPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Check if this browser has already claimed this specific giveaway
+  const [alreadyClaimed, setAlreadyClaimed] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`sprinkl_claimed_${slug}`);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const quickBanks = [
     { name: 'OPay', code: '100004' },
     { name: 'PalmPay', code: '100033' },
@@ -44,6 +54,18 @@ export default function PublicClaimPage() {
       return res.data.giveaway;
     },
   });
+
+  // Check by giveaway ID as well once giveawayData is loaded
+  useEffect(() => {
+    if (giveawayData?.id && !alreadyClaimed) {
+      try {
+        const saved = localStorage.getItem(`sprinkl_claimed_${giveawayData.id}`);
+        if (saved) {
+          setAlreadyClaimed(JSON.parse(saved));
+        }
+      } catch {}
+    }
+  }, [giveawayData?.id, alreadyClaimed]);
 
   // Dynamic SEO — updates once giveaway data is available so each claim
   // page has a unique, keyword-rich title that can be shared on social media.
@@ -108,6 +130,12 @@ export default function PublicClaimPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    if (alreadyClaimed) {
+      setError('You have already claimed this giveaway on this browser.');
+      return;
+    }
+
     setLoading(true);
 
     if (giveawayData.currency === 'NGN' && !resolvedName) {
@@ -129,6 +157,24 @@ export default function PublicClaimPage() {
 
       const res = await api.post(`/g/${slug}/claim`, payload);
       const claimId = res.data.claim.id;
+
+      // Save claim record to localStorage so this browser cannot claim again
+      const claimRecord = {
+        claimId,
+        slug,
+        giveawayId: giveawayData.id,
+        claimedAt: new Date().toISOString(),
+        destination: resolvedName || accountNumber || walletAddress,
+        amount: giveawayData.amountPerRecipient,
+        currency: giveawayData.currency,
+      };
+      try {
+        localStorage.setItem(`sprinkl_claimed_${slug}`, JSON.stringify(claimRecord));
+        if (giveawayData.id) {
+          localStorage.setItem(`sprinkl_claimed_${giveawayData.id}`, JSON.stringify(claimRecord));
+        }
+      } catch {}
+
       navigate(`/g/${slug}/claim/${claimId}/success`, { state: { claim: res.data.claim } });
     } catch (err) {
       setError(err.response?.data?.error || 'Claim submission failed');
@@ -213,83 +259,173 @@ export default function PublicClaimPage() {
           </div>
         )}
 
-        {/* Claim Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* NGN Bank Destination */}
-          {giveawayData.currency === 'NGN' && (
-            <>
-              {/* Typeable / Searchable Bank Selector */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Select or Type Bank Name
-                </label>
+        {/* State A: Already Claimed from this browser */}
+        {alreadyClaimed ? (
+          <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-2xl p-6 text-center space-y-4 animate-in fade-in">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
+              <CheckCircle2 className="w-7 h-7" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                ALREADY CLAIMED
+              </span>
+              <h3 className="text-base sm:text-lg font-extrabold text-white pt-2">
+                You've Already Claimed!
+              </h3>
+              <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
+                This browser has already claimed from this giveaway. Each participant is limited to one claim per drop.
+              </p>
+            </div>
+            {alreadyClaimed.claimId && (
+              <Link
+                to={`/g/${slug}/claim/${alreadyClaimed.claimId}/success`}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-500 hover:bg-brand-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all hover:scale-105 active:scale-95"
+              >
+                <span>View Your Claim Receipt</span>
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              </Link>
+            )}
+          </div>
+        ) : giveawayData.isFullyClaimed || giveawayData.status === 'completed' || giveawayData.slotsClaimed >= giveawayData.totalSlots ? (
+          /* State B: Fully Claim (Claimant limit reached / completed) */
+          <div className="bg-amber-500/10 border border-amber-500/25 rounded-2xl p-6 text-center space-y-4 animate-in fade-in">
+            <div className="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto shadow-lg shadow-amber-500/10">
+              <Gift className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider">
+                FULLY CLAIM
+              </span>
+              <h3 className="text-base sm:text-lg font-extrabold text-white pt-2">
+                Fully Claimed
+              </h3>
+              <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
+                All {giveawayData.totalSlots} available slot{giveawayData.totalSlots === 1 ? '' : 's'} for this giveaway have already been claimed. Follow the host for future drops!
+              </p>
+            </div>
+            <div className="pt-1">
+              <Link
+                to="/signup"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-500 hover:bg-brand-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all hover:scale-105 active:scale-95"
+              >
+                <span>Host Your Own Giveaway</span>
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              </Link>
+            </div>
+          </div>
+        ) : giveawayData.isCancelled ? (
+          /* State C: Cancelled */
+          <div className="bg-rose-500/10 border border-rose-500/25 rounded-2xl p-6 text-center space-y-4 animate-in fade-in">
+            <div className="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                CANCELLED
+              </span>
+              <h3 className="text-base sm:text-lg font-extrabold text-white pt-2">
+                Giveaway Cancelled
+              </h3>
+              <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
+                This giveaway campaign has been cancelled by the host.
+              </p>
+            </div>
+          </div>
+        ) : giveawayData.isExpired ? (
+          /* State D: Expired */
+          <div className="bg-slate-800/80 border border-dark-border rounded-2xl p-6 text-center space-y-4 animate-in fade-in">
+            <div className="w-12 h-12 rounded-full bg-slate-700/50 text-slate-300 flex items-center justify-center mx-auto">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
+                EXPIRED
+              </span>
+              <h3 className="text-base sm:text-lg font-extrabold text-white pt-2">
+                Giveaway Expired
+              </h3>
+              <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
+                The time limit for this giveaway has elapsed.
+              </p>
+            </div>
+          </div>
+        ) : (
+          /* State E: Active Claim Form */
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* NGN Bank Destination */}
+            {giveawayData.currency === 'NGN' && (
+              <>
+                {/* Typeable / Searchable Bank Selector */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Select or Type Bank Name
+                  </label>
 
-                {bankName ? (
-                  <div className="flex items-center justify-between p-3.5 rounded-xl bg-dark-bg border border-brand-500/50 text-white shadow-sm">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
-                        <Building2 className="w-4 h-4" />
+                  {bankName ? (
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-dark-bg border border-brand-500/50 text-white shadow-sm">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
+                          <Building2 className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-white">{bankName}</p>
+                          <p className="text-[10px] text-dark-muted font-mono">Code: {bankCode}</p>
+                        </div>
                       </div>
-                      <span className="text-sm font-bold text-slate-100">{bankName}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setBankCode('');
-                        setBankName('');
-                        setResolvedName('');
-                        setBankQuery('');
-                      }}
-                      className="text-xs text-brand-400 hover:text-brand-300 font-semibold px-2.5 py-1 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 transition-colors"
-                    >
-                      Change Bank
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2 relative">
-                    <div className="relative">
-                      <Search className="w-4 h-4 text-dark-muted absolute left-3.5 top-3" />
-                      <input
-                        type="text"
-                        value={bankQuery}
-                        onChange={(e) => {
-                          setBankQuery(e.target.value);
-                          setShowBankDropdown(true);
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setBankName('');
+                          setBankCode('');
+                          setBankQuery('');
+                          setResolvedName('');
                         }}
-                        onFocus={() => setShowBankDropdown(true)}
-                        placeholder="Type bank name (e.g. OPay, PalmPay, GTBank)..."
-                        className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 placeholder:text-dark-muted"
-                      />
+                        className="text-xs text-brand-400 hover:text-brand-300 font-semibold px-2.5 py-1 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 transition-colors"
+                      >
+                        Change
+                      </button>
                     </div>
-
-                    {/* Filtered Dropdown */}
-                    {showBankDropdown && filteredBanks.length > 0 && (
-                      <div className="absolute top-10 left-0 right-0 max-h-56 overflow-y-auto bg-dark-card border border-dark-border rounded-xl shadow-2xl z-30 divide-y divide-dark-border/50">
-                        {filteredBanks.map((b) => (
-                          <button
-                            key={b.code}
-                            type="button"
-                            onClick={() => {
-                              setBankCode(b.code);
-                              setBankName(b.name);
-                              setBankQuery('');
-                              setShowBankDropdown(false);
-                            }}
-                            className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-brand-500/10 hover:text-brand-400 transition-colors flex items-center justify-between"
-                          >
-                            <span className="font-semibold">{b.name}</span>
-                            <span className="text-[10px] text-dark-muted font-mono">{b.code}</span>
-                          </button>
-                        ))}
+                  ) : (
+                    <div className="relative">
+                      <div className="relative">
+                        <Search className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="text"
+                          value={bankQuery}
+                          onChange={(e) => {
+                            setBankQuery(e.target.value);
+                            setShowBankDropdown(true);
+                          }}
+                          onFocus={() => setShowBankDropdown(true)}
+                          className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 placeholder:text-dark-muted"
+                          placeholder="Search e.g. OPay, Kuda, GTBank, Zenith..."
+                        />
                       </div>
-                    )}
 
-                    {/* Quick Popular Banks */}
-                    <div>
-                      <span className="text-[10px] text-dark-muted font-medium uppercase tracking-wider block mb-1">
-                        Popular Banks:
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
+                      {/* Dropdown Results */}
+                      {showBankDropdown && filteredBanks.length > 0 && (
+                        <div className="absolute z-50 left-0 right-0 mt-1 bg-dark-card border border-dark-border rounded-xl shadow-2xl max-h-52 overflow-y-auto divide-y divide-dark-border/50">
+                          {filteredBanks.map((b) => (
+                            <button
+                              key={b.code}
+                              type="button"
+                              onClick={() => {
+                                setBankCode(b.code);
+                                setBankName(b.name);
+                                setShowBankDropdown(false);
+                                setBankQuery('');
+                              }}
+                              className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-brand-500/10 hover:text-brand-400 transition-colors flex items-center justify-between"
+                            >
+                              <span className="font-semibold">{b.name}</span>
+                              <span className="text-[10px] text-dark-muted font-mono">{b.code}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Quick Bank Chips */}
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {quickBanks.map((qb) => (
                           <button
                             key={qb.code}
@@ -297,8 +433,8 @@ export default function PublicClaimPage() {
                             onClick={() => {
                               setBankCode(qb.code);
                               setBankName(qb.name);
-                              setBankQuery('');
                               setShowBankDropdown(false);
+                              setBankQuery('');
                             }}
                             className="text-[11px] px-2.5 py-1 rounded-lg bg-dark-bg border border-dark-border text-slate-300 hover:border-brand-500 hover:text-brand-400 font-medium transition-all"
                           >
@@ -307,115 +443,121 @@ export default function PublicClaimPage() {
                         ))}
                       </div>
                     </div>
+                  )}
+                </div>
+
+                {/* Account Number */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    10-Digit Account Number
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={10}
+                    required
+                    value={accountNumber}
+                    onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
+                    className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono tracking-wider"
+                    placeholder="0123456789"
+                  />
+                </div>
+
+                {/* Resolving / Name Resolution Feedback */}
+                {resolving && (
+                  <div className="text-xs text-brand-400 flex items-center gap-2 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20 animate-pulse">
+                    <div className="w-3.5 h-3.5 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
+                    <span>Verifying account with bank registry...</span>
                   </div>
                 )}
-              </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Bank Account Number (10 Digits)</label>
-                <input
-                  type="text"
-                  maxLength={10}
-                  required
-                  value={accountNumber}
-                  onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono tracking-wider"
-                  placeholder="0123456789"
-                />
-              </div>
-
-              {/* Bank Verification Status & Display */}
-              {resolving && (
-                <div className="text-xs text-brand-400 flex items-center gap-2 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20 animate-pulse">
-                  <div className="w-3.5 h-3.5 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
-                  <span>Verifying account details...</span>
-                </div>
-              )}
-
-              {resolvedName && (
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs space-y-1 shadow-inner">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400">
-                      Verified Bank Account
-                    </span>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                {resolvedName && (
+                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs space-y-1 shadow-inner">
+                    <div className="flex items-center gap-1.5 font-bold">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Verified Account Name</span>
+                    </div>
+                    <p className="text-sm font-extrabold text-white tracking-tight uppercase">
+                      {resolvedName}
+                    </p>
+                    <p className="text-[10px] text-emerald-400/80">
+                      Funds will be dispatched directly to this bank account instantly upon claim.
+                    </p>
                   </div>
-                  <p className="text-base font-extrabold text-white tracking-wide">{resolvedName}</p>
-                  <p className="text-xs font-medium text-emerald-300/80">
-                    {bankName || 'Bank'} &bull; <span className="font-mono">{accountNumber}</span>
+                )}
+
+                {resolveErr && (
+                  <div className="text-xs text-rose-400 font-medium p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                    {resolveErr}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* USDT Crypto Destination */}
+            {giveawayData.currency === 'USDT' && (
+              <>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Select USDT Network
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {['TRC20', 'BEP20'].map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setChain(c)}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          chain === c
+                            ? 'bg-brand-500/10 border-brand-500 text-brand-400'
+                            : 'bg-dark-bg border-dark-border text-slate-400 hover:border-slate-700'
+                        }`}
+                      >
+                        <Coins className="w-3.5 h-3.5" />
+                        <span>{c}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    {chain} USDT Wallet Address
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={walletAddress}
+                    onChange={(e) => setWalletAddress(e.target.value)}
+                    className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500 font-mono"
+                    placeholder={chain === 'TRC20' ? 'T...' : '0x...'}
+                  />
+                  <p className="text-[10px] text-amber-400/80 mt-1">
+                    Warning: Double check your address. Transfers are irreversible once broadcast on-chain.
                   </p>
                 </div>
-              )}
+              </>
+            )}
 
-              {resolveErr && (
-                <div className="text-xs text-rose-400 font-medium p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-                  {resolveErr}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* USDT Crypto Destination */}
-          {giveawayData.currency === 'USDT' && (
-            <>
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Select USDT Network</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {['TRC20', 'BEP20'].map((c) => (
-                    <button
-                      type="button"
-                      key={c}
-                      onClick={() => setChain(c)}
-                      className={`py-2 text-xs font-semibold rounded-xl border transition-all ${
-                        chain === c
-                          ? 'bg-brand-500/10 border-brand-500 text-brand-400'
-                          : 'bg-dark-bg border-dark-border text-slate-400'
-                      }`}
-                    >
-                      USDT-{c} {c === 'TRC20' ? '(Tron)' : '(BSC)'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Your USDT-{chain} Wallet Address
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={walletAddress}
-                  onChange={(e) => setWalletAddress(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500 font-mono"
-                  placeholder={chain === 'TRC20' ? 'TNPn8Z4L1v9XQZpXqJzV5vK8xQZ9...' : '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'}
-                />
-                <p className="text-[10px] text-dark-muted mt-1">
-                  Warning: Double check your address. Transfers are irreversible once broadcast on-chain.
-                </p>
-              </div>
-            </>
-          )}
-
-          {/* Guarantee Footer */}
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={loading || resolving || (giveawayData.currency === 'NGN' && !resolvedName)}
-              className="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-2xl shadow-xl shadow-brand-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>
-                {resolving
-                  ? 'Verifying Bank Account...'
-                  : loading
-                  ? 'Processing Claim...'
-                  : `Claim ${formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)} Now`}
-              </span>
-              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-            </button>
-          </div>
-        </form>
+            {/* Guarantee Footer */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading || resolving || (giveawayData.currency === 'NGN' && !resolvedName)}
+                className="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-2xl shadow-xl shadow-brand-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>
+                  {resolving
+                    ? 'Verifying Bank Account...'
+                    : loading
+                    ? 'Processing Claim...'
+                    : `Claim ${formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)} Now`}
+                </span>
+                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+          </form>
+        )}
 
         <p className="text-center text-[10px] text-dark-muted">
           Secured by <strong className="text-slate-300">Sprinkl Engine</strong> • 1 Claim Per Destination
