@@ -315,59 +315,59 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-10 shadow-2xl">
+            <div className="bg-dark-card border border-dark-border rounded-2xl sm:rounded-3xl p-4 sm:p-8 lg:p-10 shadow-2xl">
               {/* Currency Selector */}
-              <div className="mb-8">
-                <label className="block text-xs font-bold uppercase tracking-wider text-dark-muted mb-3">
+              <div className="mb-6 sm:mb-8">
+                <label className="block text-xs font-bold uppercase tracking-wider text-dark-muted mb-2.5">
                   Select Payout Currency
                 </label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
                   <button
                     type="button"
                     onClick={() => handleCurrencyChange('NGN')}
-                    className={`py-3.5 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border ${
+                    className={`py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all border text-sm sm:text-base ${
                       calcCurrency === 'NGN'
                         ? 'bg-brand-500/20 border-brand-500 text-brand-300 shadow-lg shadow-brand-500/10'
                         : 'bg-slate-900 border-dark-border text-slate-400 hover:text-white'
                     }`}
                   >
-                    <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-black">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-black shrink-0">
                       ₦
                     </span>
-                    <span>Nigerian Naira (NGN)</span>
+                    <span className="truncate">Nigerian Naira (NGN)</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleCurrencyChange('USDT')}
-                    className={`py-3.5 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border ${
+                    className={`py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all border text-sm sm:text-base ${
                       calcCurrency === 'USDT'
                         ? 'bg-teal-500/20 border-teal-400 text-teal-300 shadow-lg shadow-teal-500/10'
                         : 'bg-slate-900 border-dark-border text-slate-400 hover:text-white'
                     }`}
                   >
-                    <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center text-xs font-black">
+                    <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center text-xs font-black shrink-0">
                       $
                     </span>
-                    <span>Tether USD (Crypto USDT)</span>
+                    <span className="truncate">Tether USD (Crypto USDT)</span>
                   </button>
                 </div>
               </div>
 
               {/* Number of Recipients Selector */}
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-3">
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-wrap items-baseline justify-between gap-1 mb-2.5">
                   <label className="text-xs font-bold uppercase tracking-wider text-dark-muted">
                     Number of Winners / Slots
                   </label>
-                  <span className="text-lg font-black text-brand-400">{recipientsCount} Winners</span>
+                  <span className="text-base sm:text-lg font-black text-brand-400">{recipientsCount} Winners</span>
                 </div>
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3">
                   {recipientPresets.map((num) => (
                     <button
                       key={num}
                       type="button"
                       onClick={() => setRecipientsCount(num)}
-                      className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors border ${
+                      className={`flex-1 min-w-[72px] sm:min-w-0 sm:flex-none text-center px-2.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-colors border ${
                         recipientsCount === num
                           ? 'bg-brand-500 text-slate-950 border-brand-500'
                           : 'bg-slate-900 border-dark-border text-slate-300 hover:bg-slate-800'
@@ -389,20 +389,20 @@ export default function LandingPage() {
               </div>
 
               {/* Amount per Winner Selector */}
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-3">
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-wrap items-baseline justify-between gap-1 mb-2.5">
                   <label className="text-xs font-bold uppercase tracking-wider text-dark-muted">
                     Amount Per Winner
                   </label>
-                  <span className="text-lg font-black text-white">{formattedPerRecipient}</span>
+                  <span className="text-base sm:text-lg font-black text-white">{formattedPerRecipient}</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {(calcCurrency === 'NGN' ? ngnAmountPresets : usdtAmountPresets).map((val) => (
                     <button
                       key={val}
                       type="button"
                       onClick={() => setAmountPerRecipient(val)}
-                      className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors border ${
+                      className={`flex-1 min-w-[65px] sm:min-w-0 sm:flex-none text-center px-2.5 sm:px-4 py-2 rounded-lg text-xs font-bold transition-colors border ${
                         amountPerRecipient === val
                           ? 'bg-brand-500 text-slate-950 border-brand-500'
                           : 'bg-slate-900 border-dark-border text-slate-300 hover:bg-slate-800'
@@ -415,36 +415,36 @@ export default function LandingPage() {
               </div>
 
               {/* Summary Card */}
-              <div className="bg-slate-900/80 border border-dark-border rounded-2xl p-6 mb-6">
-                <div className="grid sm:grid-cols-4 gap-4 text-center sm:text-left">
+              <div className="bg-slate-900/80 border border-dark-border rounded-2xl p-4 sm:p-6 mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-left">
                   <div>
-                    <p className="text-xs text-dark-muted font-medium">Prize Pool</p>
-                    <p className="text-xl font-black text-white">{formattedBudget}</p>
+                    <p className="text-[11px] sm:text-xs text-dark-muted font-medium">Prize Pool</p>
+                    <p className="text-lg sm:text-xl font-black text-white">{formattedBudget}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-dark-muted font-medium">Platform Fee</p>
-                    <p className="text-xl font-black text-brand-400">
+                    <p className="text-[11px] sm:text-xs text-dark-muted font-medium">Platform Fee</p>
+                    <p className="text-lg sm:text-xl font-black text-brand-400">
                       {calcCurrency === 'NGN'
                         ? `₦${Math.round(promoFee).toLocaleString()}`
                         : `$${promoFee.toFixed(2)}`}
                     </p>
-                    <p className="text-[10px] text-emerald-400 font-semibold">
+                    <p className="text-[10px] text-emerald-400 font-semibold truncate">
                       {isWhaleCalc ? '3.0% Whale Cap' : '2.5% New Host Promo'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-dark-muted font-medium">Payout Latency</p>
-                    <p className="text-xl font-black text-teal-300">&lt; 2 Seconds</p>
+                    <p className="text-[11px] sm:text-xs text-dark-muted font-medium">Payout Latency</p>
+                    <p className="text-lg sm:text-xl font-black text-teal-300">&lt; 2 Seconds</p>
                     <p className="text-[10px] text-dark-muted">Automated Settlement</p>
                   </div>
                   <div>
-                    <p className="text-xs text-dark-muted font-medium">Anti-Duplicate</p>
-                    <p className="text-xl font-black text-emerald-400">100% Lock</p>
+                    <p className="text-[11px] sm:text-xs text-dark-muted font-medium">Anti-Duplicate</p>
+                    <p className="text-lg sm:text-xl font-black text-emerald-400">100% Lock</p>
                     <p className="text-[10px] text-dark-muted">0% Double-Claims</p>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-dark-border/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-dark-muted">
+                <div className="mt-4 pt-3 border-t border-dark-border/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-dark-muted text-center sm:text-left">
                   <span>
                     Min payout: <strong>₦500 / $2 USDT</strong> per winner &bull; Standard fee: <strong>5.0%</strong> (3% on drops &gt;₦1M / $1k)
                   </span>
