@@ -11,6 +11,7 @@ import {
   Image as ImageIcon,
   Bot,
   User,
+  UserCheck,
   Clock,
   Sparkles,
   ExternalLink,
@@ -32,9 +33,24 @@ export default function SupportChatWidget() {
   const [loading, setLoading] = useState(false);
   const [closing, setClosing] = useState(false);
   const [initialLoaded, setInitialLoaded] = useState(false);
+  const [showEndModal, setShowEndModal] = useState(false);
+
+  // Prompt state for requesting a live human agent
+  const [showAgentPrompt, setShowAgentPrompt] = useState(false);
+  const [agentName, setAgentName] = useState('');
+  const [agentEmail, setAgentEmail] = useState('');
+  const [agentNote, setAgentNote] = useState('');
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Prefill agent name & email when user is logged in
+  useEffect(() => {
+    if (user) {
+      if (user.fullName) setAgentName(user.fullName);
+      if (user.email) setAgentEmail(user.email);
+    }
+  }, [user]);
 
   // Auto-scroll to bottom of messages
   const scrollToBottom = () => {
@@ -94,7 +110,7 @@ export default function SupportChatWidget() {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSendMessage = async (customText = null) => {
+  const handleSendMessage = async (customText = null, options = {}) => {
     const textToSend = (customText !== null ? customText : inputText).trim();
 
     if (!textToSend && selectedFiles.length === 0) return;
@@ -106,9 +122,14 @@ export default function SupportChatWidget() {
       if (sessionId) formData.append('sessionId', sessionId);
       formData.append('text', textToSend || 'Sent attachment(s)');
 
-      if (user) {
-        formData.append('name', user.fullName || 'User');
-        formData.append('email', user.email || '');
+      const finalName = options.customName || agentName || user?.fullName || 'Guest User';
+      const finalEmail = options.customEmail || agentEmail || user?.email || '';
+
+      formData.append('name', finalName);
+      formData.append('email', finalEmail);
+
+      if (options.isAgentRequest) {
+        formData.append('isAgentRequest', 'true');
       }
 
       selectedFiles.forEach((file) => {
@@ -119,7 +140,7 @@ export default function SupportChatWidget() {
       const tempUserMessage = {
         _id: `temp_${Date.now()}`,
         sender: 'user',
-        senderName: user?.fullName || 'You',
+        senderName: finalName || 'You',
         text: textToSend,
         createdAt: new Date().toISOString(),
         attachments: selectedFiles.map((f) => ({
@@ -165,17 +186,12 @@ export default function SupportChatWidget() {
       setMessages([]);
       return;
     }
+    // Show the custom end-session modal instead of the generic confirmDialog
+    setShowEndModal(true);
+  };
 
-    const confirmed = await confirmDialog({
-      title: 'End Support Chat?',
-      message:
-        'Ending this session will permanently delete all uploaded attachments. Are you sure?',
-      confirmText: 'Yes, End & Purge Files',
-      confirmVariant: 'danger',
-    });
-
-    if (!confirmed) return;
-
+  const confirmEndSession = async () => {
+    setShowEndModal(false);
     setClosing(true);
     try {
       const res = await api.post(`/support/close/${sessionId}`);
@@ -206,6 +222,58 @@ export default function SupportChatWidget() {
 
   return (
     <>
+      {/* ─── Custom End-Session Confirmation Modal ─── */}
+      {showEndModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-sm bg-dark-card border border-rose-500/30 rounded-2xl shadow-2xl shadow-rose-500/10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Red gradient header */}
+            <div className="px-6 pt-6 pb-4 bg-gradient-to-b from-rose-500/10 to-transparent border-b border-rose-500/20 text-center">
+              <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-rose-400" />
+              </div>
+              <h3 className="text-base font-extrabold text-white mb-1">End Support Chat?</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                This will permanently close your session and{' '}
+                <span className="text-rose-400 font-semibold">
+                  delete all uploaded attachments
+                </span>{' '}
+                from our servers. This action cannot be undone.
+              </p>
+            </div>
+
+            {/* Attachment warning */}
+            <div className="mx-4 my-3 px-3.5 py-2.5 rounded-xl bg-rose-500/8 border border-rose-500/20 flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
+              <p className="text-[11px] text-rose-300 leading-relaxed">
+                All files uploaded during this session will be erased from MongoDB GridFS storage immediately and cannot be recovered.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="px-4 pb-5 flex gap-2.5">
+              <button
+                onClick={() => setShowEndModal(false)}
+                className="flex-1 py-2.5 rounded-xl border border-dark-border text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+              >
+                Keep Chatting
+              </button>
+              <button
+                onClick={confirmEndSession}
+                disabled={closing}
+                className="flex-1 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {closing ? (
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+                {closing ? 'Closing…' : 'End & Purge Files'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Floating Launcher Button */}
       {!isOpen && (
         <button
