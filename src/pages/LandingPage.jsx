@@ -100,18 +100,6 @@ export default function LandingPage() {
       <Navbar />
 
       <main className="flex-grow">
-        {/* Top Urgency / Trust Banner */}
-        <aside
-          aria-label="Platform Announcement"
-          className="bg-brand-500/10 border-b border-brand-500/20 py-2.5 px-4 text-center text-xs font-semibold text-brand-400 flex items-center justify-center gap-2"
-        >
-          <span className="inline-block w-2 h-2 rounded-full bg-brand-400 animate-ping" />
-          <span>Over ₦45,000,000+ disbursed across 14,000+ winners with 0 double-claim incidents.</span>
-          <Link to="/signup" className="underline font-bold hover:text-brand-300 ml-1">
-            Start free &rarr;
-          </Link>
-        </aside>
-
         {/* Hero Section */}
         <section
           aria-labelledby="hero-heading"
