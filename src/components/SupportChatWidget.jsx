@@ -385,21 +385,18 @@ export default function SupportChatWidget() {
           style={launcherStyle}
           className={`group fixed ${
             launcherPos.x !== null ? '' : 'bottom-4 right-4 sm:bottom-6 sm:right-6'
-          } z-[9998] flex items-center overflow-hidden bg-gradient-to-br from-brand-500 to-emerald-500 hover:from-brand-600 hover:to-emerald-600 text-slate-950 font-extrabold rounded-full shadow-2xl shadow-brand-500/40 transition-[box-shadow,transform] duration-200 hover:shadow-brand-500/60 ${
+          } z-[9998] flex items-center h-12 w-12 min-w-[48px] max-w-[48px] hover:max-w-[130px] hover:w-auto rounded-full bg-gradient-to-br from-brand-500 to-emerald-500 hover:from-brand-600 hover:to-emerald-600 text-slate-950 font-extrabold shadow-2xl shadow-brand-500/40 hover:shadow-brand-500/60 overflow-hidden transition-all duration-300 ease-in-out ${
             isDragging ? 'scale-95 cursor-grabbing shadow-none' : 'cursor-pointer hover:scale-105 active:scale-95'
           }`}
           aria-label="Open support chat"
         >
-          {/* Icon — always visible */}
-          <div className="relative flex items-center justify-center w-12 h-12 shrink-0">
+          {/* Icon — centered in a 48x48 circle */}
+          <div className="flex items-center justify-center w-12 h-12 shrink-0">
             <Bot className="w-5 h-5 text-slate-950 stroke-[2.5]" />
-            <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-white rounded-full border-2 border-slate-950 animate-pulse" />
           </div>
 
-          {/* Label — slides in on hover */}
-          <span
-            className="pr-4 pl-0 text-xs font-extrabold text-slate-950 whitespace-nowrap max-w-0 opacity-0 group-hover:max-w-[80px] group-hover:opacity-100 transition-all duration-300 ease-in-out overflow-hidden"
-          >
+          {/* Label — slides in smoothly on hover */}
+          <span className="text-xs font-extrabold text-slate-950 whitespace-nowrap opacity-0 max-w-0 group-hover:max-w-[70px] group-hover:opacity-100 group-hover:pr-4 group-hover:pl-0.5 transition-all duration-300 ease-in-out overflow-hidden select-none">
             Support
           </span>
         </button>
