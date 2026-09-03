@@ -163,10 +163,10 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
               className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full ${
                 currency === 'USDT'
                   ? 'bg-slate-950/20 text-slate-950'
-                  : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                  : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
               }`}
             >
-              Upcoming
+              LIVE
             </span>
           </button>
         </div>
