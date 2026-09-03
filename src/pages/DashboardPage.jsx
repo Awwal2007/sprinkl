@@ -309,66 +309,208 @@ export default function DashboardPage() {
 
         {/* Ledger History Audit Table */}
         <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6">
-          <h2 className="text-lg font-bold text-white mb-1">Immutable Ledger History</h2>
-          <p className="text-xs text-dark-muted mb-4">Complete append-only audit trail of wallet entries</p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h2 className="text-lg font-bold text-white">Immutable Ledger History</h2>
+              <p className="text-xs text-dark-muted">Complete audit trail of all deposits, payouts, reservations, and cancellations</p>
+            </div>
+          </div>
 
           {walletData?.ledgerHistory && walletData.ledgerHistory.length > 0 ? (
             <>
               {/* Mobile Cards */}
-              <div className="sm:hidden space-y-2">
-                {walletData.ledgerHistory.map((item) => (
-                  <div key={item._id} className="bg-dark-bg rounded-xl border border-dark-border p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className={`inline-flex items-center gap-1 text-xs font-bold capitalize ${
-                        item.direction === 'credit' ? 'text-emerald-400' : 'text-rose-400'
-                      }`}>
-                        {item.direction === 'credit' ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
-                        {item.type}
-                      </span>
-                      <span className="text-xs font-mono font-bold text-white">
-                        {item.direction === 'credit' ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
-                      </span>
+              <div className="sm:hidden space-y-3">
+                {walletData.ledgerHistory.map((item) => {
+                  const isCredit = item.direction === 'credit';
+                  const itemStatus = item.status || 'paid';
+                  return (
+                    <div key={item._id} className="bg-dark-bg rounded-2xl border border-dark-border p-3.5 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider ${
+                              item.type === 'payout'
+                                ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                                : item.type === 'fund'
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                : item.type === 'cancel'
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                : 'bg-slate-800 text-slate-300 border border-dark-border'
+                            }`}
+                          >
+                            {item.type === 'cancel' ? 'Cancelled / Refund' : item.type}
+                          </span>
+
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+                              itemStatus === 'paid' || itemStatus === 'success' || itemStatus === 'completed'
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                : itemStatus === 'failed'
+                                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                : itemStatus === 'cancelled'
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                            }`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                itemStatus === 'paid' || itemStatus === 'success'
+                                  ? 'bg-emerald-400'
+                                  : itemStatus === 'failed'
+                                  ? 'bg-rose-400'
+                                  : 'bg-amber-400'
+                              }`}
+                            />
+                            <span className="capitalize">{itemStatus}</span>
+                          </span>
+                        </div>
+
+                        <span
+                          className={`text-sm font-mono font-black ${
+                            isCredit ? 'text-emerald-400' : 'text-slate-100'
+                          }`}
+                        >
+                          {isCredit ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
+                        </span>
+                      </div>
+
+                      {/* Beneficiary details if present */}
+                      {item.beneficiaryName ? (
+                        <div className="p-2.5 rounded-xl bg-slate-900/60 border border-dark-border/60 text-xs">
+                          <span className="text-[10px] text-dark-muted uppercase font-bold block mb-0.5">
+                            Beneficiary:
+                          </span>
+                          <p className="font-extrabold text-white">{item.beneficiaryName}</p>
+                          <p className="text-[11px] font-mono text-dark-muted">
+                            {item.beneficiaryBank ? `${item.beneficiaryBank} • ` : ''}
+                            {item.beneficiaryAccount || ''}
+                          </p>
+                        </div>
+                      ) : item.note ? (
+                        <p className="text-xs text-slate-300 font-medium">{item.note}</p>
+                      ) : null}
+
+                      <div className="flex items-center justify-between text-[10px] text-dark-muted pt-1 border-t border-dark-border/50">
+                        <span>
+                          {new Date(item.createdAt).toLocaleDateString()}{' '}
+                          {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        <span>Balance After: {formatCurrency(item.balanceAfter, item.currency)}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-[11px] text-dark-muted">
-                      <span>{new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      <span>Bal: {formatCurrency(item.balanceAfter, item.currency)}</span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
+
               {/* Desktop Table */}
               <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
-                      <th className="py-2.5 px-3">Date</th>
-                      <th className="py-2.5 px-3">Type</th>
-                      <th className="py-2.5 px-3">Currency</th>
-                      <th className="py-2.5 px-3">Amount</th>
-                      <th className="py-2.5 px-3 text-right">Balance After</th>
+                      <th className="py-3 px-3">Date & Time</th>
+                      <th className="py-3 px-3">Type</th>
+                      <th className="py-3 px-3">Beneficiary / Note</th>
+                      <th className="py-3 px-3">Status</th>
+                      <th className="py-3 px-3">Amount</th>
+                      <th className="py-3 px-3 text-right">Balance After</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-dark-border text-xs">
-                    {walletData.ledgerHistory.map((item) => (
-                      <tr key={item._id} className="hover:bg-slate-800/30">
-                        <td className="py-3 px-3 text-dark-muted">
-                          {new Date(item.createdAt).toLocaleDateString()} {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </td>
-                        <td className="py-3 px-3 capitalize font-medium text-slate-200">
-                          <span className={`inline-flex items-center gap-1 ${item.direction === 'credit' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            {item.direction === 'credit' ? <ArrowDownLeft className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
-                            {item.type}
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 font-semibold text-slate-300">{item.currency}</td>
-                        <td className="py-3 px-3 font-mono font-bold">
-                          {item.direction === 'credit' ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
-                        </td>
-                        <td className="py-3 px-3 text-right font-mono text-dark-muted">
-                          {formatCurrency(item.balanceAfter, item.currency)}
-                        </td>
-                      </tr>
-                    ))}
+                    {walletData.ledgerHistory.map((item) => {
+                      const isCredit = item.direction === 'credit';
+                      const itemStatus = item.status || 'paid';
+                      return (
+                        <tr key={item._id} className="hover:bg-slate-800/30 transition-colors">
+                          <td className="py-3.5 px-3 text-dark-muted whitespace-nowrap">
+                            <p className="text-slate-300 font-medium">
+                              {new Date(item.createdAt).toLocaleDateString()}
+                            </p>
+                            <p className="text-[10px]">
+                              {new Date(item.createdAt).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                          </td>
+
+                          {/* Type */}
+                          <td className="py-3.5 px-3">
+                            <span
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider ${
+                                item.type === 'payout'
+                                  ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                                  : item.type === 'fund'
+                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                  : item.type === 'cancel'
+                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                  : 'bg-slate-800 text-slate-300 border border-dark-border'
+                              }`}
+                            >
+                              {item.type === 'cancel' ? 'Cancelled / Refund' : item.type}
+                            </span>
+                          </td>
+
+                          {/* Beneficiary / Note */}
+                          <td className="py-3.5 px-3">
+                            {item.beneficiaryName ? (
+                              <div className="space-y-0.5">
+                                <p className="font-extrabold text-white text-xs">{item.beneficiaryName}</p>
+                                <p className="text-[11px] font-mono text-dark-muted">
+                                  {item.beneficiaryBank ? `${item.beneficiaryBank} • ` : ''}
+                                  {item.beneficiaryAccount || ''}
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="text-xs text-slate-300 font-medium">
+                                {item.note || (item.type === 'fund' ? 'Wallet Deposit' : 'Platform Action')}
+                              </p>
+                            )}
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-3.5 px-3">
+                            <span
+                              className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold inline-flex items-center gap-1.5 ${
+                                itemStatus === 'paid' || itemStatus === 'success' || itemStatus === 'completed'
+                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                  : itemStatus === 'failed'
+                                  ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                  : itemStatus === 'cancelled'
+                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                  : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                              }`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  itemStatus === 'paid' || itemStatus === 'success'
+                                    ? 'bg-emerald-400'
+                                    : itemStatus === 'failed'
+                                    ? 'bg-rose-400'
+                                    : 'bg-amber-400'
+                                }`}
+                              />
+                              <span className="capitalize">{itemStatus}</span>
+                            </span>
+                          </td>
+
+                          {/* Amount */}
+                          <td className="py-3.5 px-3 whitespace-nowrap">
+                            <span
+                              className={`font-mono font-bold text-xs ${
+                                isCredit ? 'text-emerald-400' : 'text-slate-100'
+                              }`}
+                            >
+                              {isCredit ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
+                            </span>
+                          </td>
+
+                          {/* Balance After */}
+                          <td className="py-3.5 px-3 text-right font-mono text-dark-muted whitespace-nowrap">
+                            {formatCurrency(item.balanceAfter, item.currency)}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
