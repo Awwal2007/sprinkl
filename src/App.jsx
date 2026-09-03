@@ -12,6 +12,7 @@ import PublicClaimPage from './pages/PublicClaimPage';
 import ClaimSuccessPage from './pages/ClaimSuccessPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import NotificationCenter from './components/NotificationCenter';
 import SupportChatWidget from './components/SupportChatWidget';
 import { useAuthStore } from './store/useAuthStore';
@@ -122,6 +123,8 @@ export default function App() {
         }
       />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

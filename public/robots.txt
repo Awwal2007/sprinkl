@@ -1,5 +1,31 @@
+﻿User-agent: Googlebot
+Allow: /
+Allow: /privacy
+Allow: /privacy-policy
+Allow: /signup
+Allow: /login
+Allow: /g/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /verify-email
+
+User-agent: Bingbot
+Allow: /
+Allow: /privacy
+Allow: /privacy-policy
+Allow: /signup
+Allow: /login
+Allow: /g/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /verify-email
+
 User-agent: *
 Allow: /
+Allow: /privacy
+Allow: /privacy-policy
 Allow: /signup
 Allow: /login
 Allow: /g/
@@ -21,8 +47,5 @@ Disallow: /
 User-agent: anthropic-ai
 Disallow: /
 
-# Sitemap location — always use canonical www URL
+# Canonical Sitemap location
 Sitemap: https://www.sprinkl.biz/sitemap.xml
-
-# Crawl delay (be polite to servers)
-Crawl-delay: 10

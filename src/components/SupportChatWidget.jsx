@@ -11,16 +11,17 @@ import {
   Image as ImageIcon,
   Bot,
   User,
-  UserCheck,
+  Shield,
   Clock,
   Sparkles,
   ExternalLink,
   ChevronDown,
+  RefreshCw,
 } from 'lucide-react';
 import api from '../api/client';
 import { useSupportStore } from '../store/useSupportStore';
 import { useAuthStore } from '../store/useAuthStore';
-import { toast, confirmDialog } from '../store/useNotificationStore';
+import { toast } from '../store/useNotificationStore';
 
 export default function SupportChatWidget() {
   const { isOpen, openChat, closeChat, toggleChat, sessionId, setSessionId, clearSession } =
@@ -34,23 +35,11 @@ export default function SupportChatWidget() {
   const [closing, setClosing] = useState(false);
   const [initialLoaded, setInitialLoaded] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
-
-  // Prompt state for requesting a live human agent
-  const [showAgentPrompt, setShowAgentPrompt] = useState(false);
-  const [agentName, setAgentName] = useState('');
-  const [agentEmail, setAgentEmail] = useState('');
-  const [agentNote, setAgentNote] = useState('');
+  const [isClosedSession, setIsClosedSession] = useState(false);
+  const [sessionClosedDate, setSessionClosedDate] = useState(null);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
-
-  // Prefill agent name & email when user is logged in
-  useEffect(() => {
-    if (user) {
-      if (user.fullName) setAgentName(user.fullName);
-      if (user.email) setAgentEmail(user.email);
-    }
-  }, [user]);
 
   // Auto-scroll to bottom of messages
   const scrollToBottom = () => {
@@ -64,28 +53,64 @@ export default function SupportChatWidget() {
   }, [messages, isOpen]);
 
   // Load existing session messages if sessionId exists
-  useEffect(() => {
+  const fetchSessionData = async () => {
     if (!sessionId) {
       setInitialLoaded(true);
       return;
     }
 
-    const fetchSession = async () => {
+    try {
+      const res = await api.get(`/support/session/${sessionId}`);
+      if (res.data) {
+        if (res.data.messages) {
+          setMessages(res.data.messages);
+        }
+        if (res.data.session?.status === 'closed') {
+          setIsClosedSession(true);
+          setSessionClosedDate(res.data.session.closedAt);
+        } else {
+          setIsClosedSession(false);
+        }
+      }
+    } catch (err) {
+      // If session not found, clear stored ID
+      clearSession();
+      setIsClosedSession(false);
+    } finally {
+      setInitialLoaded(true);
+    }
+  };
+
+  useEffect(() => {
+    fetchSessionData();
+  }, [sessionId, clearSession]);
+
+  // Real-time polling: Check for admin replies while chat window is open
+  useEffect(() => {
+    if (!isOpen || !sessionId) return;
+
+    const interval = setInterval(async () => {
       try {
         const res = await api.get(`/support/session/${sessionId}`);
         if (res.data && res.data.messages) {
-          setMessages(res.data.messages);
+          setMessages((prev) => {
+            if (res.data.messages.length !== prev.length) {
+              return res.data.messages;
+            }
+            return prev;
+          });
+          if (res.data.session?.status === 'closed') {
+            setIsClosedSession(true);
+            setSessionClosedDate(res.data.session.closedAt);
+          }
         }
-      } catch (err) {
-        // If session not found or closed, clear stored ID
-        clearSession();
-      } finally {
-        setInitialLoaded(true);
+      } catch (e) {
+        // quiet catch
       }
-    };
+    }, 3500);
 
-    fetchSession();
-  }, [sessionId, clearSession]);
+    return () => clearInterval(interval);
+  }, [isOpen, sessionId]);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);
@@ -122,8 +147,8 @@ export default function SupportChatWidget() {
       if (sessionId) formData.append('sessionId', sessionId);
       formData.append('text', textToSend || 'Sent attachment(s)');
 
-      const finalName = options.customName || agentName || user?.fullName || 'Guest User';
-      const finalEmail = options.customEmail || agentEmail || user?.email || '';
+      const finalName = options.customName || user?.fullName || 'Guest User';
+      const finalEmail = options.customEmail || user?.email || '';
 
       formData.append('name', finalName);
       formData.append('email', finalEmail);
@@ -154,6 +179,7 @@ export default function SupportChatWidget() {
       setMessages((prev) => [...prev, tempUserMessage]);
       setInputText('');
       setSelectedFiles([]);
+      setIsClosedSession(false); // resumed seamlessly
 
       const res = await api.post('/support/message', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -186,7 +212,6 @@ export default function SupportChatWidget() {
       setMessages([]);
       return;
     }
-    // Show the custom end-session modal instead of the generic confirmDialog
     setShowEndModal(true);
   };
 
@@ -202,14 +227,20 @@ export default function SupportChatWidget() {
       if (res.data.closingMessage) {
         setMessages((prev) => [...prev, res.data.closingMessage]);
       }
-      setTimeout(() => {
-        clearSession();
-      }, 3000);
+      setIsClosedSession(true);
+      setSessionClosedDate(res.data.closedAt || new Date().toISOString());
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to close session', 'Error');
     } finally {
       setClosing(false);
     }
+  };
+
+  const handleStartNewChat = () => {
+    clearSession();
+    setMessages([]);
+    setIsClosedSession(false);
+    setSessionClosedDate(null);
   };
 
   const quickPrompts = [
@@ -224,28 +255,28 @@ export default function SupportChatWidget() {
     <>
       {/* ─── Custom End-Session Confirmation Modal ─── */}
       {showEndModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="w-full max-w-sm bg-dark-card border border-rose-500/30 rounded-2xl shadow-2xl shadow-rose-500/10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            {/* Red gradient header */}
+            {/* Header */}
             <div className="px-6 pt-6 pb-4 bg-gradient-to-b from-rose-500/10 to-transparent border-b border-rose-500/20 text-center">
               <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center">
                 <Trash2 className="w-6 h-6 text-rose-400" />
               </div>
               <h3 className="text-base font-extrabold text-white mb-1">End Support Chat?</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                This will permanently close your session and{' '}
+                This will close your active chat with the agent and{' '}
                 <span className="text-rose-400 font-semibold">
-                  delete all uploaded attachments
+                  permanently erase all uploaded files
                 </span>{' '}
-                from our servers. This action cannot be undone.
+                from storage immediately.
               </p>
             </div>
 
-            {/* Attachment warning */}
-            <div className="mx-4 my-3 px-3.5 py-2.5 rounded-xl bg-rose-500/8 border border-rose-500/20 flex items-start gap-2.5">
+            {/* Privacy Guarantee Warning (No technical storage disclosure) */}
+            <div className="mx-4 my-3 px-3.5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
-              <p className="text-[11px] text-rose-300 leading-relaxed">
-                All files uploaded during this session will be erased from MongoDB GridFS storage immediately and cannot be recovered.
+              <p className="text-[11px] text-rose-300 leading-relaxed font-medium">
+                All files uploaded during this session will be erased immediately and cannot be recovered.
               </p>
             </div>
 
@@ -294,10 +325,10 @@ export default function SupportChatWidget() {
       {isOpen && (
         <div
           id="support-chat-window"
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[85vh] bg-dark-bg/95 backdrop-blur-2xl border border-dark-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
+          className="fixed bottom-2 right-2 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-1rem)] sm:w-[430px] h-[600px] max-h-[90vh] bg-dark-bg/95 backdrop-blur-2xl border border-dark-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
         >
           {/* Header */}
-          <div className="px-4 py-3.5 bg-slate-900/90 border-b border-dark-border flex items-center justify-between shrink-0">
+          <div className="px-4 py-3 bg-slate-900/90 border-b border-dark-border flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black shadow-md">
@@ -307,30 +338,42 @@ export default function SupportChatWidget() {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="font-extrabold text-sm text-white">Sprinkl Assistant</h3>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-1 py-0.2 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20">
-                    Bot
+                  <h3 className="font-extrabold text-sm text-white">Sprinkl Support</h3>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20">
+                    Live Desk
                   </span>
                 </div>
                 <p className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span>Online • Email Alerts Active</span>
+                  <span>AI Assistant &amp; Live Agents Active</span>
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-1">
-              {sessionId && messages.length > 0 && (
+              {sessionId && messages.length > 0 && !isClosedSession && (
                 <button
                   onClick={handleCloseSession}
                   disabled={closing}
-                  title="End chat and purge all attachments"
-                  className="px-2.5 py-1.5 text-xs text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors flex items-center gap-1 font-medium"
+                  title="Close chat with agent and erase files"
+                  className="px-2.5 py-1 text-xs text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors flex items-center gap-1 font-medium"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span className="hidden xs:inline">End Chat</span>
+                  <span className="hidden xs:inline">Close Chat</span>
                 </button>
               )}
+
+              {isClosedSession && (
+                <button
+                  onClick={handleStartNewChat}
+                  title="Start fresh conversation"
+                  className="px-2 py-1 text-xs text-brand-400 hover:bg-brand-500/10 rounded-lg transition-colors flex items-center gap-1 font-semibold"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span className="hidden xs:inline">New Chat</span>
+                </button>
+              )}
+
               <button
                 onClick={closeChat}
                 className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
@@ -350,9 +393,8 @@ export default function SupportChatWidget() {
                 <span>Welcome to Sprinkl Support!</span>
               </div>
               <p>
-                Have questions about funding, payouts, or giveaway setup? Type below or attach a
-                screenshot. Every message triggers an immediate email notification to our support
-                team.
+                Ask about giveaway creation, instant payouts, wallet funding, or fraud prevention.
+                Our AI assistant answers immediately, and live human agents can join your chat at any time.
               </p>
             </div>
 
@@ -379,15 +421,60 @@ export default function SupportChatWidget() {
             {/* Render Messages */}
             {messages.map((msg) => {
               const isUser = msg.sender === 'user';
+              const isAdmin = msg.sender === 'admin';
+              const isClosingNotice =
+                msg.text.includes('Chat with the agent has been closed') ||
+                msg.text.includes('Chat session has been successfully closed');
+
+              // Prominent Closed Notice Banner with Date and Time
+              if (isClosingNotice) {
+                return (
+                  <div
+                    key={msg._id}
+                    className="my-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-2 animate-in fade-in"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                        Chat With Agent Closed
+                      </p>
+                      <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                        {msg.text}
+                      </p>
+                    </div>
+                    <div className="pt-2 border-t border-amber-500/20 flex items-center justify-center gap-2">
+                      <span className="text-[10px] text-slate-400">
+                        Ask any AI question below, or start a new thread:
+                      </span>
+                      <button
+                        onClick={handleStartNewChat}
+                        className="px-2.5 py-1 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold text-[11px] rounded-lg transition-all"
+                      >
+                        Start New Chat
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+
               return (
                 <div
                   key={msg._id}
                   className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
                 >
                   <div className="flex items-center gap-1.5 mb-1 px-1">
-                    <span className="text-[10px] font-semibold text-dark-muted">
-                      {isUser ? 'You' : msg.senderName || 'Sprinkl Bot'}
-                    </span>
+                    {isAdmin ? (
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
+                        <Shield className="w-3 h-3" />
+                        <span>{msg.senderName || 'Sprinkl Agent'}</span>
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-semibold text-dark-muted">
+                        {isUser ? 'You' : msg.senderName || 'Sprinkl Bot'}
+                      </span>
+                    )}
                     <span className="text-[9px] text-dark-muted font-mono">
                       {msg.createdAt
                         ? new Date(msg.createdAt).toLocaleTimeString([], {
@@ -399,22 +486,29 @@ export default function SupportChatWidget() {
                   </div>
 
                   <div
-                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed break-words ${
+                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed break-words shadow-md ${
                       isUser
                         ? 'bg-brand-500 text-slate-950 font-medium rounded-tr-none'
+                        : isAdmin
+                        ? 'bg-gradient-to-br from-slate-900 to-emerald-950/60 border border-emerald-500/40 text-slate-100 rounded-tl-none shadow-emerald-500/5'
                         : 'bg-slate-900 border border-dark-border text-slate-200 rounded-tl-none'
                     }`}
                   >
                     <p className="whitespace-pre-wrap text-[13px]">{msg.text}</p>
 
-                    {/* One-click Request Agent Button when bot prompts to request an agent */}
+                    {/* One-click Request Agent Button when bot prompts */}
                     {!isUser &&
+                      !isAdmin &&
                       (msg.text.includes('outside the topics') ||
                         msg.text.includes('request a human agent') ||
                         msg.text.includes('Request Agent')) && (
                         <button
                           type="button"
-                          onClick={() => handleSendMessage('I would like to speak with a human support agent.')}
+                          onClick={() =>
+                            handleSendMessage('I would like to speak with a human support agent.', {
+                              isAgentRequest: true,
+                            })
+                          }
                           className="mt-3 w-full py-2 px-3 rounded-xl bg-brand-500/20 hover:bg-brand-500/30 border border-brand-500/40 text-brand-300 font-bold text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
                         >
                           <User className="w-3.5 h-3.5" />
@@ -503,7 +597,7 @@ export default function SupportChatWidget() {
             </div>
           )}
 
-          {/* Footer & Input */}
+          {/* Footer & Input: ALWAYS UNLOCKED for AI prompts and chatting */}
           <div className="p-3 bg-slate-900 border-t border-dark-border shrink-0">
             <form
               onSubmit={(e) => {
@@ -534,7 +628,11 @@ export default function SupportChatWidget() {
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Ask support or report an issue..."
+                placeholder={
+                  isClosedSession
+                    ? 'Ask the AI a question or start fresh...'
+                    : 'Ask support or type your question...'
+                }
                 className="flex-1 bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
               />
 
@@ -548,9 +646,18 @@ export default function SupportChatWidget() {
               </button>
             </form>
 
-            <p className="text-[10px] text-dark-muted text-center mt-2">
-              🔒 Attachments are &bull; deleted upon ending chat
-            </p>
+            <div className="flex items-center justify-between text-[10px] text-dark-muted mt-2 px-1">
+              <span>🔒 Files erased upon ending chat</span>
+              {isClosedSession && (
+                <button
+                  type="button"
+                  onClick={handleStartNewChat}
+                  className="text-brand-400 hover:underline font-semibold"
+                >
+                  + Start New Chat
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

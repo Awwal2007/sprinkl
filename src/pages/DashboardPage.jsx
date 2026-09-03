@@ -1,7 +1,20 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Wallet, Plus, Building2, Coins, ArrowUpRight, ArrowDownLeft, Gift, Share2, Eye, RotateCcw } from 'lucide-react';
+import {
+  Wallet,
+  Plus,
+  Building2,
+  Coins,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Gift,
+  Share2,
+  Eye,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import api from '../api/client';
 import Navbar from '../components/Navbar';
 import FundWalletModal from '../components/FundWalletModal';
@@ -14,6 +27,13 @@ export default function DashboardPage() {
   const [shareData, setShareData] = useState(null);
   const [releasingCurrency, setReleasingCurrency] = useState(null);
   const [releaseNotice, setReleaseNotice] = useState(null);
+
+  // Pagination states
+  const [giveawayPage, setGiveawayPage] = useState(1);
+  const giveawaysPerPage = 5;
+
+  const [historyPage, setHistoryPage] = useState(1);
+  const historyPerPage = 10;
 
   const queryClient = useQueryClient();
 
@@ -239,56 +259,123 @@ export default function DashboardPage() {
           </div>
 
           {giveawaysData && giveawaysData.length > 0 ? (
-            <div className="grid gap-4">
-              {giveawaysData.map((g) => {
-                const publicUrl = `${window.location.origin}/g/${g.slug}`;
+            <>
+              {(() => {
+                const totalGiveaways = giveawaysData.length;
+                const totalGiveawayPages = Math.max(1, Math.ceil(totalGiveaways / giveawaysPerPage));
+                const safeGiveawayPage = Math.min(Math.max(1, giveawayPage), totalGiveawayPages);
+                const paginatedGiveaways = giveawaysData.slice(
+                  (safeGiveawayPage - 1) * giveawaysPerPage,
+                  safeGiveawayPage * giveawaysPerPage
+                );
+
                 return (
-                  <div
-                    key={g._id}
-                    className="bg-dark-bg p-4 rounded-xl border border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-colors"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <StatusBadge status={g.status} />
-                        <h3 className="text-sm font-bold text-white line-clamp-1">{g.title}</h3>
-                      </div>
-                      <div className="flex items-center gap-3 text-xs text-dark-muted">
-                        <span>
-                          Amount:{' '}
-                          <strong className="text-slate-200">
-                            {formatCurrency(g.amountPerRecipient, g.currency)} / person
-                          </strong>
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Slots:{' '}
-                          <strong className="text-brand-400">
-                            {g.slotsClaimed} / {g.totalSlots} claimed
-                          </strong>
-                        </span>
-                      </div>
+                  <div className="space-y-4">
+                    <div className="grid gap-4">
+                      {paginatedGiveaways.map((g) => {
+                        const publicUrl = `${window.location.origin}/g/${g.slug}`;
+                        return (
+                          <div
+                            key={g._id}
+                            className="bg-dark-bg p-4 rounded-xl border border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-colors"
+                          >
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <StatusBadge status={g.status} />
+                                <h3 className="text-sm font-bold text-white line-clamp-1">{g.title}</h3>
+                              </div>
+                              <div className="flex items-center gap-3 text-xs text-dark-muted">
+                                <span>
+                                  Amount:{' '}
+                                  <strong className="text-slate-200">
+                                    {formatCurrency(g.amountPerRecipient, g.currency)} / person
+                                  </strong>
+                                </span>
+                                <span>•</span>
+                                <span>
+                                  Slots:{' '}
+                                  <strong className="text-brand-400">
+                                    {g.slotsClaimed} / {g.totalSlots} claimed
+                                  </strong>
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                onClick={() => setShareData({ publicUrl, title: g.title })}
+                                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 rounded-lg flex items-center gap-1 transition-colors"
+                              >
+                                <Share2 className="w-3.5 h-3.5" />
+                                <span>Share</span>
+                              </button>
+                              <Link
+                                to={`/dashboard/giveaway/${g._id}`}
+                                className="px-3 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 border border-brand-500/20 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Manage</span>
+                              </Link>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        onClick={() => setShareData({ publicUrl, title: g.title })}
-                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 rounded-lg flex items-center gap-1 transition-colors"
-                      >
-                        <Share2 className="w-3.5 h-3.5" />
-                        <span>Share</span>
-                      </button>
-                      <Link
-                        to={`/dashboard/giveaway/${g._id}`}
-                        className="px-3 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 border border-brand-500/20 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Manage</span>
-                      </Link>
-                    </div>
+                    {/* Giveaways Pagination Bar */}
+                    {totalGiveawayPages > 1 && (
+                      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-dark-muted border-t border-dark-border/60">
+                        <p>
+                          Showing{' '}
+                          <span className="font-semibold text-slate-200">
+                            {(giveawayPage - 1) * giveawaysPerPage + 1}
+                          </span>{' '}
+                          to{' '}
+                          <span className="font-semibold text-slate-200">
+                            {Math.min(giveawayPage * giveawaysPerPage, totalGiveaways)}
+                          </span>{' '}
+                          of <span className="font-semibold text-slate-200">{totalGiveaways}</span> giveaways
+                        </p>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => setGiveawayPage((p) => Math.max(1, p - 1))}
+                            disabled={giveawayPage === 1}
+                            className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-dark-bg transition-colors"
+                            aria-label="Previous giveaway page"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+
+                          {Array.from({ length: totalGiveawayPages }, (_, i) => i + 1).map((num) => (
+                            <button
+                              key={num}
+                              onClick={() => setGiveawayPage(num)}
+                              className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                                giveawayPage === num
+                                  ? 'bg-brand-500 text-slate-950 shadow-sm'
+                                  : 'bg-dark-bg border border-dark-border text-slate-300 hover:bg-slate-800'
+                              }`}
+                            >
+                              {num}
+                            </button>
+                          ))}
+
+                          <button
+                            onClick={() => setGiveawayPage((p) => Math.min(totalGiveawayPages, p + 1))}
+                            disabled={giveawayPage === totalGiveawayPages}
+                            className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-dark-bg transition-colors"
+                            aria-label="Next giveaway page"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
-              })}
-            </div>
+              })()}
+            </>
           ) : (
             <div className="text-center py-12 bg-dark-bg/50 rounded-xl border border-dashed border-dark-border">
               <Gift className="w-10 h-10 text-dark-muted mx-auto mb-3" />
@@ -318,202 +405,267 @@ export default function DashboardPage() {
 
           {walletData?.ledgerHistory && walletData.ledgerHistory.length > 0 ? (
             <>
-              {/* Mobile Cards */}
-              <div className="sm:hidden space-y-3">
-                {walletData.ledgerHistory.map((item) => {
-                  const isCredit = item.direction === 'credit';
-                  const itemStatus = item.status || 'paid';
-                  return (
-                    <div key={item._id} className="bg-dark-bg rounded-2xl border border-dark-border p-3.5 space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <span
-                            className={`px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider ${
-                              item.type === 'payout'
-                                ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-                                : item.type === 'fund'
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                : item.type === 'cancel'
-                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                : 'bg-slate-800 text-slate-300 border border-dark-border'
-                            }`}
-                          >
-                            {item.type === 'cancel' ? 'Cancelled / Refund' : item.type}
-                          </span>
+              {(() => {
+                const totalHistory = walletData.ledgerHistory.length;
+                const totalHistoryPages = Math.max(1, Math.ceil(totalHistory / historyPerPage));
+                const safeHistoryPage = Math.min(Math.max(1, historyPage), totalHistoryPages);
+                const paginatedHistory = walletData.ledgerHistory.slice(
+                  (safeHistoryPage - 1) * historyPerPage,
+                  safeHistoryPage * historyPerPage
+                );
 
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
-                              itemStatus === 'paid' || itemStatus === 'success' || itemStatus === 'completed'
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                : itemStatus === 'failed'
-                                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                                : itemStatus === 'cancelled'
-                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
-                            }`}
-                          >
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                itemStatus === 'paid' || itemStatus === 'success'
-                                  ? 'bg-emerald-400'
-                                  : itemStatus === 'failed'
-                                  ? 'bg-rose-400'
-                                  : 'bg-amber-400'
-                              }`}
-                            />
-                            <span className="capitalize">{itemStatus}</span>
-                          </span>
-                        </div>
+                return (
+                  <div className="space-y-4">
+                    {/* Mobile Cards */}
+                    <div className="sm:hidden space-y-3">
+                      {paginatedHistory.map((item) => {
+                        const isCredit = item.direction === 'credit';
+                        const itemStatus = item.status || 'paid';
+                        return (
+                          <div key={item._id} className="bg-dark-bg rounded-2xl border border-dark-border p-3.5 space-y-2.5">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <span
+                                  className={`px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider ${
+                                    item.type === 'payout'
+                                      ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                                      : item.type === 'fund'
+                                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                      : item.type === 'cancel'
+                                      ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                      : 'bg-slate-800 text-slate-300 border border-dark-border'
+                                  }`}
+                                >
+                                  {item.type === 'cancel' ? 'Cancelled / Refund' : item.type}
+                                </span>
 
-                        <span
-                          className={`text-sm font-mono font-black ${
-                            isCredit ? 'text-emerald-400' : 'text-slate-100'
-                          }`}
-                        >
-                          {isCredit ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
-                        </span>
-                      </div>
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+                                    itemStatus === 'paid' || itemStatus === 'success' || itemStatus === 'completed'
+                                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                      : itemStatus === 'failed'
+                                      ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                      : itemStatus === 'cancelled'
+                                      ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                      : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                                  }`}
+                                >
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full ${
+                                      itemStatus === 'paid' || itemStatus === 'success'
+                                        ? 'bg-emerald-400'
+                                        : itemStatus === 'failed'
+                                        ? 'bg-rose-400'
+                                        : 'bg-amber-400'
+                                    }`}
+                                  />
+                                  <span className="capitalize">{itemStatus}</span>
+                                </span>
+                              </div>
 
-                      {/* Beneficiary details if present */}
-                      {item.beneficiaryName ? (
-                        <div className="p-2.5 rounded-xl bg-slate-900/60 border border-dark-border/60 text-xs">
-                          <span className="text-[10px] text-dark-muted uppercase font-bold block mb-0.5">
-                            Beneficiary:
-                          </span>
-                          <p className="font-extrabold text-white">{item.beneficiaryName}</p>
-                          <p className="text-[11px] font-mono text-dark-muted">
-                            {item.beneficiaryBank ? `${item.beneficiaryBank} • ` : ''}
-                            {item.beneficiaryAccount || ''}
-                          </p>
-                        </div>
-                      ) : item.note ? (
-                        <p className="text-xs text-slate-300 font-medium">{item.note}</p>
-                      ) : null}
+                              <span
+                                className={`text-sm font-mono font-black ${
+                                  isCredit ? 'text-emerald-400' : 'text-slate-100'
+                                }`}
+                              >
+                                {isCredit ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
+                              </span>
+                            </div>
 
-                      <div className="flex items-center justify-between text-[10px] text-dark-muted pt-1 border-t border-dark-border/50">
-                        <span>
-                          {new Date(item.createdAt).toLocaleDateString()}{' '}
-                          {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        <span>Balance After: {formatCurrency(item.balanceAfter, item.currency)}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Desktop Table */}
-              <div className="hidden sm:block overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
-                      <th className="py-3 px-3">Date & Time</th>
-                      <th className="py-3 px-3">Type</th>
-                      <th className="py-3 px-3">Beneficiary / Note</th>
-                      <th className="py-3 px-3">Status</th>
-                      <th className="py-3 px-3">Amount</th>
-                      <th className="py-3 px-3 text-right">Balance After</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-dark-border text-xs">
-                    {walletData.ledgerHistory.map((item) => {
-                      const isCredit = item.direction === 'credit';
-                      const itemStatus = item.status || 'paid';
-                      return (
-                        <tr key={item._id} className="hover:bg-slate-800/30 transition-colors">
-                          <td className="py-3.5 px-3 text-dark-muted whitespace-nowrap">
-                            <p className="text-slate-300 font-medium">
-                              {new Date(item.createdAt).toLocaleDateString()}
-                            </p>
-                            <p className="text-[10px]">
-                              {new Date(item.createdAt).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}
-                            </p>
-                          </td>
-
-                          {/* Type */}
-                          <td className="py-3.5 px-3">
-                            <span
-                              className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider ${
-                                item.type === 'payout'
-                                  ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-                                  : item.type === 'fund'
-                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                  : item.type === 'cancel'
-                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                  : 'bg-slate-800 text-slate-300 border border-dark-border'
-                              }`}
-                            >
-                              {item.type === 'cancel' ? 'Cancelled / Refund' : item.type}
-                            </span>
-                          </td>
-
-                          {/* Beneficiary / Note */}
-                          <td className="py-3.5 px-3">
+                            {/* Beneficiary details if present */}
                             {item.beneficiaryName ? (
-                              <div className="space-y-0.5">
-                                <p className="font-extrabold text-white text-xs">{item.beneficiaryName}</p>
+                              <div className="p-2.5 rounded-xl bg-slate-900/60 border border-dark-border/60 text-xs">
+                                <span className="text-[10px] text-dark-muted uppercase font-bold block mb-0.5">
+                                  Beneficiary:
+                                </span>
+                                <p className="font-extrabold text-white">{item.beneficiaryName}</p>
                                 <p className="text-[11px] font-mono text-dark-muted">
                                   {item.beneficiaryBank ? `${item.beneficiaryBank} • ` : ''}
                                   {item.beneficiaryAccount || ''}
                                 </p>
                               </div>
-                            ) : (
-                              <p className="text-xs text-slate-300 font-medium">
-                                {item.note || (item.type === 'fund' ? 'Wallet Deposit' : 'Platform Action')}
-                              </p>
-                            )}
-                          </td>
+                            ) : item.note ? (
+                              <p className="text-xs text-slate-300 font-medium">{item.note}</p>
+                            ) : null}
 
-                          {/* Status */}
-                          <td className="py-3.5 px-3">
-                            <span
-                              className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold inline-flex items-center gap-1.5 ${
-                                itemStatus === 'paid' || itemStatus === 'success' || itemStatus === 'completed'
-                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                  : itemStatus === 'failed'
-                                  ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                                  : itemStatus === 'cancelled'
-                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                                  : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                            <div className="flex items-center justify-between text-[10px] text-dark-muted pt-1 border-t border-dark-border/50">
+                              <span>
+                                {new Date(item.createdAt).toLocaleDateString()}{' '}
+                                {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                              <span>Balance After: {formatCurrency(item.balanceAfter, item.currency)}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Desktop Table */}
+                    <div className="hidden sm:block overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                            <th className="py-3 px-3">Date & Time</th>
+                            <th className="py-3 px-3">Type</th>
+                            <th className="py-3 px-3">Beneficiary / Note</th>
+                            <th className="py-3 px-3">Status</th>
+                            <th className="py-3 px-3">Amount</th>
+                            <th className="py-3 px-3 text-right">Balance After</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-dark-border text-xs">
+                          {paginatedHistory.map((item) => {
+                            const isCredit = item.direction === 'credit';
+                            const itemStatus = item.status || 'paid';
+                            return (
+                              <tr key={item._id} className="hover:bg-slate-800/30 transition-colors">
+                                <td className="py-3.5 px-3 text-dark-muted whitespace-nowrap">
+                                  <p className="text-slate-300 font-medium">
+                                    {new Date(item.createdAt).toLocaleDateString()}
+                                  </p>
+                                  <p className="text-[10px]">
+                                    {new Date(item.createdAt).toLocaleTimeString([], {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                    })}
+                                  </p>
+                                </td>
+
+                                {/* Type */}
+                                <td className="py-3.5 px-3">
+                                  <span
+                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider ${
+                                      item.type === 'payout'
+                                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                                        : item.type === 'fund'
+                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                        : item.type === 'cancel'
+                                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                        : 'bg-slate-800 text-slate-300 border border-dark-border'
+                                    }`}
+                                  >
+                                    {item.type === 'cancel' ? 'Cancelled / Refund' : item.type}
+                                  </span>
+                                </td>
+
+                                {/* Beneficiary / Note */}
+                                <td className="py-3.5 px-3">
+                                  {item.beneficiaryName ? (
+                                    <div className="space-y-0.5">
+                                      <p className="font-extrabold text-white text-xs">{item.beneficiaryName}</p>
+                                      <p className="text-[11px] font-mono text-dark-muted">
+                                        {item.beneficiaryBank ? `${item.beneficiaryBank} • ` : ''}
+                                        {item.beneficiaryAccount || ''}
+                                      </p>
+                                    </div>
+                                  ) : (
+                                    <p className="text-xs text-slate-300 font-medium">
+                                      {item.note || (item.type === 'fund' ? 'Wallet Deposit' : 'Platform Action')}
+                                    </p>
+                                  )}
+                                </td>
+
+                                {/* Status */}
+                                <td className="py-3.5 px-3">
+                                  <span
+                                    className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold inline-flex items-center gap-1.5 ${
+                                      itemStatus === 'paid' || itemStatus === 'success' || itemStatus === 'completed'
+                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                        : itemStatus === 'failed'
+                                        ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                        : itemStatus === 'cancelled'
+                                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                        : 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                                    }`}
+                                  >
+                                    <span
+                                      className={`w-1.5 h-1.5 rounded-full ${
+                                        itemStatus === 'paid' || itemStatus === 'success'
+                                          ? 'bg-emerald-400'
+                                          : itemStatus === 'failed'
+                                          ? 'bg-rose-400'
+                                          : 'bg-amber-400'
+                                      }`}
+                                    />
+                                    <span className="capitalize">{itemStatus}</span>
+                                  </span>
+                                </td>
+
+                                {/* Amount */}
+                                <td className="py-3.5 px-3 whitespace-nowrap">
+                                  <span
+                                    className={`font-mono font-bold text-xs ${
+                                      isCredit ? 'text-emerald-400' : 'text-slate-100'
+                                    }`}
+                                  >
+                                    {isCredit ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
+                                  </span>
+                                </td>
+
+                                {/* Balance After */}
+                                <td className="py-3.5 px-3 text-right font-mono text-dark-muted whitespace-nowrap">
+                                  {formatCurrency(item.balanceAfter, item.currency)}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* History Pagination Bar */}
+                    {totalHistoryPages > 1 && (
+                      <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-dark-muted border-t border-dark-border/60">
+                        <p>
+                          Showing{' '}
+                          <span className="font-semibold text-slate-200">
+                            {(historyPage - 1) * historyPerPage + 1}
+                          </span>{' '}
+                          to{' '}
+                          <span className="font-semibold text-slate-200">
+                            {Math.min(historyPage * historyPerPage, totalHistory)}
+                          </span>{' '}
+                          of <span className="font-semibold text-slate-200">{totalHistory}</span> ledger entries
+                        </p>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
+                            disabled={historyPage === 1}
+                            className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-dark-bg transition-colors"
+                            aria-label="Previous history page"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+
+                          {Array.from({ length: totalHistoryPages }, (_, i) => i + 1).map((num) => (
+                            <button
+                              key={num}
+                              onClick={() => setHistoryPage(num)}
+                              className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+                                historyPage === num
+                                  ? 'bg-brand-500 text-slate-950 shadow-sm'
+                                  : 'bg-dark-bg border border-dark-border text-slate-300 hover:bg-slate-800'
                               }`}
                             >
-                              <span
-                                className={`w-1.5 h-1.5 rounded-full ${
-                                  itemStatus === 'paid' || itemStatus === 'success'
-                                    ? 'bg-emerald-400'
-                                    : itemStatus === 'failed'
-                                    ? 'bg-rose-400'
-                                    : 'bg-amber-400'
-                                }`}
-                              />
-                              <span className="capitalize">{itemStatus}</span>
-                            </span>
-                          </td>
+                              {num}
+                            </button>
+                          ))}
 
-                          {/* Amount */}
-                          <td className="py-3.5 px-3 whitespace-nowrap">
-                            <span
-                              className={`font-mono font-bold text-xs ${
-                                isCredit ? 'text-emerald-400' : 'text-slate-100'
-                              }`}
-                            >
-                              {isCredit ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
-                            </span>
-                          </td>
-
-                          {/* Balance After */}
-                          <td className="py-3.5 px-3 text-right font-mono text-dark-muted whitespace-nowrap">
-                            {formatCurrency(item.balanceAfter, item.currency)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                          <button
+                            onClick={() => setHistoryPage((p) => Math.min(totalHistoryPages, p + 1))}
+                            disabled={historyPage === totalHistoryPages}
+                            className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-dark-bg transition-colors"
+                            aria-label="Next history page"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </>
           ) : (
             <p className="text-xs text-dark-muted py-4 text-center">No ledger entries recorded yet.</p>

@@ -32,9 +32,9 @@ import { useSupportStore } from '../store/useSupportStore';
 export default function LandingPage() {
   const { openChat } = useSupportStore();
   useSEO({
-    title: 'Sprinkl — Nigeria\'s #1 Automated Cash & Crypto Giveaway Platform | NGN & USDT Instant Payouts',
+    title: 'Sprinkl — Automated Cash & Crypto Giveaways in Nigeria',
     description:
-      'Host fraud-proof giveaways in Nigeria. Sprinkl automatically pays winners directly to their bank accounts (NGN) or crypto wallets (USDT TRC20/BEP20). Zero double-claims. Launch in 60 seconds. Trusted by Nigerian creators, brands & communities.',
+      'Sprinkl is Nigeria\'s #1 automated dual-currency giveaway platform. Pay winners directly to bank accounts (NGN) or crypto wallets (USDT). Zero double-claims guaranteed.',
     path: '/',
   });
 
@@ -135,7 +135,7 @@ export default function LandingPage() {
                 id="hero-heading"
                 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-[1.08]"
               >
-                Send Cash & Crypto Giveaways{' '}
+                Sprinkl — Automated Cash &amp; Crypto Giveaways{' '}
                 <br className="hidden sm:inline" />
                 <span className="text-emerald-400 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200 bg-clip-text text-transparent font-extrabold inline-block drop-shadow-sm">
                   With Zero Double-Claims.
@@ -870,6 +870,15 @@ export default function LandingPage() {
                   <CheckCircle2 className="w-3.5 h-3.5 text-brand-400" />
                   <span>Zero Double-Claims</span>
                 </li>
+                <li>
+                  <Link
+                    to="/privacy"
+                    className="flex items-center gap-1.5 text-slate-400 hover:text-brand-400 transition-colors"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-brand-400" />
+                    <span>Privacy Policy (NDPR)</span>
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -877,6 +886,9 @@ export default function LandingPage() {
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             <p>&copy; 2026 Sprinkl.biz. All rights reserved.</p>
             <div className="flex items-center gap-6">
+              <Link to="/privacy" className="hover:text-slate-300 transition-colors">
+                Privacy Policy
+              </Link>
               <Link to="/login" className="hover:text-slate-300 transition-colors">
                 Sign In
               </Link>
