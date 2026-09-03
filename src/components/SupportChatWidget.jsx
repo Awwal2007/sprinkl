@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   MessageSquare,
   X,
@@ -19,6 +19,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import api from '../api/client';
+import socket, { joinSession, leaveSession } from '../lib/socket';
 import { useSupportStore } from '../store/useSupportStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from '../store/useNotificationStore';
@@ -85,32 +86,39 @@ export default function SupportChatWidget() {
     fetchSessionData();
   }, [sessionId, clearSession]);
 
-  // Real-time polling: Check for admin replies while chat window is open
+  // ── Real-time Socket.IO: join session room and listen for push events ──
   useEffect(() => {
-    if (!isOpen || !sessionId) return;
+    if (!sessionId) return;
 
-    const interval = setInterval(async () => {
-      try {
-        const res = await api.get(`/support/session/${sessionId}`);
-        if (res.data && res.data.messages) {
-          setMessages((prev) => {
-            if (res.data.messages.length !== prev.length) {
-              return res.data.messages;
-            }
-            return prev;
-          });
-          if (res.data.session?.status === 'closed') {
-            setIsClosedSession(true);
-            setSessionClosedDate(res.data.session.closedAt);
-          }
-        }
-      } catch (e) {
-        // quiet catch
-      }
-    }, 3500);
+    // Join the session room to receive push events
+    joinSession(sessionId);
 
-    return () => clearInterval(interval);
-  }, [isOpen, sessionId]);
+    // Handle incoming messages (from bot, admin, or other user devices)
+    const handleNewMessage = ({ message }) => {
+      if (!message) return;
+      setMessages((prev) => {
+        // Deduplicate: don't add if _id already exists
+        if (prev.some((m) => m._id === message._id)) return prev;
+        return [...prev, message];
+      });
+    };
+
+    // Handle session being closed (by admin or user on another device)
+    const handleSessionClosed = ({ closedAt }) => {
+      setIsClosedSession(true);
+      setSessionClosedDate(closedAt || new Date().toISOString());
+    };
+
+    socket.on('new_message', handleNewMessage);
+    socket.on('session_closed', handleSessionClosed);
+
+    return () => {
+      socket.off('new_message', handleNewMessage);
+      socket.off('session_closed', handleSessionClosed);
+      leaveSession(sessionId);
+    };
+  }, [sessionId]);
+
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);

@@ -37,6 +37,7 @@ import Navbar from '../components/Navbar';
 import StatusBadge from '../components/StatusBadge';
 import { toast, confirmDialog } from '../store/useNotificationStore';
 import { useAuthStore } from '../store/useAuthStore';
+import socket, { joinAdminRoom } from '../lib/socket';
 
 export default function AdminDashboardPage() {
   const queryClient = useQueryClient();
@@ -87,6 +88,35 @@ export default function AdminDashboardPage() {
     if (sessionParam) setSelectedSessionId(sessionParam);
   }, []);
 
+  // ── Real-time Socket.IO: join admins room for instant push updates ──
+  useEffect(() => {
+    const { accessToken } = useAuthStore.getState();
+    joinAdminRoom(accessToken);
+
+    const handleNewMessage = ({ session }) => {
+      // Refresh the sessions list and selected thread immediately
+      queryClient.invalidateQueries({ queryKey: ['adminSupportSessions'] });
+      if (session?.sessionId) {
+        queryClient.invalidateQueries({ queryKey: ['adminSessionMessages', session.sessionId] });
+      }
+    };
+
+    const handleSessionClosed = ({ sessionId }) => {
+      queryClient.invalidateQueries({ queryKey: ['adminSupportSessions'] });
+      if (sessionId) {
+        queryClient.invalidateQueries({ queryKey: ['adminSessionMessages', sessionId] });
+      }
+    };
+
+    socket.on('new_message', handleNewMessage);
+    socket.on('session_closed', handleSessionClosed);
+
+    return () => {
+      socket.off('new_message', handleNewMessage);
+      socket.off('session_closed', handleSessionClosed);
+    };
+  }, [queryClient]);
+
   const { data: supportSessionsData, refetch: refetchSupportSessions } = useQuery({
     queryKey: ['adminSupportSessions', supportPage, supportStatusFilter, supportSearch],
     queryFn: async () => {
@@ -100,7 +130,8 @@ export default function AdminDashboardPage() {
       });
       return res.data;
     },
-    refetchInterval: 6000,
+    // No polling — socket invalidates on new messages
+    refetchInterval: false,
   });
 
   // Auto-select first session if none selected
@@ -119,7 +150,8 @@ export default function AdminDashboardPage() {
       return res.data;
     },
     enabled: !!selectedSessionId,
-    refetchInterval: 4000,
+    // No polling — socket invalidates on new messages
+    refetchInterval: false,
   });
 
   // Scroll chat to bottom when messages update
