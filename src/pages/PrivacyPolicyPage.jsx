@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShieldCheck,
@@ -22,6 +22,52 @@ export default function PrivacyPolicyPage() {
       'Learn how Sprinkl protects your data. Read our NDPR-compliant privacy policy detailing data encryption, anti-fraud safeguards, and immediate file purging upon closing chat.',
     path: '/privacy',
   });
+
+  // Inject page-specific JSON-LD: BreadcrumbList + WebPage schema
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'privacy-page-jsonld';
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'BreadcrumbList',
+          '@id': 'https://www.sprinkl.biz/privacy#breadcrumb',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Home',
+              item: 'https://www.sprinkl.biz/',
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: 'Privacy Policy',
+              item: 'https://www.sprinkl.biz/privacy',
+            },
+          ],
+        },
+        {
+          '@type': 'WebPage',
+          '@id': 'https://www.sprinkl.biz/privacy#webpage',
+          url: 'https://www.sprinkl.biz/privacy',
+          name: 'Privacy Policy — Sprinkl | Data Protection & Security',
+          isPartOf: { '@id': 'https://www.sprinkl.biz/#website' },
+          breadcrumb: { '@id': 'https://www.sprinkl.biz/privacy#breadcrumb' },
+          description:
+            "Sprinkl's NDPR and GDPR-compliant Privacy Policy detailing data encryption, anti-fraud safeguards, and immediate file purging.",
+          inLanguage: 'en',
+        },
+      ],
+    });
+    document.head.appendChild(script);
+    return () => {
+      const existing = document.getElementById('privacy-page-jsonld');
+      if (existing) existing.remove();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100 selection:bg-brand-500 selection:text-slate-950 font-sans">
