@@ -169,7 +169,7 @@ export default function SupportChatWidget() {
     const confirmed = await confirmDialog({
       title: 'End Support Chat?',
       message:
-        'Ending this session will permanently delete all uploaded attachments from MongoDB storage as requested. Are you sure?',
+        'Ending this session will permanently delete all uploaded attachments. Are you sure?',
       confirmText: 'Yes, End & Purge Files',
       confirmVariant: 'danger',
     });
