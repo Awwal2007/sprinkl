@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { CheckCircle2, Clock, Share2, Sparkles, ArrowLeft, ExternalLink } from 'lucide-react';
+import { CheckCircle2, Clock, Share2, Sparkles, ArrowLeft, ExternalLink, Gift, ArrowRight } from 'lucide-react';
 import api from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 
@@ -98,12 +98,42 @@ export default function ClaimSuccessPage() {
           )}
         </div>
 
-        <div className="pt-2">
+        {/* Viral Growth Hook: Want to create yours? */}
+        <div className="bg-gradient-to-br from-brand-500/15 via-dark-card to-dark-bg border border-brand-500/30 rounded-2xl p-5 text-left space-y-3 relative overflow-hidden shadow-xl shadow-brand-500/5 group">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-brand-500 text-slate-950 flex items-center justify-center font-black shadow-md shadow-brand-500/20 shrink-0 group-hover:scale-105 transition-transform">
+              <Gift className="w-5 h-5 stroke-[2.5]" />
+            </div>
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-brand-400 block">
+                Loved this instant payout?
+              </span>
+              <h2 className="text-sm font-black text-white">
+                Want to create your own giveaway?
+              </h2>
+            </div>
+          </div>
+
+          <p className="text-xs text-dark-muted leading-relaxed">
+            Reward your fans, followers, or community with instant cash drops in <strong className="text-slate-200">Naira (NGN)</strong> or <strong className="text-slate-200">Crypto (USDT)</strong>. 100% automated with zero double-claims.
+          </p>
+
+          <Link
+            to="/signup"
+            className="w-full py-3 px-4 bg-brand-500 hover:bg-brand-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-500/20 hover:scale-[1.01] active:scale-[0.99]"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Create Your Giveaway Free</span>
+            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+          </Link>
+        </div>
+
+        <div className="pt-1">
           <Link
             to="/"
-            className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-bold text-slate-300 hover:text-white flex items-center justify-center gap-2 transition-colors border border-dark-border"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             <span>Return to Sprinkl Home</span>
           </Link>
         </div>

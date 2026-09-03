@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Gift, ShieldCheck, CheckCircle2, AlertCircle, Building2, Coins, ArrowRight, Sparkles, Search } from 'lucide-react';
 import api from '../api/client';
@@ -150,11 +150,22 @@ export default function PublicClaimPage() {
 
   if (!giveawayData) {
     return (
-      <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
-        <div className="bg-dark-card p-6 rounded-2xl border border-dark-border max-w-sm w-full text-center">
-          <AlertCircle className="w-10 h-10 text-rose-400 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-white mb-1">Giveaway Not Available</h2>
-          <p className="text-xs text-dark-muted">This giveaway link is invalid or has expired.</p>
+      <div className="min-h-screen bg-dark-bg flex flex-col items-center justify-center p-4">
+        <div className="bg-dark-card p-6 rounded-3xl border border-dark-border max-w-sm w-full text-center space-y-4 shadow-2xl">
+          <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
+          <div>
+            <h2 className="text-lg font-bold text-white mb-1">Giveaway Not Available</h2>
+            <p className="text-xs text-dark-muted">This giveaway link is invalid or has ended.</p>
+          </div>
+          <div className="pt-2">
+            <Link
+              to="/signup"
+              className="w-full py-3 px-4 bg-brand-500 hover:bg-brand-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-brand-500/20"
+            >
+              <span>Want to create yours? Start Free</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -409,6 +420,28 @@ export default function PublicClaimPage() {
         <p className="text-center text-[10px] text-dark-muted">
           Secured by <strong className="text-slate-300">Sprinkl Engine</strong> • 1 Claim Per Destination
         </p>
+      </div>
+
+      {/* Under-Card Viral Hook: Want to create yours? */}
+      <div className="mt-4 text-center max-w-md w-full">
+        <div className="p-3.5 sm:px-5 rounded-2xl bg-dark-card/90 border border-dark-border/80 backdrop-blur-md shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center shrink-0 border border-brand-500/20">
+              <Gift className="w-4 h-4 stroke-[2.5]" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-white">Want to create yours?</p>
+              <p className="text-[10px] text-dark-muted">Host instant giveaways in NGN or USDT</p>
+            </div>
+          </div>
+          <Link
+            to="/signup"
+            className="w-full sm:w-auto px-4 py-2 bg-brand-500 hover:bg-brand-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-brand-500/15 hover:scale-105 active:scale-95"
+          >
+            <span>Create Yours Free</span>
+            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+          </Link>
+        </div>
       </div>
     </div>
   );
