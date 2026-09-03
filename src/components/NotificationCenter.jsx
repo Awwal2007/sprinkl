@@ -42,13 +42,25 @@ export default function NotificationCenter() {
   const getToastStyles = (type) => {
     switch (type) {
       case 'success':
-        return 'border-emerald-500/30 bg-dark-card/95 shadow-emerald-500/10 text-emerald-300';
+        return {
+          card: 'border-emerald-500/30 bg-slate-950/95 shadow-emerald-500/15 text-emerald-300',
+          accent: 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]',
+        };
       case 'error':
-        return 'border-rose-500/30 bg-dark-card/95 shadow-rose-500/10 text-rose-300';
+        return {
+          card: 'border-rose-500/30 bg-slate-950/95 shadow-rose-500/15 text-rose-300',
+          accent: 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.5)]',
+        };
       case 'warning':
-        return 'border-amber-500/30 bg-dark-card/95 shadow-amber-500/10 text-amber-300';
+        return {
+          card: 'border-amber-500/30 bg-slate-950/95 shadow-amber-500/15 text-amber-300',
+          accent: 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]',
+        };
       default:
-        return 'border-brand-500/30 bg-dark-card/95 shadow-brand-500/10 text-brand-300';
+        return {
+          card: 'border-brand-500/30 bg-slate-950/95 shadow-brand-500/15 text-brand-300',
+          accent: 'bg-brand-400 shadow-[0_0_8px_rgba(34,197,94,0.5)]',
+        };
     }
   };
 
@@ -57,41 +69,49 @@ export default function NotificationCenter() {
       {/* Toast Notifications Container */}
       <div
         aria-live="polite"
-        className="fixed top-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"
+        className="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 sm:top-5 z-[99999] flex flex-col gap-2.5 sm:max-w-sm pointer-events-none"
       >
-        {toasts.map((t) => (
-          <div
-            key={t.id}
-            className={`pointer-events-auto rounded-2xl border p-4 shadow-2xl backdrop-blur-xl transition-all duration-300 transform translate-y-0 opacity-100 flex items-start gap-3 relative overflow-hidden ${getToastStyles(
-              t.type
-            )}`}
-            role="alert"
-          >
-            {getToastIcon(t.type)}
-            <div className="flex-1 min-w-0 pr-2">
-              {t.title && (
-                <p className="text-xs font-extrabold text-white tracking-wide mb-0.5">
-                  {t.title}
-                </p>
-              )}
-              <p className="text-xs text-slate-200 leading-relaxed break-words font-medium">
-                {t.message}
-              </p>
-            </div>
-            <button
-              onClick={() => removeToast(t.id)}
-              className="text-slate-400 hover:text-white transition-colors p-1 -mr-1 -mt-1 rounded-lg"
-              aria-label="Dismiss notification"
+        {toasts.map((t) => {
+          const styles = getToastStyles(t.type);
+          return (
+            <div
+              key={t.id}
+              className={`pointer-events-auto rounded-2xl border p-4 shadow-2xl backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-top-3 sm:slide-in-from-right-3 flex items-start gap-3 relative overflow-hidden ${styles.card}`}
+              role="alert"
             >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
+              {/* Left Accent Stripe */}
+              <div className={`w-1 absolute left-0 top-0 bottom-0 rounded-l-2xl ${styles.accent}`} />
+
+              <div className="shrink-0 mt-0.5">
+                {getToastIcon(t.type)}
+              </div>
+
+              <div className="flex-1 min-w-0 pr-1">
+                {t.title && (
+                  <p className="text-xs font-extrabold text-white tracking-wide mb-0.5">
+                    {t.title}
+                  </p>
+                )}
+                <p className="text-xs text-slate-200 leading-relaxed break-words font-medium">
+                  {t.message}
+                </p>
+              </div>
+
+              <button
+                onClick={() => removeToast(t.id)}
+                className="text-slate-400 hover:text-white transition-colors p-1 -mr-1 -mt-1 rounded-lg shrink-0"
+                aria-label="Dismiss notification"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       {/* Confirmation Modal */}
       {confirmModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[99998] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
           <div
             className="relative w-full max-w-md bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200"
             role="dialog"

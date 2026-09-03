@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   MessageSquare,
   X,
@@ -39,6 +39,13 @@ export default function SupportChatWidget() {
   const [isClosedSession, setIsClosedSession] = useState(false);
   const [sessionClosedDate, setSessionClosedDate] = useState(null);
 
+  // Draggable launcher position
+  const [launcherPos, setLauncherPos] = useState({ x: null, y: null });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [hasDragged, setHasDragged] = useState(false);
+  const launcherRef = useRef(null);
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -52,6 +59,60 @@ export default function SupportChatWidget() {
       scrollToBottom();
     }
   }, [messages, isOpen]);
+
+  // Drag handlers for launcher
+  const handleDragStart = useCallback((e) => {
+    const el = launcherRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    setDragOffset({ x: clientX - rect.left, y: clientY - rect.top });
+    setIsDragging(true);
+    setHasDragged(false);
+    e.preventDefault();
+  }, []);
+
+  const handleDragMove = useCallback((e) => {
+    if (!isDragging) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const el = launcherRef.current;
+    const w = el ? el.offsetWidth : 56;
+    const h = el ? el.offsetHeight : 56;
+    const newX = Math.max(8, Math.min(window.innerWidth - w - 8, clientX - dragOffset.x));
+    const newY = Math.max(8, Math.min(window.innerHeight - h - 8, clientY - dragOffset.y));
+    setLauncherPos({ x: newX, y: newY });
+    setHasDragged(true);
+    e.preventDefault();
+  }, [isDragging, dragOffset]);
+
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleDragMove, { passive: false });
+      window.addEventListener('touchend', handleDragEnd);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('touchend', handleDragEnd);
+    };
+  }, [isDragging, handleDragMove, handleDragEnd]);
+
+  // Compute launcher style
+  const launcherStyle = useMemo(() => {
+    if (launcherPos.x !== null && launcherPos.y !== null) {
+      return { left: launcherPos.x, top: launcherPos.y, bottom: 'auto', right: 'auto' };
+    }
+    return {};
+  }, [launcherPos]);
 
   // Load existing session messages if sessionId exists
   const fetchSessionData = async () => {
@@ -313,19 +374,34 @@ export default function SupportChatWidget() {
         </div>
       )}
 
-      {/* Floating Launcher Button */}
+      {/* Floating Draggable Launcher Button */}
       {!isOpen && (
         <button
-          onClick={openChat}
+          ref={launcherRef}
           id="support-chat-launcher"
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 bg-gradient-to-r from-brand-500 to-emerald-500 hover:from-brand-600 hover:to-emerald-600 text-slate-950 font-extrabold text-xs sm:text-sm rounded-full shadow-2xl shadow-brand-500/30 transition-all hover:scale-105 active:scale-95 group"
+          onClick={() => { if (!hasDragged) openChat(); }}
+          onMouseDown={handleDragStart}
+          onTouchStart={handleDragStart}
+          style={launcherStyle}
+          className={`group fixed ${
+            launcherPos.x !== null ? '' : 'bottom-4 right-4 sm:bottom-6 sm:right-6'
+          } z-[9998] flex items-center overflow-hidden bg-gradient-to-br from-brand-500 to-emerald-500 hover:from-brand-600 hover:to-emerald-600 text-slate-950 font-extrabold rounded-full shadow-2xl shadow-brand-500/40 transition-[box-shadow,transform] duration-200 hover:shadow-brand-500/60 ${
+            isDragging ? 'scale-95 cursor-grabbing shadow-none' : 'cursor-pointer hover:scale-105 active:scale-95'
+          }`}
           aria-label="Open support chat"
         >
-          <div className="relative">
-            <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-slate-950 stroke-[2.5]" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full border-2 border-slate-950 animate-pulse" />
+          {/* Icon — always visible */}
+          <div className="relative flex items-center justify-center w-12 h-12 shrink-0">
+            <Bot className="w-5 h-5 text-slate-950 stroke-[2.5]" />
+            <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-white rounded-full border-2 border-slate-950 animate-pulse" />
           </div>
-          <span className="text-xs sm:text-sm">Support</span>
+
+          {/* Label — slides in on hover */}
+          <span
+            className="pr-4 pl-0 text-xs font-extrabold text-slate-950 whitespace-nowrap max-w-0 opacity-0 group-hover:max-w-[80px] group-hover:opacity-100 transition-all duration-300 ease-in-out overflow-hidden"
+          >
+            Support
+          </span>
         </button>
       )}
 
@@ -333,7 +409,7 @@ export default function SupportChatWidget() {
       {isOpen && (
         <div
           id="support-chat-window"
-          className="fixed bottom-2 right-2 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-1rem)] sm:w-[430px] h-[600px] max-h-[90vh] bg-dark-bg/95 backdrop-blur-2xl border border-dark-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
+          className="fixed bottom-2 right-2 sm:bottom-6 sm:right-6 z-[9999] w-[calc(100vw-1rem)] sm:w-[430px] h-[600px] max-h-[90vh] bg-dark-bg/95 backdrop-blur-2xl border border-dark-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
         >
           {/* Header */}
           <div className="px-4 py-3 bg-slate-900/90 border-b border-dark-border flex items-center justify-between shrink-0">
