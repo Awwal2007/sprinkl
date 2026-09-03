@@ -24,6 +24,7 @@ import {
   Headphones,
   MessageSquare,
   Mail,
+  FileText,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import useSEO from '../hooks/useSEO';
