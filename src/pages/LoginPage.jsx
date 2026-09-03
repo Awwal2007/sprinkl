@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Gift, Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Gift, Lock, Mail, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from '../store/useNotificationStore';
@@ -17,6 +17,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
+  const [unverifiedEmail, setUnverifiedEmail] = useState(null);
+  const [resending, setResending] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -31,6 +34,8 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setUnverifiedEmail(null);
+    setResendSent(false);
     setLoading(true);
 
     try {
@@ -41,10 +46,28 @@ export default function LoginPage() {
       navigate('/dashboard');
     } catch (err) {
       const errMsg = err.response?.data?.error || 'Login failed. Please check credentials.';
+      const isUnverified = err.response?.status === 403 && err.response?.data?.emailVerified === false;
+      if (isUnverified) {
+        setUnverifiedEmail(err.response?.data?.email || email);
+      }
       setError(errMsg);
-      toast.error(errMsg, 'Login Failed');
+      toast.error(errMsg, isUnverified ? 'Email Verification Required' : 'Login Failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!unverifiedEmail || resending) return;
+    setResending(true);
+    try {
+      await api.post('/auth/resend-verification', { email: unverifiedEmail });
+      setResendSent(true);
+      toast.success('Verification link sent! Please check your email inbox.', 'Email Sent');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to resend verification email', 'Error');
+    } finally {
+      setResending(false);
     }
   };
 
@@ -78,8 +101,24 @@ export default function LoginPage() {
           )}
 
           {error && (
-            <div className="p-3 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">
-              {error}
+            <div className="p-4 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium space-y-2.5">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <p className="leading-relaxed">{error}</p>
+              </div>
+              {unverifiedEmail && (
+                <div className="pt-2.5 border-t border-rose-500/20 flex items-center justify-between gap-2">
+                  <span className="text-dark-muted text-[11px]">Didn't receive the email?</span>
+                  <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={resending || resendSent}
+                    className="text-brand-400 hover:text-brand-300 font-bold underline transition-colors disabled:opacity-50 text-xs"
+                  >
+                    {resending ? 'Sending…' : resendSent ? 'Verification link sent ✓' : 'Resend link'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
