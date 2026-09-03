@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Gift, ArrowLeft, Share2, Ban, CheckCircle2, Clock, ExternalLink } from 'lucide-react';
+import { Gift, ArrowLeft, Share2, Ban, CheckCircle2, Clock, ExternalLink, RotateCcw } from 'lucide-react';
 import api from '../api/client';
 import Navbar from '../components/Navbar';
 import ShareModal from '../components/ShareModal';
@@ -13,6 +13,7 @@ export default function GiveawayDetailPage() {
   const navigate = useNavigate();
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [transferring, setTransferring] = useState(false);
 
   const { data, refetch } = useQuery({
     queryKey: ['giveaway', id],
@@ -43,7 +44,7 @@ export default function GiveawayDetailPage() {
     const confirmed = await confirmDialog({
       title: 'Cancel Giveaway?',
       message:
-        'Are you sure you want to cancel this giveaway campaign? All remaining unclaimed slots will be closed and funds returned directly to your available wallet balance.',
+        'Are you sure you want to cancel this giveaway campaign? All remaining unclaimed slots will be closed, and you will be able to transfer the unspent funds back to your main wallet.',
       confirmText: 'Yes, Cancel Giveaway',
       cancelText: 'Keep Active',
       confirmVariant: 'danger',
@@ -54,7 +55,7 @@ export default function GiveawayDetailPage() {
       setCancelling(true);
       const res = await api.post(`/giveaways/${id}/cancel`);
       toast.success(
-        res.data.message || 'Giveaway cancelled and unspent funds released to your wallet.',
+        res.data.message || 'Giveaway cancelled. You can now transfer unspent funds to your main wallet.',
         'Giveaway Cancelled'
       );
       refetch();
@@ -62,6 +63,19 @@ export default function GiveawayDetailPage() {
       toast.error(err.response?.data?.error || 'Cancellation failed', 'Cancel Error');
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handleTransferToMainWallet = async () => {
+    try {
+      setTransferring(true);
+      const res = await api.post(`/giveaways/${id}/transfer-to-main-wallet`);
+      toast.success(res.data.message || 'Funds transferred back to your main wallet!', 'Funds Transferred');
+      refetch();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Transfer failed', 'Transfer Error');
+    } finally {
+      setTransferring(false);
     }
   };
 
@@ -109,6 +123,25 @@ export default function GiveawayDetailPage() {
                   <Ban className="w-4 h-4" />
                   <span>{cancelling ? 'Cancelling...' : 'Cancel Giveaway'}</span>
                 </button>
+              )}
+
+              {giveaway.status === 'cancelled' && !giveaway.fundsReleased && (
+                <button
+                  onClick={handleTransferToMainWallet}
+                  disabled={transferring}
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                  title="Transfer remaining unspent funds back to your main available balance"
+                >
+                  <RotateCcw className={`w-4 h-4 ${transferring ? 'animate-spin' : ''}`} />
+                  <span>{transferring ? 'Transferring...' : 'Transfer to Main Wallet'}</span>
+                </button>
+              )}
+
+              {giveaway.status === 'cancelled' && giveaway.fundsReleased && (
+                <div className="px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Funds Transferred to Main Wallet</span>
+                </div>
               )}
             </div>
           </div>

@@ -61,16 +61,25 @@ export default function DashboardPage() {
     }
   };
 
+  // Check if there are cancelled giveaways with pending unspent funds
+  const hasCancelledWithFunds = (curr) => {
+    const rawReserved = walletData?.balances?.[curr]?.reserved || 0;
+    if (rawReserved <= 0) return false;
+    return giveawaysData?.some(
+      (g) => g.currency === curr && g.status === 'cancelled' && !g.fundsReleased
+    );
+  };
+
   const handleReleaseReserved = async (currency) => {
     const rawAmt = walletData?.balances?.[currency]?.reserved || 0;
     if (rawAmt <= 0) return;
 
     const formattedAmt = formatCurrency(rawAmt, currency);
     const confirmed = await confirmDialog({
-      title: `Transfer Reserved ${currency} to Main Balance?`,
-      message: `This will transfer all reserved ${currency} funds (${formattedAmt}) back to your available balance. Any active/open giveaways in ${currency} will be safely closed.`,
-      confirmText: 'Yes, Transfer Funds',
-      cancelText: 'Keep Giveaways Active',
+      title: `Transfer ${currency} to Main Wallet?`,
+      message: `This will transfer all unspent ${currency} funds (${formattedAmt}) from your cancelled giveaway(s) back to your main available balance.`,
+      confirmText: 'Yes, Transfer to Main Wallet',
+      cancelText: 'Cancel',
       confirmVariant: 'brand',
     });
     if (!confirmed) return;
@@ -86,6 +95,17 @@ export default function DashboardPage() {
       toast.error(err.response?.data?.error || 'Failed to transfer reserved funds', 'Transfer Failed');
     } finally {
       setReleasingCurrency(null);
+    }
+  };
+
+  const handleTransferGiveawayFunds = async (giveawayId) => {
+    try {
+      const res = await api.post(`/giveaways/${giveawayId}/transfer-to-main-wallet`);
+      toast.success(res.data.message || 'Funds transferred to main wallet!', 'Funds Transferred');
+      queryClient.invalidateQueries({ queryKey: ['wallet'] });
+      queryClient.invalidateQueries({ queryKey: ['giveaways'] });
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Transfer failed', 'Transfer Error');
     }
   };
 
@@ -165,15 +185,15 @@ export default function DashboardPage() {
                     {formatCurrency(walletData?.balances?.NGN?.reserved || 0, 'NGN')}
                   </span>
                 </div>
-                {(walletData?.balances?.NGN?.reserved || 0) > 0 && (
+                {hasCancelledWithFunds('NGN') && (
                   <button
                     onClick={() => handleReleaseReserved('NGN')}
                     disabled={releasingCurrency === 'NGN'}
-                    className="px-2.5 py-1 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 border border-brand-500/30 text-brand-400 font-bold text-[11px] transition-all flex items-center gap-1.5 disabled:opacity-50"
-                    title="Transfer reserved funds back to your main available balance"
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-[11px] transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    title="Transfer unspent funds from cancelled giveaways back to your main wallet"
                   >
                     <RotateCcw className={`w-3 h-3 ${releasingCurrency === 'NGN' ? 'animate-spin' : ''}`} />
-                    <span>{releasingCurrency === 'NGN' ? 'Transferring...' : 'Transfer to Main Balance'}</span>
+                    <span>{releasingCurrency === 'NGN' ? 'Transferring...' : 'Transfer to Main Wallet'}</span>
                   </button>
                 )}
               </div>
@@ -218,15 +238,15 @@ export default function DashboardPage() {
                     {formatCurrency(walletData?.balances?.USDT?.reserved || 0, 'USDT')}
                   </span>
                 </div>
-                {(walletData?.balances?.USDT?.reserved || 0) > 0 && (
+                {hasCancelledWithFunds('USDT') && (
                   <button
                     onClick={() => handleReleaseReserved('USDT')}
                     disabled={releasingCurrency === 'USDT'}
-                    className="px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 font-bold text-[11px] transition-all flex items-center gap-1.5 disabled:opacity-50"
-                    title="Transfer reserved funds back to your main available balance"
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-[11px] transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    title="Transfer unspent funds from cancelled giveaways back to your main wallet"
                   >
                     <RotateCcw className={`w-3 h-3 ${releasingCurrency === 'USDT' ? 'animate-spin' : ''}`} />
-                    <span>{releasingCurrency === 'USDT' ? 'Transferring...' : 'Transfer to Main Balance'}</span>
+                    <span>{releasingCurrency === 'USDT' ? 'Transferring...' : 'Transfer to Main Wallet'}</span>
                   </button>
                 )}
               </div>
@@ -302,6 +322,16 @@ export default function DashboardPage() {
                             </div>
 
                             <div className="flex items-center gap-2 shrink-0">
+                              {g.status === 'cancelled' && !g.fundsReleased && (
+                                <button
+                                  onClick={() => handleTransferGiveawayFunds(g._id)}
+                                  className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold rounded-lg flex items-center gap-1 transition-colors"
+                                  title="Transfer unspent funds back to main wallet"
+                                >
+                                  <RotateCcw className="w-3.5 h-3.5" />
+                                  <span>Transfer to Main Wallet</span>
+                                </button>
+                              )}
                               <button
                                 onClick={() => setShareData({ publicUrl, title: g.title })}
                                 className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 rounded-lg flex items-center gap-1 transition-colors"
