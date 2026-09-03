@@ -149,21 +149,17 @@ export default function CreateGiveawayPage() {
                   <div className="text-xs text-dark-muted">Paid via Flutterwave Transfers to NG Bank Accounts</div>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrency('USDT');
-                    setAmountPerRecipient(10);
-                  }}
-                  className={`p-4 rounded-xl border text-left transition-all ${
-                    currency === 'USDT'
-                      ? 'bg-brand-500/10 border-brand-500 text-white shadow-md'
-                      : 'bg-dark-bg border-dark-border text-slate-400 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="font-bold text-sm mb-1">Tether USDT (Crypto)</div>
-                  <div className="text-xs text-dark-muted">Paid via TRC-20 / BEP-20 Hot Wallet</div>
-                </button>
+                <div className="relative p-4 rounded-xl border border-dark-border bg-dark-bg text-left opacity-60 cursor-not-allowed select-none">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="font-bold text-sm mb-1 text-slate-400">Tether USDT (Crypto)</div>
+                      <div className="text-xs text-dark-muted">Paid via TRC-20 / BEP-20 Hot Wallet</div>
+                    </div>
+                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0 ml-2 mt-0.5">
+                      Upcoming
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
