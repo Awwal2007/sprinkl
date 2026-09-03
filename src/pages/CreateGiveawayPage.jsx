@@ -32,14 +32,14 @@ export default function CreateGiveawayPage() {
   const isPromo = walletData?.feeTier ? walletData.feeTier.isPromo : true;
   const remainingPromoCount = walletData?.feeTier ? walletData.feeTier.remainingPromoCount : 3;
 
-  const minPayout = currency === 'NGN' ? 500 : 0.2;
+  const minPayout = currency === 'NGN' ? 300 : 0.2;
   const giftPool = (parseFloat(amountPerRecipient) || 0) * (parseInt(totalSlots) || 0);
 
   // Check Whale Tier: >= ₦1,000,000 NGN or >= $1,000 USDT
   const isWhale = (currency === 'NGN' && giftPool >= 1000000) || (currency === 'USDT' && giftPool >= 1000);
 
   let feeRate = isWhale ? 0.03 : (isPromo ? 0.025 : 0.05);
-  const minFloor = currency === 'NGN' ? (isPromo ? 250 : 500) : (isPromo ? 0.50 : 1.00);
+  const minFloor = currency === 'NGN' ? (isPromo ? 150 : 300) : (isPromo ? 0.50 : 1.00);
   const maxCap = isWhale ? (currency === 'NGN' ? 35000 : 35) : Infinity;
 
   let calculatedFee = giftPool * feeRate;
@@ -54,8 +54,8 @@ export default function CreateGiveawayPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (currency === 'NGN' && parseFloat(amountPerRecipient) < 500) {
-      setError('Minimum payout per winner is ₦500 NGN to ensure transfer costs are fully covered.');
+    if (currency === 'NGN' && parseFloat(amountPerRecipient) < 300) {
+      setError('Minimum payout per winner is ₦300 NGN.');
       return;
     }
     if (currency === 'USDT' && parseFloat(amountPerRecipient) < 0.2) {
@@ -202,8 +202,45 @@ export default function CreateGiveawayPage() {
                     onChange={(e) => setAmountPerRecipient(e.target.value)}
                     className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono"
                   />
+                  
+                  {/* Quick preset buttons */}
+                  {currency === 'NGN' ? (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {[300, 500, 1000, 2000, 5000].map((amt) => (
+                        <button
+                          key={amt}
+                          type="button"
+                          onClick={() => setAmountPerRecipient(amt)}
+                          className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border transition-colors ${
+                            Number(amountPerRecipient) === amt
+                              ? 'bg-brand-500/15 border-brand-500 text-brand-400'
+                              : 'bg-dark-bg border-dark-border text-slate-400 hover:text-white hover:border-slate-600'
+                          }`}
+                        >
+                          ₦{amt >= 1000 ? `${amt / 1000}k` : amt}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {[1, 5, 10, 25, 50].map((amt) => (
+                        <button
+                          key={amt}
+                          type="button"
+                          onClick={() => setAmountPerRecipient(amt)}
+                          className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border transition-colors ${
+                            Number(amountPerRecipient) === amt
+                              ? 'bg-brand-500/15 border-brand-500 text-brand-400'
+                              : 'bg-dark-bg border-dark-border text-slate-400 hover:text-white hover:border-slate-600'
+                          }`}
+                        >
+                          ${amt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   <p className="text-[10px] text-dark-muted mt-1">
-                    Min: {currency === 'NGN' ? '₦500' : '$0.20 USDT'} per winner
+                    Min: {currency === 'NGN' ? '₦300' : '$0.20 USDT'} per winner
                   </p>
                 </div>
 
