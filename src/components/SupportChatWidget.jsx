@@ -201,6 +201,7 @@ export default function SupportChatWidget() {
     'When will USDT crypto deposits be live?',
     'How do I cancel a giveaway and get a refund?',
     'Why does a claim show as failed?',
+    '🙋 Speak with a Human Agent',
   ];
 
   return (
@@ -338,6 +339,21 @@ export default function SupportChatWidget() {
                   >
                     <p className="whitespace-pre-wrap text-[13px]">{msg.text}</p>
 
+                    {/* One-click Request Agent Button when bot prompts to request an agent */}
+                    {!isUser &&
+                      (msg.text.includes('outside the topics') ||
+                        msg.text.includes('request a human agent') ||
+                        msg.text.includes('Request Agent')) && (
+                        <button
+                          type="button"
+                          onClick={() => handleSendMessage('I would like to speak with a human support agent.')}
+                          className="mt-3 w-full py-2 px-3 rounded-xl bg-brand-500/20 hover:bg-brand-500/30 border border-brand-500/40 text-brand-300 font-bold text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                        >
+                          <User className="w-3.5 h-3.5" />
+                          <span>🙋 Connect with Human Agent</span>
+                        </button>
+                      )}
+
                     {/* Render message attachments */}
                     {msg.attachments && msg.attachments.length > 0 && (
                       <div className="mt-2.5 pt-2 border-t border-black/10 dark:border-white/10 space-y-1.5">
@@ -465,7 +481,7 @@ export default function SupportChatWidget() {
             </form>
 
             <p className="text-[10px] text-dark-muted text-center mt-2">
-              🔒 Attachments stored in MongoDB GridFS &bull; Purged upon ending chat
+              🔒 Attachments are &bull; deleted upon ending chat
             </p>
           </div>
         </div>
