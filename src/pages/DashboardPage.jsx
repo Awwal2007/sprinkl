@@ -218,8 +218,8 @@ export default function DashboardPage() {
                   <p className="text-[10px] text-dark-muted">TRC-20 & BEP-20 Chains</p>
                 </div>
               </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded font-bold">
-                ACTIVE
+              <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-bold">
+                UPCOMING
               </span>
             </div>
 
@@ -231,7 +231,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="pt-4 border-t border-dark-border space-y-2 text-xs">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <span className="text-dark-muted">Reserved in Giveaways: </span>
                   <span className="font-semibold text-slate-300">
@@ -252,29 +252,27 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center justify-between pt-1">
                 <span className="text-dark-muted">Top Up:</span>
-                <button
-                  onClick={() => setIsFundModalOpen(true)}
-                  className="text-brand-400 hover:underline font-semibold"
-                >
-                  Deposit USDT →
-                </button>
+                <span className="text-amber-400/80 text-xs font-semibold">
+                  Upcoming
+                </span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Giveaways List Section */}
-        <section className="bg-dark-card border border-dark-border rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
+        <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6">
+          <div className="flex items-start sm:items-center justify-between gap-3 mb-6">
             <div>
               <h2 className="text-lg font-bold text-white">Your Giveaways</h2>
               <p className="text-xs text-dark-muted">Manage active campaigns and inspect live payout feeds</p>
             </div>
             <Link
               to="/dashboard/create"
-              className="text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center gap-1"
+              className="text-xs text-brand-400 hover:text-brand-300 font-bold flex items-center gap-1.5 shrink-0 whitespace-nowrap px-3 py-1.5 rounded-xl bg-brand-500/10 border border-brand-500/20 hover:bg-brand-500/20 transition-all"
             >
-              <span>+ Create New</span>
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Create New</span>
             </Link>
           </div>
 
@@ -299,20 +297,22 @@ export default function DashboardPage() {
                             key={g._id}
                             className="bg-dark-bg p-4 rounded-xl border border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-colors"
                           >
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
+                            <div className="space-y-2 min-w-0">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <StatusBadge status={g.status} />
-                                <h3 className="text-sm font-bold text-white line-clamp-1">{g.title}</h3>
+                                <h3 className="text-sm font-bold text-white break-words sm:truncate max-w-full">
+                                  {g.title}
+                                </h3>
                               </div>
-                              <div className="flex items-center gap-3 text-xs text-dark-muted">
-                                <span>
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-dark-muted">
+                                <span className="whitespace-nowrap">
                                   Amount:{' '}
                                   <strong className="text-slate-200">
                                     {formatCurrency(g.amountPerRecipient, g.currency)} / person
                                   </strong>
                                 </span>
-                                <span>•</span>
-                                <span>
+                                <span className="hidden sm:inline text-slate-600">•</span>
+                                <span className="whitespace-nowrap">
                                   Slots:{' '}
                                   <strong className="text-brand-400">
                                     {g.slotsClaimed} / {g.totalSlots} claimed
@@ -321,27 +321,27 @@ export default function DashboardPage() {
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 pt-3 sm:pt-0 border-t sm:border-t-0 border-dark-border/60 sm:shrink-0">
                               {g.status === 'cancelled' && !g.fundsReleased && (
                                 <button
                                   onClick={() => handleTransferGiveawayFunds(g._id)}
-                                  className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold rounded-lg flex items-center gap-1 transition-colors"
+                                  className="w-full sm:w-auto px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold rounded-lg flex items-center justify-center gap-1 transition-colors"
                                   title="Transfer unspent funds back to main wallet"
                                 >
                                   <RotateCcw className="w-3.5 h-3.5" />
-                                  <span>Transfer to Main Wallet</span>
+                                  <span className="whitespace-nowrap">Transfer to Main Wallet</span>
                                 </button>
                               )}
                               <button
                                 onClick={() => setShareData({ publicUrl, title: g.title })}
-                                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 rounded-lg flex items-center gap-1 transition-colors"
+                                className="flex-1 sm:flex-initial px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 rounded-lg flex items-center justify-center gap-1 transition-colors"
                               >
                                 <Share2 className="w-3.5 h-3.5" />
                                 <span>Share</span>
                               </button>
                               <Link
                                 to={`/dashboard/giveaway/${g._id}`}
-                                className="px-3 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 border border-brand-500/20 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors"
+                                className="flex-1 sm:flex-initial px-3.5 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 border border-brand-500/20 text-xs font-semibold rounded-lg flex items-center justify-center gap-1 transition-colors"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                                 <span>Manage</span>

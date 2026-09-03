@@ -318,14 +318,14 @@ export default function SupportChatWidget() {
         <button
           onClick={openChat}
           id="support-chat-launcher"
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-brand-500 to-emerald-500 hover:from-brand-600 hover:to-emerald-600 text-slate-950 font-bold text-sm rounded-full shadow-2xl shadow-brand-500/30 transition-all hover:scale-105 active:scale-95 group"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 bg-gradient-to-r from-brand-500 to-emerald-500 hover:from-brand-600 hover:to-emerald-600 text-slate-950 font-extrabold text-xs sm:text-sm rounded-full shadow-2xl shadow-brand-500/30 transition-all hover:scale-105 active:scale-95 group"
           aria-label="Open support chat"
         >
           <div className="relative">
-            <Bot className="w-5 h-5 text-slate-950 stroke-[2.5]" />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white rounded-full border-2 border-slate-950 animate-pulse" />
+            <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-slate-950 stroke-[2.5]" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full border-2 border-slate-950 animate-pulse" />
           </div>
-          <span>Support</span>
+          <span className="text-xs sm:text-sm">Support</span>
         </button>
       )}
 

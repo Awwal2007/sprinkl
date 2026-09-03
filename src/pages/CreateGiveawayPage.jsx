@@ -102,7 +102,7 @@ export default function CreateGiveawayPage() {
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
       <Navbar />
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-5 sm:space-y-6">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24 sm:pb-12 flex-1 w-full space-y-5 sm:space-y-6">
         <Link
           to="/dashboard"
           className="inline-flex items-center gap-1.5 text-xs text-dark-muted hover:text-slate-200 transition-colors"
@@ -132,7 +132,7 @@ export default function CreateGiveawayPage() {
             {/* Currency Choice */}
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-2">Choose Giveaway Currency</label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -145,17 +145,17 @@ export default function CreateGiveawayPage() {
                       : 'bg-dark-bg border-dark-border text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <div className="font-bold text-sm mb-1">Nigerian Naira (NGN)</div>
-                  <div className="text-xs text-dark-muted">Paid via Flutterwave Transfers to NG Bank Accounts</div>
+                  <div className="font-bold text-sm mb-1 text-white">Nigerian Naira (NGN)</div>
+                  <div className="text-xs text-dark-muted leading-relaxed">Paid via Flutterwave Transfers to NG Bank Accounts</div>
                 </button>
 
                 <div className="relative p-4 rounded-xl border border-dark-border bg-dark-bg text-left opacity-60 cursor-not-allowed select-none">
-                  <div className="flex items-start justify-between">
-                    <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
                       <div className="font-bold text-sm mb-1 text-slate-400">Tether USDT (Crypto)</div>
-                      <div className="text-xs text-dark-muted">Paid via TRC-20 / BEP-20 Hot Wallet</div>
+                      <div className="text-xs text-dark-muted leading-relaxed">Paid via TRC-20 / BEP-20 Hot Wallet</div>
                     </div>
-                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0 ml-2 mt-0.5">
+                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0 mt-0.5">
                       Upcoming
                     </span>
                   </div>
@@ -188,7 +188,7 @@ export default function CreateGiveawayPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Amount per Person ({currency})
@@ -288,7 +288,7 @@ export default function CreateGiveawayPage() {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xs font-bold text-white">Whale Tier Discount Active</span>
                     <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-purple-500 text-white">
                       3.0% (Capped at {currency === 'NGN' ? '₦35,000' : '$35 USDT'})
@@ -305,7 +305,7 @@ export default function CreateGiveawayPage() {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xs font-bold text-white">New Creator Privilege Active</span>
                     <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-brand-500 text-slate-950">
                       2.5% Fee
@@ -327,19 +327,19 @@ export default function CreateGiveawayPage() {
 
             {/* Total Calculation Box */}
             <div className="bg-slate-900/80 p-4 rounded-xl border border-dark-border space-y-2">
-              <div className="flex justify-between text-xs text-dark-muted">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-xs text-dark-muted">
                 <span>Available Host Balance:</span>
                 <span className="font-semibold text-slate-200">
                   {availableBalance.toLocaleString()} {currency}
                 </span>
               </div>
-              <div className="flex justify-between text-xs text-dark-muted">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-xs text-dark-muted">
                 <span>Prize Pool (to {totalSlots} winners):</span>
                 <span className="font-semibold text-slate-200">
                   {giftPool.toLocaleString()} {currency}
                 </span>
               </div>
-              <div className="flex justify-between text-xs text-dark-muted">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-xs text-dark-muted">
                 <span>
                   Platform Fee ({isWhale ? '3% Whale Cap' : isPromo ? '2.5% Promo' : '5% Standard'}):
                   {isFloorApplied && (
@@ -352,7 +352,7 @@ export default function CreateGiveawayPage() {
                   {platformFee.toLocaleString()} {currency}
                 </span>
               </div>
-              <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-dark-border">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-sm font-bold text-white pt-2 border-t border-dark-border">
                 <span>Total Deducted from Wallet:</span>
                 <span className={`font-mono ${isInsufficient ? 'text-rose-400' : 'text-brand-400'}`}>
                   {totalCost.toLocaleString()} {currency}

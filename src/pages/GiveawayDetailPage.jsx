@@ -169,7 +169,14 @@ export default function GiveawayDetailPage() {
             <div className="bg-dark-bg p-3 sm:p-3.5 rounded-xl border border-dark-border">
               <span className="text-[10px] text-dark-muted uppercase font-semibold">Distributed</span>
               <p className="text-base sm:text-lg font-bold text-emerald-400 mt-0.5">
-                {formatCurrency(giveaway.stats?.totalDistributed || 0, giveaway.currency)}
+                {formatCurrency(
+                  claims
+                    ? claims
+                        .filter((c) => c.status === 'paid')
+                        .reduce((sum, c) => sum + (c.amount || giveaway.amountPerRecipient || 0), 0)
+                    : giveaway.stats?.totalDistributed || 0,
+                  giveaway.currency
+                )}
               </p>
             </div>
           </div>
