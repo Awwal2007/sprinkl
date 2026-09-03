@@ -20,12 +20,17 @@ import {
   Check,
   X,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  Headphones,
+  MessageSquare,
+  Mail,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import useSEO from '../hooks/useSEO';
+import { useSupportStore } from '../store/useSupportStore';
 
 export default function LandingPage() {
+  const { openChat } = useSupportStore();
   useSEO({
     title: 'Sprinkl — Nigeria\'s #1 Automated Cash & Crypto Giveaway Platform | NGN & USDT Instant Payouts',
     description:
@@ -459,7 +464,7 @@ export default function LandingPage() {
         </section>
 
         {/* Problem vs Solution Comparison */}
-        <section className="py-20 bg-dark-card/40 border-y border-dark-border">
+        <section id="about" className="py-20 bg-dark-card/40 border-y border-dark-border">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-14">
               <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
@@ -730,6 +735,57 @@ export default function LandingPage() {
                 >
                   <span>Sign In</span>
                 </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact & Live Support Helpdesk Section */}
+        <section id="contact" className="py-20 bg-dark-card/20 border-t border-dark-border relative">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <div className="bg-gradient-to-tr from-slate-900 via-dark-card to-slate-900 border border-dark-border rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="space-y-3 text-center md:text-left">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>24/7 Live Support & Helpdesk</span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white">
+                    Need Help or Have Questions?
+                  </h3>
+                  <p className="text-xs sm:text-sm text-dark-muted max-w-md leading-relaxed">
+                    Chat with our automated assistant or connect with our human support team. Upload screenshots, report transaction inquiries, or ask anything anytime.
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2 text-xs text-slate-300">
+                    <div className="flex items-center gap-1.5">
+                      <Mail className="w-4 h-4 text-brand-400" />
+                      <a href="mailto:support@sprinkl.biz" className="hover:text-brand-300 transition-colors font-medium">
+                        support@sprinkl.biz
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-emerald-400" />
+                      <span>Avg. response &lt; 5 mins</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto shrink-0">
+                  <button
+                    onClick={() => openChat()}
+                    className="px-6 py-3.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    <MessageSquare className="w-4 h-4 stroke-[2.5]" />
+                    <span>Open Live Support Chat</span>
+                  </button>
+                  <a
+                    href="mailto:support@sprinkl.biz?subject=Sprinkl%20Inquiry"
+                    className="px-6 py-3.5 bg-dark-bg hover:bg-slate-800 border border-dark-border text-slate-300 font-bold rounded-xl flex items-center justify-center gap-2 transition-colors text-xs"
+                  >
+                    <Mail className="w-4 h-4 text-dark-muted" />
+                    <span>Send Us an Email</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>

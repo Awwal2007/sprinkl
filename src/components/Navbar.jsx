@@ -1,13 +1,35 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Gift, Wallet, LogOut, ShieldCheck, Menu, X } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Gift, Wallet, LogOut, ShieldCheck, Menu, X, MessageSquare, Sliders, Info, Headphones } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
+import { useSupportStore } from '../store/useSupportStore';
 import { toast, confirmDialog } from '../store/useNotificationStore';
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
+  const { openChat } = useSupportStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleNavClick = (e, targetId) => {
+    if (location.pathname === '/') {
+      e.preventDefault();
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate(`/#${targetId}`);
+    }
+    setMobileOpen(false);
+  };
+
+  const handleContactClick = (e) => {
+    e.preventDefault();
+    openChat();
+    setMobileOpen(false);
+  };
 
   const handleLogout = async () => {
     const confirmed = await confirmDialog({
@@ -26,7 +48,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 bg-dark-bg/90 backdrop-blur-md border-b border-dark-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2 group shrink-0" onClick={() => setMobileOpen(false)}>
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
@@ -40,6 +62,34 @@ export default function Navbar() {
             <p className="text-[9px] sm:text-[10px] text-dark-muted font-medium -mt-0.5 hidden xs:block">Sprinkl.biz</p>
           </div>
         </Link>
+
+        {/* Middle Top Navigation Links */}
+        <nav className="hidden md:flex items-center gap-1 bg-dark-card/80 backdrop-blur-sm border border-dark-border/80 px-3 py-1.5 rounded-full shadow-inner">
+          <a
+            href="/#about"
+            onClick={(e) => handleNavClick(e, 'about')}
+            className="px-4 py-1 text-xs font-semibold text-slate-300 hover:text-brand-400 hover:bg-slate-800/80 rounded-full transition-all flex items-center gap-1.5"
+          >
+            <Info className="w-3.5 h-3.5 text-brand-400" />
+            <span>About</span>
+          </a>
+          <a
+            href="/#calculator"
+            onClick={(e) => handleNavClick(e, 'calculator')}
+            className="px-4 py-1 text-xs font-semibold text-slate-300 hover:text-brand-400 hover:bg-slate-800/80 rounded-full transition-all flex items-center gap-1.5"
+          >
+            <Sliders className="w-3.5 h-3.5 text-teal-400" />
+            <span>Calculator</span>
+          </a>
+          <button
+            onClick={handleContactClick}
+            className="px-4 py-1 text-xs font-semibold text-slate-300 hover:text-brand-400 hover:bg-slate-800/80 rounded-full transition-all flex items-center gap-1.5 group"
+          >
+            <Headphones className="w-3.5 h-3.5 text-emerald-400 group-hover:rotate-12 transition-transform" />
+            <span>Contact</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+          </button>
+        </nav>
 
         {/* Desktop Right Nav */}
         <div className="hidden sm:flex items-center gap-3">
@@ -105,6 +155,34 @@ export default function Navbar() {
       {/* Mobile Slide-down Menu */}
       {mobileOpen && (
         <div className="sm:hidden bg-dark-bg/95 backdrop-blur-md border-t border-dark-border px-4 py-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
+          {/* Quick Nav Links */}
+          <div className="grid grid-cols-3 gap-2 pb-3 mb-3 border-b border-dark-border">
+            <a
+              href="/#about"
+              onClick={(e) => handleNavClick(e, 'about')}
+              className="py-2 px-2 text-center rounded-xl bg-dark-card border border-dark-border text-xs font-semibold text-slate-300 hover:text-brand-400 flex items-center justify-center gap-1"
+            >
+              <Info className="w-3.5 h-3.5 text-brand-400" />
+              <span>About</span>
+            </a>
+            <a
+              href="/#calculator"
+              onClick={(e) => handleNavClick(e, 'calculator')}
+              className="py-2 px-2 text-center rounded-xl bg-dark-card border border-dark-border text-xs font-semibold text-slate-300 hover:text-brand-400 flex items-center justify-center gap-1"
+            >
+              <Sliders className="w-3.5 h-3.5 text-teal-400" />
+              <span>Calculator</span>
+            </a>
+            <button
+              onClick={handleContactClick}
+              className="py-2 px-2 text-center rounded-xl bg-dark-card border border-dark-border text-xs font-semibold text-emerald-400 flex items-center justify-center gap-1"
+            >
+              <Headphones className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Contact</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+            </button>
+          </div>
+
           {user ? (
             <>
               <div className="px-2 py-2 border-b border-dark-border mb-3">

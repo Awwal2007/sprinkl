@@ -11,6 +11,7 @@ import ClaimSuccessPage from './pages/ClaimSuccessPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import NotificationCenter from './components/NotificationCenter';
+import SupportChatWidget from './components/SupportChatWidget';
 import { useAuthStore } from './store/useAuthStore';
 
 function isTokenValid(token) {
@@ -65,6 +66,7 @@ export default function App() {
   return (
     <>
       <NotificationCenter />
+      <SupportChatWidget />
       <Routes>
         <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
