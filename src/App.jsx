@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import SettingsPage from './pages/SettingsPage';
 import DashboardPage from './pages/DashboardPage';
 import CreateGiveawayPage from './pages/CreateGiveawayPage';
 import GiveawayDetailPage from './pages/GiveawayDetailPage';
@@ -71,6 +73,7 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       {/* Protected Host Dashboard Routes */}
       <Route
@@ -110,7 +113,14 @@ export default function App() {
       <Route path="/g/:slug" element={<PublicClaimPage />} />
       <Route path="/g/:slug/claim/:claimId/success" element={<ClaimSuccessPage />} />
 
-      {/* Email Verification */}
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />

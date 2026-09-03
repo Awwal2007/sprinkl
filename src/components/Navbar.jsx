@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Gift, Wallet, LogOut, ShieldCheck, Menu, X, Sliders, Info, Headphones, ChevronDown } from 'lucide-react';
+import { Gift, Wallet, LogOut, ShieldCheck, Menu, X, Sliders, Info, Headphones, ChevronDown, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSupportStore } from '../store/useSupportStore';
 import { toast, confirmDialog } from '../store/useNotificationStore';
@@ -150,6 +150,14 @@ export default function Navbar() {
                       >
                         <Wallet className="w-4 h-4 text-brand-500" />
                         Dashboard
+                      </Link>
+                      <Link
+                        to="/settings"
+                        onClick={() => setAvatarOpen(false)}
+                        className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                      >
+                        <Settings className="w-4 h-4 text-slate-400" />
+                        Settings & Profile
                       </Link>
                       {user.role === 'admin' && (
                         <Link
