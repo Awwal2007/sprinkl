@@ -317,58 +317,222 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
           </div>
         )}
 
-        {/* ──────────── USDT VIEW ──────────── */}
+        {/* ──────────── USDT VIEW (OxaPay Live Gateway) ──────────── */}
         {currency === 'USDT' && (
           <div className="space-y-4 animate-in fade-in">
-            {/* Upcoming Update Card */}
-            <div className="bg-dark-bg p-5 rounded-2xl border border-amber-500/30 text-center space-y-3 relative overflow-hidden">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-400 shadow-lg shadow-amber-500/5">
-                <Clock className="w-6 h-6 animate-pulse" />
-              </div>
+            {!oxapayInvoice ? (
+              <div className="space-y-4">
+                {/* Network Selector */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Select Blockchain Network
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedChain('TRC20')}
+                      className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center justify-center gap-0.5 ${
+                        selectedChain === 'TRC20'
+                          ? 'border-brand-500 bg-brand-500/10 text-brand-400 shadow-sm'
+                          : 'border-dark-border bg-dark-bg text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <span className="font-extrabold text-white">TRC20</span>
+                      <span className="text-[10px] text-dark-muted">Tron Network</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedChain('BEP20')}
+                      className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center justify-center gap-0.5 ${
+                        selectedChain === 'BEP20'
+                          ? 'border-brand-500 bg-brand-500/10 text-brand-400 shadow-sm'
+                          : 'border-dark-border bg-dark-bg text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <span className="font-extrabold text-white">BEP20</span>
+                      <span className="text-[10px] text-dark-muted">BNB Smart Chain</span>
+                    </button>
+                  </div>
+                </div>
 
-              <div>
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-1.5">
-                  Upcoming Update
-                </span>
-                <h4 className="text-sm font-bold text-white">USDT Deposits Launching Shortly</h4>
-              </div>
+                {/* Amount */}
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Amount to Deposit (USDT)
+                    </label>
+                    <span className="text-[10px] text-dark-muted">Min: $1.00 USDT</span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-muted font-bold text-sm">$</span>
+                    <input
+                      type="number"
+                      min="1"
+                      step="any"
+                      value={usdtAmount}
+                      onChange={(e) => setUsdtAmount(e.target.value)}
+                      className="w-full bg-dark-bg border border-dark-border rounded-xl pl-8 pr-16 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                      placeholder="10.00"
+                    />
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                      USDT
+                    </span>
+                  </div>
 
-              <p className="text-xs text-dark-muted leading-relaxed max-w-xs mx-auto">
-                Automated multi-user crypto deposits (TRC20 & BEP20) via our payment gateway are currently undergoing merchant verification. We will activate this feature once verification is complete!
-              </p>
+                  {/* Preset quick buttons */}
+                  <div className="flex gap-2 mt-2">
+                    {['5', '10', '25', '50', '100'].map((amt) => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setUsdtAmount(amt)}
+                        className={`flex-1 py-1 text-[11px] font-bold rounded-lg border transition-colors ${
+                          usdtAmount === amt
+                            ? 'bg-brand-500/15 border-brand-500 text-brand-400'
+                            : 'bg-dark-bg border-dark-border text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        ${amt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-              <div className="pt-2">
+                {/* Generate Address Button */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setCurrency('NGN');
-                    setMsg(null);
-                  }}
-                  className="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
+                  onClick={handleCreateOxaPayInvoice}
+                  disabled={loading || parseFloat(usdtAmount) < 1}
+                  className="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-500/20 disabled:opacity-50"
                 >
-                  <Building2 className="w-4 h-4" />
-                  <span>Use NGN Instant Bank Deposit Instead</span>
+                  {loading ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Generating Crypto Address...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Coins className="w-4 h-4" />
+                      <span>Deposit ${parseFloat(usdtAmount || 0).toFixed(2)} USDT ({selectedChain})</span>
+                    </>
+                  )}
                 </button>
+
+                <p className="text-[11px] text-dark-muted text-center leading-relaxed">
+                  Automated deposit powered by OxaPay. Your wallet will credit automatically as soon as the transaction confirms on the blockchain.
+                </p>
               </div>
-            </div>
+            ) : (
+              /* Invoice Result State */
+              <div className="space-y-4">
+                <div className="bg-dark-bg p-4 rounded-2xl border border-dark-border text-center space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-dark-border/60">
+                    <span className="text-xs text-dark-muted font-bold">Send Exactly</span>
+                    <span className="text-sm font-black text-white font-mono">
+                      {oxapayInvoice.amount} USDT
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between pb-2 border-b border-dark-border/60">
+                    <span className="text-xs text-dark-muted font-bold">Network</span>
+                    <span className="text-xs font-black text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20">
+                      {oxapayInvoice.network || selectedChain}
+                    </span>
+                  </div>
+
+                  {/* QR Code */}
+                  {oxapayInvoice.qrCode && (
+                    <div className="py-2 flex flex-col items-center">
+                      <div className="p-2.5 bg-white rounded-xl shadow-lg inline-block">
+                        <img
+                          src={oxapayInvoice.qrCode}
+                          alt="USDT Deposit QR"
+                          className="w-40 h-40 object-contain mx-auto"
+                        />
+                      </div>
+                      <span className="text-[10px] text-dark-muted mt-2">
+                        Scan with your crypto wallet
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Payment Address */}
+                  {oxapayInvoice.payAddress && (
+                    <div className="space-y-1.5 text-left">
+                      <span className="text-[10px] text-dark-muted font-bold uppercase tracking-wider block">
+                        Deposit Address ({oxapayInvoice.network || selectedChain}):
+                      </span>
+                      <div className="flex items-center justify-between gap-2 p-2.5 bg-slate-900 rounded-xl border border-dark-border">
+                        <span className="text-xs font-mono font-bold text-brand-400 break-all select-all">
+                          {oxapayInvoice.payAddress}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(oxapayInvoice.payAddress, 'usdt-address')}
+                          className="flex items-center gap-1 text-[11px] text-slate-300 hover:text-white bg-slate-800 px-2.5 py-1.5 rounded-lg shrink-0 transition-colors"
+                        >
+                          {copied === 'usdt-address' ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                          <span>{copied === 'usdt-address' ? 'Copied' : 'Copy'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Hosted Checkout Link (if available) */}
+                  {oxapayInvoice.payLink && (
+                    <a
+                      href={oxapayInvoice.payLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors border border-dark-border mt-2"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-brand-400" />
+                      <span>Open OxaPay Hosted Checkout</span>
+                    </a>
+                  )}
+
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] leading-relaxed flex items-start gap-2 text-left">
+                    <Clock className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                    <span>
+                      Only send <strong>USDT</strong> via <strong>{oxapayInvoice.network || selectedChain}</strong>. Sending any other asset or wrong network will result in permanent loss of funds.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOxapayInvoice(null);
+                      setMsg(null);
+                    }}
+                    className="text-xs text-slate-400 hover:text-white underline transition-colors"
+                  >
+                    ← Change amount or network
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onFunded();
+                      onClose();
+                    }}
+                    className="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs rounded-xl transition-all"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Dev-only sandbox */}
             {IS_DEV && (
               <div className="pt-2 border-t border-dark-border">
                 <p className="text-[10px] text-amber-400 font-bold mb-2">⚠ DEV SANDBOX ONLY</p>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Simulate USDT Deposit</label>
                 <div className="flex gap-2">
-                  <div className="flex-1">
-                    <input
-                      type="number"
-                      min="2"
-                      step="0.5"
-                      value={usdtAmount}
-                      onChange={(e) => setUsdtAmount(e.target.value)}
-                      className="w-full bg-dark-bg border border-dark-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
-                      placeholder="2"
-                    />
-                  </div>
                   <button
                     type="button"
                     onClick={handleSimulateUsdtFund}
