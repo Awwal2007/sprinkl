@@ -426,38 +426,31 @@ export default function SupportChatWidget() {
                 msg.text.includes('Chat with the agent has been closed') ||
                 msg.text.includes('Chat session has been successfully closed');
 
-              // Prominent Closed Notice Banner with Date and Time
+              // Sleek Divider for session-closed notice
               if (isClosingNotice) {
+                const closedAt = msg.createdAt
+                  ? new Date(msg.createdAt).toLocaleString([], {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : 'Unknown time';
                 return (
                   <div
                     key={msg._id}
-                    className="my-3 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-2 animate-in fade-in"
+                    className="flex items-center gap-3 my-4 px-1 animate-in fade-in"
                   >
-                    <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
-                      <Clock className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-amber-300 uppercase tracking-wider">
-                        Chat With Agent Closed
-                      </p>
-                      <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
-                        {msg.text}
-                      </p>
-                    </div>
-                    <div className="pt-2 border-t border-amber-500/20 flex items-center justify-center gap-2">
-                      <span className="text-[10px] text-slate-400">
-                        Ask any AI question below, or start a new thread:
-                      </span>
-                      <button
-                        onClick={handleStartNewChat}
-                        className="px-2.5 py-1 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold text-[11px] rounded-lg transition-all"
-                      >
-                        Start New Chat
-                      </button>
-                    </div>
+                    <div className="flex-1 h-px bg-slate-700/60" />
+                    <span className="text-[10px] text-slate-500 font-medium whitespace-nowrap select-none">
+                      Live chat ended · {closedAt}
+                    </span>
+                    <div className="flex-1 h-px bg-slate-700/60" />
                   </div>
                 );
               }
+
 
               return (
                 <div
