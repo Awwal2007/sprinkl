@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Gift, Mail, KeyRound, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import api from '../api/client';
+import SEO from '../components/SEO';
 
 // Step indicator component
 function StepDot({ step, current, label }) {

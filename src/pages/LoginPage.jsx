@@ -4,14 +4,9 @@ import { Gift, Lock, Mail, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-r
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from '../store/useNotificationStore';
-import useSEO from '../hooks/useSEO';
+import SEO from '../components/SEO';
 
 export default function LoginPage() {
-  useSEO({
-    title: 'Login to Sprinkl — Your Nigerian Giveaway Dashboard | NGN & USDT Payouts',
-    description: "Sign in to your Sprinkl account to manage your giveaways, track payouts, and view your wallet balance. Nigeria's #1 automated giveaway platform for cash and crypto.",
-    path: '/login',
-  });
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -75,6 +70,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+      <SEO
+        title="Login to Sprinkl — Your Nigerian Giveaway Dashboard | NGN & USDT Payouts"
+        description="Sign in to your Sprinkl account to manage your giveaways, track payouts, and view your wallet balance. Nigeria's #1 automated giveaway platform for cash and crypto."
+        canonical="/login"
+        breadcrumbs={[
+          { name: 'Home', path: '/' },
+          { name: 'Sign In', path: '/login' },
+        ]}
+      />
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-brand-500/5 rounded-full blur-3xl" />

@@ -27,17 +27,11 @@ import {
   FileText,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import useSEO from '../hooks/useSEO';
+import SEO from '../components/SEO';
 import { useSupportStore } from '../store/useSupportStore';
 
 export default function LandingPage() {
   const { openChat } = useSupportStore();
-  useSEO({
-    title: 'Sprinkl — Automated Cash & Crypto Giveaways in Nigeria',
-    description:
-      'Sprinkl is Nigeria\'s #1 automated dual-currency giveaway platform. Pay winners directly to bank accounts (NGN) or crypto wallets (USDT). Zero double-claims guaranteed.',
-    path: '/',
-  });
 
   // Calculator state
   const [calcCurrency, setCalcCurrency] = useState('NGN');
@@ -111,6 +105,12 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100 selection:bg-brand-500 selection:text-slate-950 font-sans">
+      <SEO
+        title="Sprinkl — Automated Cash & Crypto Giveaways in Nigeria"
+        description="Sprinkl is Nigeria's #1 automated dual-currency giveaway platform. Pay winners directly to bank accounts (NGN) or crypto wallets (USDT). Zero double-claims guaranteed."
+        canonical="/"
+        breadcrumbs={[{ name: 'Home', path: '/' }]}
+      />
       <Navbar />
 
       <main className="flex-grow">

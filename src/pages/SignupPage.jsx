@@ -3,14 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Gift, Lock, Mail, User, Phone, ArrowRight, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
-import useSEO from '../hooks/useSEO';
+import SEO from '../components/SEO';
 
 export default function SignupPage() {
-  useSEO({
-    title: 'Sign Up Free — Start Your First Giveaway on Sprinkl Nigeria | NGN & USDT',
-    description: "Create a free Sprinkl account and launch your first giveaway in 60 seconds. Instantly pay winners to Nigerian bank accounts (NGN) or crypto wallets (USDT). No fraud. No double-claims. Nigeria's #1 giveaway platform.",
-    path: '/signup',
-  });
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -48,6 +43,15 @@ export default function SignupPage() {
   if (emailSent) {
     return (
       <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+        <SEO
+          title="Sign Up Free — Start Your First Giveaway on Sprinkl Nigeria | NGN & USDT"
+          description="Create a free Sprinkl account and launch your first giveaway in 60 seconds. Instantly pay winners to Nigerian bank accounts (NGN) or crypto wallets (USDT). No fraud. No double-claims. Nigeria's #1 giveaway platform."
+          canonical="/signup"
+          breadcrumbs={[
+            { name: 'Home', path: '/' },
+            { name: 'Sign Up', path: '/signup' },
+          ]}
+        />
         <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-10 shadow-2xl text-center">
           <div className="w-16 h-16 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center mx-auto mb-5">
             <CheckCircle2 className="w-8 h-8" />
@@ -74,6 +78,15 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+      <SEO
+        title="Sign Up Free — Start Your First Giveaway on Sprinkl Nigeria | NGN & USDT"
+        description="Create a free Sprinkl account and launch your first giveaway in 60 seconds. Instantly pay winners to Nigerian bank accounts (NGN) or crypto wallets (USDT). No fraud. No double-claims. Nigeria's #1 giveaway platform."
+        canonical="/signup"
+        breadcrumbs={[
+          { name: 'Home', path: '/' },
+          { name: 'Sign Up', path: '/signup' },
+        ]}
+      />
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-brand-500/5 rounded-full blur-3xl" />

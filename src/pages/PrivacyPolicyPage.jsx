@@ -13,43 +13,21 @@ import {
   Mail,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import useSEO from '../hooks/useSEO';
+import SEO from '../components/SEO';
 
 export default function PrivacyPolicyPage() {
-  useSEO({
-    title: 'Privacy Policy — Sprinkl | Data Protection & Security',
-    description:
-      'Learn how Sprinkl protects your data. Read our NDPR-compliant privacy policy detailing data encryption, anti-fraud safeguards, and immediate file purging upon closing chat.',
-    path: '/privacy',
-  });
-
-  // Inject page-specific JSON-LD: BreadcrumbList + WebPage schema
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.id = 'privacy-page-jsonld';
-    script.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@graph': [
-        {
-          '@type': 'BreadcrumbList',
-          '@id': 'https://www.sprinkl.biz/privacy#breadcrumb',
-          itemListElement: [
-            {
-              '@type': 'ListItem',
-              position: 1,
-              name: 'Home',
-              item: 'https://www.sprinkl.biz/',
-            },
-            {
-              '@type': 'ListItem',
-              position: 2,
-              name: 'Privacy Policy',
-              item: 'https://www.sprinkl.biz/privacy',
-            },
-          ],
-        },
-        {
+  return (
+    <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100 selection:bg-brand-500 selection:text-slate-950 font-sans">
+      <SEO
+        title="Privacy Policy — Sprinkl | Data Protection & Security"
+        description="Learn how Sprinkl protects your data. Read our NDPR-compliant privacy policy detailing data encryption, anti-fraud safeguards, and immediate file purging upon closing chat."
+        canonical="/privacy"
+        breadcrumbs={[
+          { name: 'Home', path: '/' },
+          { name: 'Privacy Policy', path: '/privacy' },
+        ]}
+        schema={{
+          '@context': 'https://schema.org',
           '@type': 'WebPage',
           '@id': 'https://www.sprinkl.biz/privacy#webpage',
           url: 'https://www.sprinkl.biz/privacy',
@@ -59,18 +37,8 @@ export default function PrivacyPolicyPage() {
           description:
             "Sprinkl's NDPR and GDPR-compliant Privacy Policy detailing data encryption, anti-fraud safeguards, and immediate file purging.",
           inLanguage: 'en',
-        },
-      ],
-    });
-    document.head.appendChild(script);
-    return () => {
-      const existing = document.getElementById('privacy-page-jsonld');
-      if (existing) existing.remove();
-    };
-  }, []);
-
-  return (
-    <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100 selection:bg-brand-500 selection:text-slate-950 font-sans">
+        }}
+      />
       <Navbar />
 
       <main className="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
