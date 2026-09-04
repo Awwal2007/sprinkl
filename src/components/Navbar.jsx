@@ -29,7 +29,8 @@ export default function Navbar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
-  const avatarRef = useRef(null);
+  const desktopAvatarRef = useRef(null);
+  const mobileAvatarRef = useRef(null);
 
   const onAppRoute = isAppRoute(location.pathname);
 
@@ -53,7 +54,9 @@ export default function Navbar() {
   // Close dropdown when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (avatarRef.current && !avatarRef.current.contains(e.target)) {
+      const clickedDesktop = desktopAvatarRef.current && desktopAvatarRef.current.contains(e.target);
+      const clickedMobile = mobileAvatarRef.current && mobileAvatarRef.current.contains(e.target);
+      if (!clickedDesktop && !clickedMobile) {
         setAvatarOpen(false);
       }
     };
@@ -138,8 +141,46 @@ export default function Navbar() {
               DESKTOP NAVIGATION (>= 768px)
              ══════════════════════════════════════════════════════ */}
 
-          {/* Desktop Public Nav Links (Hidden in dashboard/app routes) */}
-          {!onAppRoute && (
+          {/* Desktop Nav Links */}
+          {onAppRoute ? (
+            <nav className="hidden md:flex items-center gap-1 bg-dark-card/80 backdrop-blur-sm border border-dark-border/80 px-3 py-1.5 rounded-full shadow-inner">
+              <Link
+                to="/dashboard"
+                className={`px-4 py-1 text-xs font-semibold rounded-full transition-all flex items-center gap-1.5 ${
+                  location.pathname === '/dashboard'
+                    ? 'bg-brand-500/20 text-brand-400 border border-brand-500/30 font-bold'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <Wallet className="w-3.5 h-3.5 text-brand-400" />
+                <span>Dashboard</span>
+              </Link>
+              <Link
+                to="/settings"
+                className={`px-4 py-1 text-xs font-semibold rounded-full transition-all flex items-center gap-1.5 ${
+                  location.pathname === '/settings'
+                    ? 'bg-brand-500/20 text-brand-400 border border-brand-500/30 font-bold'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <Settings className="w-3.5 h-3.5 text-slate-400" />
+                <span>Settings</span>
+              </Link>
+              {user?.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  className={`px-4 py-1 text-xs font-semibold rounded-full transition-all flex items-center gap-1.5 ${
+                    location.pathname === '/admin'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold'
+                      : 'text-amber-400 hover:text-amber-300 hover:bg-amber-500/10'
+                  }`}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Admin</span>
+                </Link>
+              )}
+            </nav>
+          ) : (
             <nav className="hidden md:flex items-center gap-1 bg-dark-card/80 backdrop-blur-sm border border-dark-border/80 px-3 py-1.5 rounded-full shadow-inner">
               <a
                 href="/#about"
@@ -172,10 +213,11 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               /* User Avatar Dropdown (for Desktop) */
-              <div className="relative" ref={avatarRef}>
+              <div className="relative" ref={desktopAvatarRef}>
                 <button
+                  type="button"
                   onClick={() => setAvatarOpen((o) => !o)}
-                  className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full bg-dark-card/80 hover:bg-dark-card border border-dark-border hover:border-brand-500/30 transition-all group"
+                  className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full bg-dark-card/80 hover:bg-dark-card border border-dark-border hover:border-brand-500/30 transition-all group cursor-pointer"
                   aria-label="User menu"
                   aria-expanded={avatarOpen}
                 >
@@ -284,7 +326,7 @@ export default function Navbar() {
             {onAppRoute ? (
               /* IN DASHBOARD: Profile avatar dropdown only */
               user && (
-                <div className="relative" ref={avatarRef}>
+                <div className="relative" ref={mobileAvatarRef}>
                   <button
                     onClick={() => setAvatarOpen((o) => !o)}
                     className="flex items-center gap-1.5 p-1 rounded-full bg-dark-card border border-dark-border active:scale-95 transition-transform"
