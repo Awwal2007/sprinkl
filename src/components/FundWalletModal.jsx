@@ -6,7 +6,7 @@ const IS_DEV = import.meta.env.DEV; // true locally, false in production build
 
 export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses, kycThreshold = 500000, kycRequestStatus = 'none', onFunded }) {
   const [currency, setCurrency] = useState('NGN');
-  const [ngnAmount, setNgnAmount] = useState('3000');
+  const [ngnAmount, setNgnAmount] = useState('1000');
   const [usdtAmount, setUsdtAmount] = useState('2');
   const [selectedChain, setSelectedChain] = useState('TRC20');
   const [cryptoAddr, setCryptoAddr] = useState('');
@@ -82,8 +82,8 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
 
   const handleSimulateNgnFund = async () => {
     const amount = parseFloat(ngnAmount);
-    if (!amount || amount < 3000) {
-      setMsg({ type: 'error', text: 'Minimum NGN deposit is ₦3,000.' });
+    if (!amount || amount < 1000) {
+      setMsg({ type: 'error', text: 'Minimum NGN deposit is ₦1,000.' });
       return;
     }
     try {
@@ -192,23 +192,23 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
                   <span className="absolute left-3 top-2.5 text-sm text-dark-muted font-bold font-mono">₦</span>
                   <input
                     type="number"
-                    min="3000"
+                    min="1000"
                     step="500"
                     value={ngnAmount}
                     onChange={(e) => setNgnAmount(e.target.value)}
                     className="w-full bg-dark-card border border-dark-border rounded-xl pl-8 pr-4 py-2.5 text-base font-mono font-bold text-white focus:outline-none focus:border-brand-500"
-                    placeholder="3000"
+                    placeholder="1000"
                   />
                 </div>
                 <div className="flex items-center justify-between mt-1 text-[10px] text-dark-muted">
-                  <span>Minimum: ₦3,000</span>
+                  <span>Minimum: ₦1,000</span>
                   <span>Instant wallet credit</span>
                 </div>
               </div>
 
               {/* Amount Quick Presets */}
               <div className="grid grid-cols-4 gap-1.5 pt-1">
-                {[3000, 5000, 10000, 25000].map((val) => (
+                {[1000, 3000, 5000, 10000].map((val) => (
                   <button
                     key={val}
                     type="button"
@@ -228,8 +228,8 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
               <button
                 onClick={async () => {
                   const amt = parseFloat(ngnAmount);
-                  if (!amt || amt < 3000) {
-                    setMsg({ type: 'error', text: 'Minimum NGN deposit is ₦3,000.' });
+                  if (!amt || amt < 1000) {
+                    setMsg({ type: 'error', text: 'Minimum NGN deposit is ₦1,000.' });
                     return;
                   }
                   try {
@@ -247,7 +247,7 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
                     setLoading(false);
                   }
                 }}
-                disabled={loading || parseFloat(ngnAmount) < 3000}
+                disabled={loading || parseFloat(ngnAmount) < 1000}
                 className="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-500/20 disabled:opacity-50"
               >
                 {loading ? (
@@ -297,7 +297,7 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
                     className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
                   >
                     <Zap className="w-3.5 h-3.5 text-brand-400" />
-                    <span>Instant Sandbox Credit (₦{Number(ngnAmount || 3000).toLocaleString()})</span>
+                    <span>Instant Sandbox Credit (₦{Number(ngnAmount || 1000).toLocaleString()})</span>
                   </button>
                 </div>
               </div>

@@ -83,7 +83,7 @@ export default function LandingPage() {
     },
     {
       q: 'What are the minimum amounts?',
-      a: 'For NGN giveaways, the minimum payout per winner is ₦500 and the minimum wallet deposit is ₦3,000. For USDT giveaways, the minimum payout per winner is $0.20 USDT and the minimum wallet deposit is $2 USDT. These floors protect your margins by ensuring transfer fees are always covered.'
+      a: 'For NGN giveaways, the minimum payout per winner is ₦300 and the minimum wallet deposit is ₦1,000. For USDT giveaways, the minimum payout per winner is $0.20 USDT and the minimum wallet deposit is $2 USDT. These floors protect your margins by ensuring transfer fees are always covered.'
     },
     {
       q: 'How fast do winners receive their funds?',
@@ -99,7 +99,7 @@ export default function LandingPage() {
     },
     {
       q: 'How do I fund my host wallet to start?',
-      a: 'Hosts can instantly fund their NGN balance via Flutterwave (card or bank transfer with minimum ₦3,000), as well as dedicated crypto deposit addresses for USDT (minimum $2).'
+      a: 'Hosts can instantly fund their NGN balance via Flutterwave (card or bank transfer with minimum ₦1,000), as well as dedicated crypto deposit addresses for USDT (minimum $2).'
     }
   ];
 
