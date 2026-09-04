@@ -6,6 +6,7 @@ import api from '../api/client';
 import Navbar from '../components/Navbar';
 import PaymentThresholdModal from '../components/PaymentThresholdModal';
 import { useAuthStore } from '../store/useAuthStore';
+import SEO from '../components/SEO';
 
 export default function CreateGiveawayPage() {
   const navigate = useNavigate();
@@ -118,6 +119,12 @@ export default function CreateGiveawayPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+      <SEO
+        title="Create Giveaway — Sprinkl Host"
+        description="Create a new automated dual-currency giveaway with instant bank or crypto payouts."
+        canonical="/dashboard/create"
+        noIndex={true}
+      />
       <Navbar />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24 sm:pb-12 flex-1 w-full space-y-5 sm:space-y-6">

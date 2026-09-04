@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { CheckCircle2, Clock, Share2, Sparkles, ArrowLeft, ExternalLink, Gift, ArrowRight } from 'lucide-react';
 import api from '../api/client';
 import StatusBadge from '../components/StatusBadge';
+import SEO from '../components/SEO';
 
 export default function ClaimSuccessPage() {
   const { slug, claimId } = useParams();
@@ -43,6 +44,12 @@ export default function ClaimSuccessPage() {
 
   return (
     <div className="min-h-screen bg-dark-bg text-slate-100 flex items-center justify-center p-4">
+      <SEO
+        title={isPaid ? 'Claim Paid Successfully — Sprinkl' : 'Giveaway Claim Status — Sprinkl'}
+        description="View the live status of your giveaway prize payout on Sprinkl."
+        canonical={`/g/${slug}/claim/${claimId}/success`}
+        noIndex={true}
+      />
       <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 animate-in fade-in zoom-in duration-300 relative overflow-hidden">
         {isFailed ? (
           <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto shadow-xl shadow-rose-500/10">

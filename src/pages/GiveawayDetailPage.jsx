@@ -8,6 +8,7 @@ import ShareModal from '../components/ShareModal';
 import StatusBadge from '../components/StatusBadge';
 import { TableSkeleton, MobileCardSkeleton } from '../components/TableSkeleton';
 import { toast, confirmDialog } from '../store/useNotificationStore';
+import SEO from '../components/SEO';
 
 export default function GiveawayDetailPage() {
   const { id } = useParams();
@@ -134,6 +135,12 @@ export default function GiveawayDetailPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+      <SEO
+        title={data?.giveaway?.title ? `${data.giveaway.title} — Giveaway Management | Sprinkl` : 'Giveaway Management — Sprinkl'}
+        description="Monitor giveaway claims, payout transactions, and participant verification in real time."
+        canonical={`/dashboard/giveaway/${id}`}
+        noIndex={true}
+      />
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-5 sm:space-y-6">

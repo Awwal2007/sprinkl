@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Gift, ShieldCheck, CheckCircle2, AlertCircle, Building2, Coins, ArrowRight, Sparkles, Search } from 'lucide-react';
 import api from '../api/client';
-import useSEO from '../hooks/useSEO';
+import SEO from '../components/SEO';
 
 export default function PublicClaimPage() {
   const { slug } = useParams();
@@ -67,17 +67,14 @@ export default function PublicClaimPage() {
     }
   }, [giveawayData?.id, alreadyClaimed]);
 
-  // Dynamic SEO — updates once giveaway data is available so each claim
-  // page has a unique, keyword-rich title that can be shared on social media.
-  useSEO({
-    title: giveawayData
-      ? `Claim "${giveawayData.title}" Giveaway — Win Cash or Crypto | Sprinkl Nigeria`
-      : 'Claim Your Giveaway Prize — Instant Payout | Sprinkl Nigeria',
-    description: giveawayData
-      ? `You've been invited to claim a prize from "${giveawayData.title}" on Sprinkl! ${giveawayData.currency === 'NGN' ? 'Receive Nigerian Naira directly to your bank account.' : 'Receive USDT crypto to your wallet.'} 100% automated. No fraud. Powered by Sprinkl Nigeria.`
-      : 'Claim your giveaway prize instantly on Sprinkl. Receive Nigerian Naira to your bank account or USDT crypto to your wallet. 100% automated and fraud-proof.',
-    path: `/g/${slug}`,
-  });
+  // Dynamic SEO metadata
+  const seoTitle = giveawayData
+    ? `Claim "${giveawayData.title}" Giveaway — Win Cash or Crypto | Sprinkl Nigeria`
+    : 'Claim Your Giveaway Prize — Instant Payout | Sprinkl Nigeria';
+  const seoDescription = giveawayData
+    ? `You've been invited to claim a prize from "${giveawayData.title}" on Sprinkl! ${giveawayData.currency === 'NGN' ? 'Receive Nigerian Naira directly to your bank account.' : 'Receive USDT crypto to your wallet.'} 100% automated. No fraud. Powered by Sprinkl Nigeria.`
+    : 'Claim your giveaway prize instantly on Sprinkl. Receive Nigerian Naira to your bank account or USDT crypto to your wallet. 100% automated and fraud-proof.';
+
 
   // Fetch Banks for NGN
   const { data: banks } = useQuery({
@@ -197,6 +194,12 @@ export default function PublicClaimPage() {
   if (!giveawayData) {
     return (
       <div className="min-h-screen bg-dark-bg flex flex-col items-center justify-center p-4">
+        <SEO
+          title="Giveaway Not Found — Sprinkl"
+          description="This giveaway link is invalid or has ended."
+          canonical={`/g/${slug}`}
+          noIndex={true}
+        />
         <div className="bg-dark-card p-6 rounded-3xl border border-dark-border max-w-sm w-full text-center space-y-4 shadow-2xl">
           <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
           <div>
@@ -219,6 +222,15 @@ export default function PublicClaimPage() {
 
   return (
     <div className="min-h-screen bg-dark-bg text-slate-100 flex flex-col items-center justify-center p-4 sm:p-6">
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        canonical={`/g/${slug}`}
+        breadcrumbs={[
+          { name: 'Home', path: '/' },
+          { name: 'Claim Giveaway', path: `/g/${slug}` },
+        ]}
+      />
       {/* Container */}
       <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
         {/* Top Glow Accent */}

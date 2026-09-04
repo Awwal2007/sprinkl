@@ -23,6 +23,7 @@ import StatusBadge from '../components/StatusBadge';
 import { TableSkeleton, MobileCardSkeleton, GiveawayCardSkeleton } from '../components/TableSkeleton';
 import { toast, confirmDialog } from '../store/useNotificationStore';
 import { useAuthStore } from '../store/useAuthStore';
+import SEO from '../components/SEO';
 
 export default function DashboardPage() {
   const [isFundModalOpen, setIsFundModalOpen] = useState(false);
@@ -122,6 +123,12 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+      <SEO
+        title="Host Dashboard — Sprinkl"
+        description="Sprinkl Host Dashboard - Manage your giveaways, wallet balances, and payouts."
+        canonical="/dashboard"
+        noIndex={true}
+      />
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">

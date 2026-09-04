@@ -156,6 +156,15 @@ export default function ForgotPasswordPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+        <SEO
+          title="Password Reset Successful — Sprinkl"
+          description="Your password has been successfully updated on Sprinkl."
+          canonical="/forgot-password"
+          breadcrumbs={[
+            { name: 'Home', path: '/' },
+            { name: 'Reset Password', path: '/forgot-password' },
+          ]}
+        />
         <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-2xl p-8 shadow-2xl text-center">
           <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8 text-brand-400" />
@@ -178,6 +187,15 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+      <SEO
+        title="Reset Password — Sprinkl Host Account"
+        description="Reset your Sprinkl host account password securely with our 6-digit OTP verification."
+        canonical="/forgot-password"
+        breadcrumbs={[
+          { name: 'Home', path: '/' },
+          { name: 'Reset Password', path: '/forgot-password' },
+        ]}
+      />
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] bg-brand-500/5 rounded-full blur-3xl" />

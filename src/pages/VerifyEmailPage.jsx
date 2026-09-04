@@ -3,6 +3,7 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { CheckCircle2, AlertCircle, ArrowRight, Mail, RefreshCw } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
+import SEO from '../components/SEO';
 
 export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
@@ -42,6 +43,12 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+      <SEO
+        title="Verify Email Address — Sprinkl"
+        description="Verify your email address to activate your Sprinkl host account."
+        canonical="/verify-email"
+        noIndex={true}
+      />
       <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl text-center">
         {loading && (
           <div className="space-y-4 py-8">

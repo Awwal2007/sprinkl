@@ -43,6 +43,7 @@ import TableSkeleton, { MobileCardSkeleton } from '../components/TableSkeleton';
 import { toast, confirmDialog } from '../store/useNotificationStore';
 import { useAuthStore } from '../store/useAuthStore';
 import socket, { joinAdminRoom } from '../lib/socket';
+import SEO from '../components/SEO';
 
 export default function AdminDashboardPage() {
   const queryClient = useQueryClient();
@@ -409,6 +410,12 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+      <SEO
+        title="Admin Command Center — Sprinkl"
+        description="Sprinkl Platform Management & Operations Command Center"
+        canonical="/admin"
+        noIndex={true}
+      />
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 w-full space-y-4 sm:space-y-6">

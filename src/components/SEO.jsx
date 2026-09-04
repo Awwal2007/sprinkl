@@ -41,7 +41,9 @@ export default function SEO({
       <link rel="icon" href={`${BASE_URL}/favicon.ico`} sizes="48x48" />
       <link rel="icon" type="image/png" sizes="48x48" href={`${BASE_URL}/favicon-48x48.png`} />
       <link rel="icon" type="image/png" sizes="96x96" href={`${BASE_URL}/favicon-96x96.png`} />
+      <link rel="icon" type="image/png" sizes="144x144" href={`${BASE_URL}/favicon-144x144.png`} />
       <link rel="icon" type="image/png" sizes="192x192" href={`${BASE_URL}/favicon-192x192.png`} />
+      <link rel="icon" type="image/png" sizes="512x512" href={`${BASE_URL}/favicon-512x512.png`} />
       <link rel="icon" type="image/svg+xml" href={`${BASE_URL}/favicon.svg`} />
       <link rel="apple-touch-icon" sizes="180x180" href={`${BASE_URL}/apple-touch-icon.png`} />
       <link rel="shortcut icon" href={`${BASE_URL}/favicon.ico`} />

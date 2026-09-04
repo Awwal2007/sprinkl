@@ -21,6 +21,7 @@ import PaymentThresholdModal from '../components/PaymentThresholdModal';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { toast } from '../store/useNotificationStore';
+import SEO from '../components/SEO';
 
 // Tab IDs
 const TABS = ['profile', 'security'];
@@ -128,6 +129,12 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+      <SEO
+        title="Settings & Profile — Sprinkl"
+        description="Manage your account profile, security preferences, and payout thresholds."
+        canonical="/settings"
+        noIndex={true}
+      />
       <Navbar />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
