@@ -39,6 +39,7 @@ import {
 import api from '../api/client';
 import Navbar from '../components/Navbar';
 import StatusBadge from '../components/StatusBadge';
+import TableSkeleton, { MobileCardSkeleton } from '../components/TableSkeleton';
 import { toast, confirmDialog } from '../store/useNotificationStore';
 import { useAuthStore } from '../store/useAuthStore';
 import socket, { joinAdminRoom } from '../lib/socket';
@@ -63,7 +64,7 @@ export default function AdminDashboardPage() {
   });
 
   // Flagged accounts
-  const { data: flagData, refetch: refetchFlags } = useQuery({
+  const { data: flagData, isLoading: flagsLoading, refetch: refetchFlags } = useQuery({
     queryKey: ['adminFlags'],
     queryFn: async () => {
       const res = await api.get('/admin/flags');
@@ -215,7 +216,7 @@ export default function AdminDashboardPage() {
   const [giveawayCurrencyFilter, setGiveawayCurrencyFilter] = useState('all');
   const [giveawaySearch, setGiveawaySearch] = useState('');
 
-  const { data: giveawaysData, refetch: refetchGiveaways } = useQuery({
+  const { data: giveawaysData, isLoading: giveawaysLoading, refetch: refetchGiveaways } = useQuery({
     queryKey: ['adminGiveaways', giveawayPage, giveawayStatusFilter, giveawayCurrencyFilter, giveawaySearch],
     queryFn: async () => {
       const res = await api.get('/admin/giveaways', {
@@ -241,7 +242,7 @@ export default function AdminDashboardPage() {
   const [txDirectionFilter, setTxDirectionFilter] = useState('all');
   const [txSearch, setTxSearch] = useState('');
 
-  const { data: txData, refetch: refetchTx } = useQuery({
+  const { data: txData, isLoading: txLoading, refetch: refetchTx } = useQuery({
     queryKey: ['adminTransactions', txPage, txProviderFilter, txStatusFilter, txDirectionFilter, txSearch],
     queryFn: async () => {
       const res = await api.get('/admin/transactions', {
@@ -267,7 +268,7 @@ export default function AdminDashboardPage() {
   const [claimCurrencyFilter, setClaimCurrencyFilter] = useState('all');
   const [claimSearch, setClaimSearch] = useState('');
 
-  const { data: claimsData, refetch: refetchClaims } = useQuery({
+  const { data: claimsData, isLoading: claimsLoading, refetch: refetchClaims } = useQuery({
     queryKey: ['adminClaims', claimPage, claimStatusFilter, claimCurrencyFilter, claimSearch],
     queryFn: async () => {
       const res = await api.get('/admin/claims', {
@@ -291,7 +292,7 @@ export default function AdminDashboardPage() {
   const [userRoleFilter, setUserRoleFilter] = useState('all');
   const [userSearch, setUserSearch] = useState('');
 
-  const { data: usersData, refetch: refetchUsers } = useQuery({
+  const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = useQuery({
     queryKey: ['adminUsers', userPage, userRoleFilter, userSearch],
     queryFn: async () => {
       const res = await api.get('/admin/users', {
@@ -339,7 +340,7 @@ export default function AdminDashboardPage() {
   const [editingThresholdUserId, setEditingThresholdUserId] = useState(null);
   const [editingThresholdValue, setEditingThresholdValue] = useState('');
 
-  const { data: kycRequestsData, refetch: refetchKycRequests } = useQuery({
+  const { data: kycRequestsData, isLoading: kycRequestsLoading, refetch: refetchKycRequests } = useQuery({
     queryKey: ['adminKycRequests', kycPage, kycStatusFilter],
     queryFn: async () => {
       const res = await api.get('/admin/kyc-requests', {
@@ -478,7 +479,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* ─── Navigation Tabs Bar (Horizontal scroll on mobile) ─── */}
-        <div className="flex overflow-x-auto no-scrollbar gap-1.5 p-1 bg-dark-card/60 border border-dark-border/80 rounded-2xl">
+        <div className="flex overflow-x-auto no-scrollbar gap-1.5 p-1.5 bg-dark-card/60 border border-dark-border/80 rounded-2xl overscroll-x-contain touch-pan-x scroll-smooth">
           {[
             { id: 'overview', label: 'Overview & Reports', icon: TrendingUp },
             {
@@ -619,7 +620,27 @@ export default function AdminDashboardPage() {
                 </span>
               </div>
 
-              {flagData && flagData.length > 0 ? (
+              {flagsLoading ? (
+                <div className="space-y-4">
+                  <div className="sm:hidden">
+                    <MobileCardSkeleton count={3} />
+                  </div>
+                  <div className="hidden sm:block overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                          <th className="py-2.5 px-3">Host Name</th>
+                          <th className="py-2.5 px-3">Email</th>
+                          <th className="py-2.5 px-3">NGN Paid Out</th>
+                          <th className="py-2.5 px-3">USDT Paid Out</th>
+                          <th className="py-2.5 px-3 text-right">Payment Threshold Audit</th>
+                        </tr>
+                      </thead>
+                      <TableSkeleton rows={3} cols={5} colWidths={['w-32', 'w-44', 'w-24', 'w-24', 'w-28']} />
+                    </table>
+                  </div>
+                </div>
+              ) : flagData && flagData.length > 0 ? (
                 <>
                   {/* Mobile Cards */}
                   <div className="sm:hidden space-y-3">
@@ -655,7 +676,7 @@ export default function AdminDashboardPage() {
                           <th className="py-2.5 px-3">Email</th>
                           <th className="py-2.5 px-3">NGN Paid Out</th>
                           <th className="py-2.5 px-3">USDT Paid Out</th>
-                          <th className="py-2.5 px-3 text-right">KYC Audit Status</th>
+                          <th className="py-2.5 px-3 text-right">Payment Threshold Audit</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-dark-border text-xs">
@@ -1082,7 +1103,29 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {giveawaysData?.giveaways?.length > 0 ? (
+            {giveawaysLoading ? (
+              <div className="space-y-4">
+                <div className="sm:hidden">
+                  <MobileCardSkeleton count={4} />
+                </div>
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                        <th className="py-3 px-3">Title &amp; Slug</th>
+                        <th className="py-3 px-3">Host</th>
+                        <th className="py-3 px-3">Currency</th>
+                        <th className="py-3 px-3">Prize / Winner</th>
+                        <th className="py-3 px-3">Slots Claimed</th>
+                        <th className="py-3 px-3">Status</th>
+                        <th className="py-3 px-3 text-right">Created</th>
+                      </tr>
+                    </thead>
+                    <TableSkeleton rows={6} cols={7} colWidths={['w-44', 'w-36', 'w-16', 'w-24', 'w-20', 'w-20', 'w-20']} />
+                  </table>
+                </div>
+              </div>
+            ) : giveawaysData?.giveaways?.length > 0 ? (
               <div className="space-y-4">
                 {/* Mobile Cards */}
                 <div className="sm:hidden space-y-3">
@@ -1254,7 +1297,28 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {txData?.transactions?.length > 0 ? (
+            {txLoading ? (
+              <div className="space-y-4">
+                <div className="sm:hidden">
+                  <MobileCardSkeleton count={4} />
+                </div>
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                        <th className="py-3 px-3">Provider</th>
+                        <th className="py-3 px-3">Reference</th>
+                        <th className="py-3 px-3">Direction</th>
+                        <th className="py-3 px-3">Amount</th>
+                        <th className="py-3 px-3">Status</th>
+                        <th className="py-3 px-3 text-right">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <TableSkeleton rows={6} cols={6} colWidths={['w-24', 'w-40', 'w-20', 'w-28', 'w-20', 'w-24']} />
+                  </table>
+                </div>
+              </div>
+            ) : txData?.transactions?.length > 0 ? (
               <div className="space-y-4">
                 {/* Mobile Cards */}
                 <div className="sm:hidden space-y-3">
@@ -1413,7 +1477,29 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {claimsData?.claims?.length > 0 ? (
+            {claimsLoading ? (
+              <div className="space-y-4">
+                <div className="sm:hidden">
+                  <MobileCardSkeleton count={4} />
+                </div>
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                        <th className="py-3 px-3">Giveaway Title</th>
+                        <th className="py-3 px-3">Beneficiary Destination</th>
+                        <th className="py-3 px-3">Amount</th>
+                        <th className="py-3 px-3">Currency</th>
+                        <th className="py-3 px-3">Status</th>
+                        <th className="py-3 px-3">Payout Ref</th>
+                        <th className="py-3 px-3 text-right">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <TableSkeleton rows={6} cols={7} colWidths={['w-36', 'w-44', 'w-24', 'w-16', 'w-20', 'w-28', 'w-24']} />
+                  </table>
+                </div>
+              </div>
+            ) : claimsData?.claims?.length > 0 ? (
               <div className="space-y-4">
                 {/* Mobile Cards */}
                 <div className="sm:hidden space-y-3">
@@ -1584,7 +1670,29 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {usersData?.users?.length > 0 ? (
+            {usersLoading ? (
+              <div className="space-y-4">
+                <div className="sm:hidden">
+                  <MobileCardSkeleton count={4} />
+                </div>
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                        <th className="py-3 px-3">User</th>
+                        <th className="py-3 px-3">Role</th>
+                        <th className="py-3 px-3">Email Verified</th>
+                        <th className="py-3 px-3">Payment Limit</th>
+                        <th className="py-3 px-3">NGN Balance</th>
+                        <th className="py-3 px-3">USDT Balance</th>
+                        <th className="py-3 px-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <TableSkeleton rows={6} cols={7} colWidths={['w-36', 'w-20', 'w-20', 'w-24', 'w-24', 'w-24', 'w-28']} />
+                  </table>
+                </div>
+              </div>
+            ) : usersData?.users?.length > 0 ? (
               <div className="space-y-4">
                 {/* Mobile Cards */}
                 <div className="sm:hidden space-y-3">
@@ -1804,7 +1912,26 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {kycRequestsData?.requests?.length > 0 ? (
+            {kycRequestsLoading ? (
+              <div className="space-y-4">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                        <th className="py-3 px-3">User</th>
+                        <th className="py-3 px-3">Current Limit</th>
+                        <th className="py-3 px-3">Requested Limit</th>
+                        <th className="py-3 px-3">Reason</th>
+                        <th className="py-3 px-3">Status</th>
+                        <th className="py-3 px-3">Date</th>
+                        <th className="py-3 px-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <TableSkeleton rows={5} cols={7} colWidths={['w-36', 'w-24', 'w-24', 'w-48', 'w-20', 'w-20', 'w-28']} />
+                  </table>
+                </div>
+              </div>
+            ) : kycRequestsData?.requests?.length > 0 ? (
               <div className="space-y-4">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">

@@ -20,6 +20,7 @@ import Navbar from '../components/Navbar';
 import FundWalletModal from '../components/FundWalletModal';
 import ShareModal from '../components/ShareModal';
 import StatusBadge from '../components/StatusBadge';
+import { TableSkeleton, MobileCardSkeleton, GiveawayCardSkeleton } from '../components/TableSkeleton';
 import { toast, confirmDialog } from '../store/useNotificationStore';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -40,7 +41,11 @@ export default function DashboardPage() {
 
   const queryClient = useQueryClient();
 
-  const { data: walletData, refetch: refetchWallet } = useQuery({
+  const {
+    data: walletData,
+    isLoading: walletLoading,
+    refetch: refetchWallet,
+  } = useQuery({
     queryKey: ['wallet'],
     queryFn: async () => {
       const res = await api.get('/wallet');
@@ -48,7 +53,10 @@ export default function DashboardPage() {
     },
   });
 
-  const { data: giveawaysData } = useQuery({
+  const {
+    data: giveawaysData,
+    isLoading: giveawaysLoading,
+  } = useQuery({
     queryKey: ['giveaways'],
     queryFn: async () => {
       const res = await api.get('/giveaways');
@@ -279,7 +287,9 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          {giveawaysData && giveawaysData.length > 0 ? (
+          {giveawaysLoading ? (
+            <GiveawayCardSkeleton count={3} />
+          ) : giveawaysData && giveawaysData.length > 0 ? (
             <>
               {(() => {
                 const totalGiveaways = giveawaysData.length;
@@ -436,7 +446,28 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {walletData?.ledgerHistory && walletData.ledgerHistory.length > 0 ? (
+          {walletLoading ? (
+            <>
+              <div className="sm:hidden">
+                <MobileCardSkeleton count={5} />
+              </div>
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <th className="py-3 px-3">Date & Time</th>
+                      <th className="py-3 px-3">Type</th>
+                      <th className="py-3 px-3">Beneficiary / Note</th>
+                      <th className="py-3 px-3">Status</th>
+                      <th className="py-3 px-3">Amount</th>
+                      <th className="py-3 px-3 text-right">Balance After</th>
+                    </tr>
+                  </thead>
+                  <TableSkeleton rows={5} cols={6} colWidths={['w-24', 'w-16', 'w-44', 'w-16', 'w-20', 'w-24']} />
+                </table>
+              </div>
+            </>
+          ) : walletData?.ledgerHistory && walletData.ledgerHistory.length > 0 ? (
             <>
               {(() => {
                 const totalHistory = walletData.ledgerHistory.length;

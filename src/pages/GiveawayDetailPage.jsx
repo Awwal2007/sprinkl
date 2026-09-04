@@ -6,6 +6,7 @@ import api from '../api/client';
 import Navbar from '../components/Navbar';
 import ShareModal from '../components/ShareModal';
 import StatusBadge from '../components/StatusBadge';
+import { TableSkeleton, MobileCardSkeleton } from '../components/TableSkeleton';
 import { toast, confirmDialog } from '../store/useNotificationStore';
 
 export default function GiveawayDetailPage() {
@@ -26,8 +27,60 @@ export default function GiveawayDetailPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-dark-bg text-slate-100 flex items-center justify-center p-4">
-        <p className="text-xs text-dark-muted">Loading giveaway details...</p>
+      <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+        <Navbar />
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-5 sm:space-y-6">
+          <div className="h-4 bg-slate-800/60 rounded w-32 animate-pulse" />
+
+          {/* Giveaway Header Card Skeleton */}
+          <div className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 lg:p-8 space-y-5 animate-pulse">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="h-5 bg-slate-800 rounded-full w-20" />
+                <div className="h-4 bg-slate-800 rounded w-24" />
+              </div>
+              <div className="h-8 bg-slate-800 rounded w-3/4 max-w-md" />
+              <div className="h-4 bg-slate-800/60 rounded w-1/2 max-w-sm" />
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t border-dark-border">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-dark-bg p-3.5 rounded-xl border border-dark-border space-y-2">
+                  <div className="h-3 bg-slate-800/60 rounded w-20" />
+                  <div className="h-6 bg-slate-800 rounded w-28" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Claims Table Skeleton */}
+          <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="space-y-1">
+                <div className="h-5 bg-slate-800 rounded w-36 animate-pulse" />
+                <div className="h-3 bg-slate-800/60 rounded w-48 animate-pulse" />
+              </div>
+            </div>
+
+            <div className="sm:hidden">
+              <MobileCardSkeleton count={4} />
+            </div>
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                    <th className="py-2.5 px-3">Claimant Name</th>
+                    <th className="py-2.5 px-3">Destination</th>
+                    <th className="py-2.5 px-3">Status</th>
+                    <th className="py-2.5 px-3">Payout Reference</th>
+                    <th className="py-2.5 px-3 text-right">Time</th>
+                  </tr>
+                </thead>
+                <TableSkeleton rows={4} cols={5} colWidths={['w-28', 'w-48', 'w-16', 'w-32', 'w-16']} />
+              </table>
+            </div>
+          </section>
+        </main>
       </div>
     );
   }
