@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Building2, Copy, Check, Coins, Zap, AlertCircle, ExternalLink, RefreshCw, Clock, ShieldAlert, ArrowUpRight, CheckCircle2 } from 'lucide-react';
 import api from '../api/client';
 
 const IS_DEV = import.meta.env.DEV; // true locally, false in production build
 
-export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses, kycThreshold = 500000, kycRequestStatus = 'none', onFunded }) {
-  const [currency, setCurrency] = useState('NGN');
-  const [ngnAmount, setNgnAmount] = useState('1000');
-  const [usdtAmount, setUsdtAmount] = useState('2');
+export default function FundWalletModal({
+  isOpen,
+  onClose,
+  dva,
+  cryptoAddresses,
+  kycThreshold = 500000,
+  kycRequestStatus = 'none',
+  onFunded,
+  initialAmount,
+  defaultCurrency = 'NGN',
+}) {
+  const [currency, setCurrency] = useState(defaultCurrency || 'NGN');
+  const [ngnAmount, setNgnAmount] = useState(
+    initialAmount ? String(Math.max(1000, Math.ceil(Number(initialAmount)))) : '1000'
+  );
+  const [usdtAmount, setUsdtAmount] = useState(
+    initialAmount && defaultCurrency === 'USDT' ? String(Math.max(2, Number(initialAmount))) : '2'
+  );
   const [selectedChain, setSelectedChain] = useState('TRC20');
   const [cryptoAddr, setCryptoAddr] = useState('');
   const [copied, setCopied] = useState(null); // which text was copied
@@ -16,6 +30,29 @@ export default function FundWalletModal({ isOpen, onClose, dva, cryptoAddresses,
   const [msg, setMsg] = useState(null);
   const [localDva, setLocalDva] = useState(dva);
   const [oxapayInvoice, setOxapayInvoice] = useState(null);
+
+  // Sync state when modal is opened or props change
+  useEffect(() => {
+    if (isOpen) {
+      if (defaultCurrency) {
+        setCurrency(defaultCurrency);
+      }
+      if (initialAmount) {
+        const val = Number(initialAmount);
+        if (val > 0) {
+          if (defaultCurrency === 'USDT') {
+            setUsdtAmount(String(Math.max(2, val)));
+          } else {
+            setNgnAmount(String(Math.max(1000, Math.ceil(val))));
+          }
+        }
+      }
+    }
+  }, [isOpen, initialAmount, defaultCurrency]);
+
+  useEffect(() => {
+    setLocalDva(dva);
+  }, [dva]);
 
   if (!isOpen) return null;
 

@@ -167,53 +167,6 @@ export default function CreateGiveawayPage() {
             </div>
           )}
 
-          {/* Wallet Balance Status Banner */}
-          {availableBalance <= 0 ? (
-            <div className="p-4 mb-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
-                  <Wallet className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-amber-300">Wallet Empty — Deposit Required</h4>
-                  <p className="text-[11px] text-amber-200/80 mt-0.5 leading-relaxed">
-                    You don't have any {currency} deposited in your host account yet. Please fund your wallet first before creating a giveaway.
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowFundModal(true)}
-                className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl flex items-center gap-1.5 transition-all shrink-0 shadow-md hover:scale-[1.02] cursor-pointer"
-              >
-                <Wallet className="w-3.5 h-3.5" />
-                <span>Fund Wallet Now</span>
-              </button>
-            </div>
-          ) : isInsufficient ? (
-            <div className="p-4 mb-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center shrink-0 mt-0.5">
-                  <AlertCircle className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-rose-300">Insufficient Balance to Launch</h4>
-                  <p className="text-[11px] text-rose-200/80 mt-0.5 leading-relaxed">
-                    This giveaway requires {totalCost.toLocaleString()} {currency}, but your available balance is {availableBalance.toLocaleString()} {currency}. Please top up your wallet first.
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowFundModal(true)}
-                className="px-4 py-2 bg-rose-500 hover:bg-rose-400 text-white font-black text-xs rounded-xl flex items-center gap-1.5 transition-all shrink-0 shadow-md hover:scale-[1.02] cursor-pointer"
-              >
-                <Wallet className="w-3.5 h-3.5" />
-                <span>Top Up Wallet</span>
-              </button>
-            </div>
-          ) : null}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Currency Choice */}
             <div>
@@ -476,8 +429,7 @@ export default function CreateGiveawayPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setError(`Your ${currency} wallet has no funds. Please fund your wallet first before creating a giveaway.`);
-                  toast.info(`Please fund your ${currency} wallet first to create a giveaway.`, 'Fund Wallet Required');
+                  setError(null);
                   setShowFundModal(true);
                 }}
                 className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
@@ -489,8 +441,7 @@ export default function CreateGiveawayPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setError(`Insufficient balance. Please fund your wallet with at least ${(totalCost - availableBalance).toLocaleString()} ${currency} to launch this giveaway.`);
-                  toast.info(`Please add at least ${(totalCost - availableBalance).toLocaleString()} ${currency} to your wallet.`, 'Fund Wallet Required');
+                  setError(null);
                   setShowFundModal(true);
                 }}
                 className="w-full py-3.5 bg-brand-500/90 hover:bg-brand-500 text-slate-950 font-extrabold rounded-xl shadow-xl shadow-brand-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
@@ -525,6 +476,8 @@ export default function CreateGiveawayPage() {
         dva={walletData?.dva}
         cryptoAddresses={walletData?.cryptoAddresses}
         kycThreshold={userThresholdNaira}
+        initialAmount={totalCost}
+        defaultCurrency={currency}
         onFunded={() => {
           refetchWallet();
           setShowFundModal(false);
