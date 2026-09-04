@@ -183,6 +183,11 @@ export default function PublicClaimPage() {
   if (loadingGiveaway) {
     return (
       <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+        <SEO
+          title="Claim Giveaway Prize — Sprinkl"
+          description="Claim your giveaway prize instantly on Sprinkl with automated cash or crypto payouts."
+          canonical={`/g/${slug}`}
+        />
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-xs text-dark-muted font-medium">Securing giveaway claim link...</p>
