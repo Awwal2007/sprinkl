@@ -110,18 +110,6 @@ export default function DashboardPage() {
     }
   };
 
-  const totalAvailable =
-    (walletData?.balances?.NGN?.available || 0) +
-    (walletData?.balances?.USDT?.available || 0);
-
-  const handleCreateGiveawayClick = (e) => {
-    if (!walletLoading && totalAvailable <= 0) {
-      e.preventDefault();
-      toast.info('Please fund your wallet first before creating a giveaway.', 'Fund Wallet Required');
-      setIsFundModalOpen(true);
-    }
-  };
-
   const handleTransferGiveawayFunds = async (giveawayId) => {
     try {
       const res = await api.post(`/giveaways/${giveawayId}/transfer-to-main-wallet`);
@@ -173,7 +161,6 @@ export default function DashboardPage() {
             </button>
             <Link
               to="/dashboard/create"
-              onClick={handleCreateGiveawayClick}
               className="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-brand-500/20 flex items-center gap-1.5 transition-all hover:scale-[1.02]"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
@@ -300,7 +287,6 @@ export default function DashboardPage() {
             </div>
             <Link
               to="/dashboard/create"
-              onClick={handleCreateGiveawayClick}
               className="text-xs text-brand-400 hover:text-brand-300 font-bold flex items-center gap-1.5 shrink-0 whitespace-nowrap px-3 py-1.5 rounded-xl bg-brand-500/10 border border-brand-500/20 hover:bg-brand-500/20 transition-all"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -449,7 +435,6 @@ export default function DashboardPage() {
               </p>
               <Link
                 to="/dashboard/create"
-                onClick={handleCreateGiveawayClick}
                 className="px-4 py-2 bg-brand-500 text-slate-950 font-bold text-xs rounded-lg inline-flex items-center gap-1"
               >
                 <Plus className="w-4 h-4" />

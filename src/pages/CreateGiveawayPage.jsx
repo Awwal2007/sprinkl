@@ -425,26 +425,14 @@ export default function CreateGiveawayPage() {
               </div>
             )}
 
-            {availableBalance <= 0 ? (
+            {isInsufficient ? (
               <button
                 type="button"
                 onClick={() => {
                   setError(null);
                   setShowFundModal(true);
                 }}
-                className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <Wallet className="w-4 h-4" />
-                <span>Fund Wallet to Create Giveaway</span>
-              </button>
-            ) : isInsufficient ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setError(null);
-                  setShowFundModal(true);
-                }}
-                className="w-full py-3.5 bg-brand-500/90 hover:bg-brand-500 text-slate-950 font-extrabold rounded-xl shadow-xl shadow-brand-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                className="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-slate-950 font-extrabold rounded-xl shadow-xl shadow-brand-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
                 <Wallet className="w-4 h-4" />
                 <span>Fund Wallet to Proceed</span>
