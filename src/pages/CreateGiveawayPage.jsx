@@ -66,7 +66,7 @@ export default function CreateGiveawayPage() {
 
   const platformFee = giftPool > 0 ? Math.round(calculatedFee * 100) / 100 : 0;
   const totalCost = giftPool + platformFee;
-  const isInsufficient = totalCost > availableBalance;
+  const isInsufficient = Math.round(totalCost * 100) > Math.round(availableBalance * 100);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
