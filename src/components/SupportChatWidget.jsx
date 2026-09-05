@@ -325,16 +325,16 @@ export default function SupportChatWidget() {
       {/* ─── Custom End-Session Confirmation Modal ─── */}
       {showEndModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-sm bg-dark-card border border-rose-500/30 rounded-2xl shadow-2xl shadow-rose-500/10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-sm bg-white dark:bg-dark-card border border-rose-500/30 rounded-2xl shadow-2xl shadow-rose-500/10 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             {/* Header */}
             <div className="px-6 pt-6 pb-4 bg-gradient-to-b from-rose-500/10 to-transparent border-b border-rose-500/20 text-center">
               <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-rose-400" />
+                <Trash2 className="w-6 h-6 text-rose-500 dark:text-rose-400" />
               </div>
-              <h3 className="text-base font-extrabold text-white mb-1">End Support Chat?</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-1">End Support Chat?</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 This will close your active chat with the agent and{' '}
-                <span className="text-rose-400 font-semibold">
+                <span className="text-rose-600 dark:text-rose-400 font-semibold">
                   permanently erase all uploaded files
                 </span>{' '}
                 from storage immediately.
@@ -343,8 +343,8 @@ export default function SupportChatWidget() {
 
             {/* Privacy Guarantee Warning (No technical storage disclosure) */}
             <div className="mx-4 my-3 px-3.5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
-              <p className="text-[11px] text-rose-300 leading-relaxed font-medium">
+              <AlertCircle className="w-4 h-4 text-rose-500 dark:text-rose-400 mt-0.5 flex-shrink-0" />
+              <p className="text-[11px] text-rose-700 dark:text-rose-300 leading-relaxed font-medium">
                 All files uploaded during this session will be erased immediately and cannot be recovered.
               </p>
             </div>
@@ -353,7 +353,7 @@ export default function SupportChatWidget() {
             <div className="px-4 pb-5 flex gap-2.5">
               <button
                 onClick={() => setShowEndModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-dark-border text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                className="flex-1 py-2.5 rounded-xl border border-slate-300 dark:border-dark-border text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 Keep Chatting
               </button>
@@ -406,26 +406,26 @@ export default function SupportChatWidget() {
       {isOpen && (
         <div
           id="support-chat-window"
-          className="fixed bottom-2 right-2 sm:bottom-6 sm:right-6 z-[9999] w-[calc(100vw-1rem)] sm:w-[430px] h-[600px] max-h-[90vh] bg-dark-bg/95 backdrop-blur-2xl border border-dark-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
+          className="fixed bottom-2 right-2 sm:bottom-6 sm:right-6 z-[9999] w-[calc(100vw-1rem)] sm:w-[430px] h-[600px] max-h-[90vh] bg-white/95 dark:bg-dark-bg/95 backdrop-blur-2xl border border-slate-200 dark:border-dark-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
         >
           {/* Header */}
-          <div className="px-4 py-3 bg-slate-900/90 border-b border-dark-border flex items-center justify-between shrink-0">
+          <div className="px-4 py-3 bg-slate-100/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-dark-border flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black shadow-md">
                   <Bot className="w-5 h-5 stroke-[2.5]" />
                 </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-slate-900 rounded-full" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-white dark:border-slate-900 rounded-full" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="font-extrabold text-sm text-white">Sprinkl Support</h3>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20">
+                  <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Sprinkl Support</h3>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-brand-500/10 text-emerald-600 dark:text-brand-400 border border-brand-500/20">
                     Live Desk
                   </span>
                 </div>
-                <p className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-ping" />
                   <span>AI Assistant &amp; Live Agents Active</span>
                 </p>
               </div>
@@ -437,7 +437,7 @@ export default function SupportChatWidget() {
                   onClick={handleCloseSession}
                   disabled={closing}
                   title="Close chat with agent and erase files"
-                  className="px-2.5 py-1 text-xs text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors flex items-center gap-1 font-medium"
+                  className="px-2.5 py-1 text-xs text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors flex items-center gap-1 font-medium"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span className="hidden xs:inline">Close Chat</span>
@@ -448,7 +448,7 @@ export default function SupportChatWidget() {
                 <button
                   onClick={handleStartNewChat}
                   title="Start fresh conversation"
-                  className="px-2 py-1 text-xs text-brand-400 hover:bg-brand-500/10 rounded-lg transition-colors flex items-center gap-1 font-semibold"
+                  className="px-2 py-1 text-xs text-emerald-600 dark:text-brand-400 hover:bg-brand-500/10 rounded-lg transition-colors flex items-center gap-1 font-semibold"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   <span className="hidden xs:inline">New Chat</span>
@@ -457,7 +457,7 @@ export default function SupportChatWidget() {
 
               <button
                 onClick={closeChat}
-                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
                 aria-label="Minimize support chat"
               >
                 <X className="w-4 h-4" />
@@ -468,8 +468,8 @@ export default function SupportChatWidget() {
           {/* Messages Thread */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
             {/* Welcome Message */}
-            <div className="p-3.5 rounded-xl bg-slate-900/70 border border-dark-border/80 text-slate-300 leading-relaxed">
-              <div className="flex items-center gap-2 text-brand-400 font-bold mb-1.5">
+            <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900/70 border border-slate-200 dark:border-dark-border/80 text-slate-700 dark:text-slate-300 leading-relaxed">
+              <div className="flex items-center gap-2 text-emerald-600 dark:text-brand-400 font-bold mb-1.5">
                 <Sparkles className="w-4 h-4" />
                 <span>Welcome to Sprinkl Support!</span>
               </div>
@@ -482,7 +482,7 @@ export default function SupportChatWidget() {
             {/* Quick Prompts if conversation just started */}
             {messages.length === 0 && (
               <div className="space-y-1.5 pt-1">
-                <p className="text-[11px] font-semibold text-dark-muted uppercase tracking-wider">
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-dark-muted uppercase tracking-wider">
                   Suggested topics:
                 </p>
                 <div className="flex flex-col gap-1.5">
@@ -490,7 +490,7 @@ export default function SupportChatWidget() {
                     <button
                       key={i}
                       onClick={() => handleSendMessage(prompt)}
-                      className="text-left px-3 py-2 rounded-lg bg-dark-card hover:bg-slate-800 border border-dark-border/70 text-slate-300 hover:text-brand-300 text-xs transition-colors"
+                      className="text-left px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-dark-card dark:hover:bg-slate-800 border border-slate-200 dark:border-dark-border/70 text-slate-700 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-300 text-xs transition-colors"
                     >
                       {prompt}
                     </button>
@@ -523,11 +523,11 @@ export default function SupportChatWidget() {
                     key={msg._id}
                     className="flex items-center gap-3 my-4 px-1 animate-in fade-in"
                   >
-                    <div className="flex-1 h-px bg-slate-700/60" />
+                    <div className="flex-1 h-px bg-slate-300 dark:bg-slate-700/60" />
                     <span className="text-[10px] text-slate-500 font-medium whitespace-nowrap select-none">
                       Live chat ended · {closedAt}
                     </span>
-                    <div className="flex-1 h-px bg-slate-700/60" />
+                    <div className="flex-1 h-px bg-slate-300 dark:bg-slate-700/60" />
                   </div>
                 );
               }
@@ -540,16 +540,16 @@ export default function SupportChatWidget() {
                 >
                   <div className="flex items-center gap-1.5 mb-1 px-1">
                     {isAdmin ? (
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
                         <Shield className="w-3 h-3" />
                         <span>{msg.senderName || 'Sprinkl Agent'}</span>
                       </span>
                     ) : (
-                      <span className="text-[10px] font-semibold text-dark-muted">
+                      <span className="text-[10px] font-semibold text-slate-500 dark:text-dark-muted">
                         {isUser ? 'You' : msg.senderName || 'Sprinkl Bot'}
                       </span>
                     )}
-                    <span className="text-[9px] text-dark-muted font-mono">
+                    <span className="text-[9px] text-slate-400 dark:text-dark-muted font-mono">
                       {msg.createdAt
                         ? new Date(msg.createdAt).toLocaleTimeString([], {
                             hour: '2-digit',
@@ -564,8 +564,8 @@ export default function SupportChatWidget() {
                       isUser
                         ? 'bg-brand-500 text-slate-950 font-medium rounded-tr-none'
                         : isAdmin
-                        ? 'bg-gradient-to-br from-slate-900 to-emerald-950/60 border border-emerald-500/40 text-slate-100 rounded-tl-none shadow-emerald-500/5'
-                        : 'bg-slate-900 border border-dark-border text-slate-200 rounded-tl-none'
+                        ? 'bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-300 text-slate-900 dark:from-slate-900 dark:to-emerald-950/60 dark:border-emerald-500/40 dark:text-slate-100 rounded-tl-none shadow-emerald-500/5'
+                        : 'bg-slate-100 border border-slate-200 text-slate-800 dark:bg-slate-900 dark:border-dark-border dark:text-slate-200 rounded-tl-none'
                     }`}
                   >
                     <p className="whitespace-pre-wrap text-[13px]">{msg.text}</p>
@@ -583,7 +583,7 @@ export default function SupportChatWidget() {
                               isAgentRequest: true,
                             })
                           }
-                          className="mt-3 w-full py-2 px-3 rounded-xl bg-brand-500/20 hover:bg-brand-500/30 border border-brand-500/40 text-brand-300 font-bold text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                          className="mt-3 w-full py-2 px-3 rounded-xl bg-brand-500/20 hover:bg-brand-500/30 border border-brand-500/40 text-brand-700 dark:text-brand-300 font-bold text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
                         >
                           <User className="w-3.5 h-3.5" />
                           <span>🙋 Connect with Human Agent</span>
@@ -614,9 +614,9 @@ export default function SupportChatWidget() {
                                   <img
                                     src={downloadUrl}
                                     alt={att.filename}
-                                    className="max-h-36 rounded-lg object-cover border border-white/10 group-hover:opacity-90 transition-opacity"
+                                    className="max-h-36 rounded-lg object-cover border border-slate-200 dark:border-white/10 group-hover:opacity-90 transition-opacity"
                                   />
-                                  <span className="text-[10px] text-brand-300 font-mono mt-0.5 block underline flex items-center gap-1">
+                                  <span className="text-[10px] text-emerald-600 dark:text-brand-300 font-mono mt-0.5 block underline flex items-center gap-1">
                                     <ExternalLink className="w-3 h-3" /> View full image
                                   </span>
                                 </a>
@@ -625,11 +625,11 @@ export default function SupportChatWidget() {
                                   href={downloadUrl || '#'}
                                   target={downloadUrl ? '_blank' : '_self'}
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-2 p-2 rounded bg-black/20 hover:bg-black/30 text-[11px] font-mono transition-colors"
+                                  className="flex items-center gap-2 p-2 rounded bg-black/5 dark:bg-black/20 hover:bg-black/10 dark:hover:bg-black/30 text-[11px] font-mono transition-colors"
                                 >
                                   <FileText className="w-4 h-4 shrink-0" />
                                   <span className="truncate flex-1">{att.filename}</span>
-                                  <span className="text-[9px] text-dark-muted">
+                                  <span className="text-[9px] text-slate-500 dark:text-dark-muted">
                                     {att.size ? `${Math.round(att.size / 1024)}KB` : ''}
                                   </span>
                                 </a>
@@ -649,20 +649,20 @@ export default function SupportChatWidget() {
 
           {/* Attachments Preview Strip */}
           {selectedFiles.length > 0 && (
-            <div className="px-4 py-2 bg-slate-900/90 border-t border-dark-border flex flex-wrap gap-2">
+            <div className="px-4 py-2 bg-slate-100 dark:bg-slate-900/90 border-t border-slate-200 dark:border-dark-border flex flex-wrap gap-2">
               {selectedFiles.map((file, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-dark-card border border-dark-border text-[11px] text-slate-200"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-[11px] text-slate-700 dark:text-slate-200"
                 >
-                  <ImageIcon className="w-3 h-3 text-brand-400" />
+                  <ImageIcon className="w-3 h-3 text-emerald-600 dark:text-brand-400" />
                   <span className="max-w-[120px] truncate">{file.name}</span>
-                  <span className="text-[9px] text-dark-muted font-mono">
+                  <span className="text-[9px] text-slate-500 dark:text-dark-muted font-mono">
                     ({Math.round(file.size / 1024)}KB)
                   </span>
                   <button
                     onClick={() => removeSelectedFile(idx)}
-                    className="p-0.5 hover:text-rose-400 transition-colors"
+                    className="p-0.5 hover:text-rose-500 transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -672,7 +672,7 @@ export default function SupportChatWidget() {
           )}
 
           {/* Footer & Input: ALWAYS UNLOCKED for AI prompts and chatting */}
-          <div className="p-3 bg-slate-900 border-t border-dark-border shrink-0">
+          <div className="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-dark-border shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -693,7 +693,7 @@ export default function SupportChatWidget() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 title="Add attachment (images, PDFs, documents)"
-                className="p-2.5 rounded-xl bg-dark-card hover:bg-slate-800 border border-dark-border text-slate-400 hover:text-brand-400 transition-colors shrink-0"
+                className="p-2.5 rounded-xl bg-white dark:bg-dark-card hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-dark-border text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-brand-400 transition-colors shrink-0"
               >
                 <Paperclip className="w-4 h-4" />
               </button>
@@ -707,7 +707,7 @@ export default function SupportChatWidget() {
                     ? 'Ask the AI a question or start fresh...'
                     : 'Ask support or type your question...'
                 }
-                className="flex-1 bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
+                className="flex-1 bg-white dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
               />
 
               <button
@@ -720,13 +720,13 @@ export default function SupportChatWidget() {
               </button>
             </form>
 
-            <div className="flex items-center justify-between text-[10px] text-dark-muted mt-2 px-1">
+            <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-dark-muted mt-2 px-1">
               <span>🔒 Files erased upon ending chat</span>
               {isClosedSession && (
                 <button
                   type="button"
                   onClick={handleStartNewChat}
-                  className="text-brand-400 hover:underline font-semibold"
+                  className="text-emerald-600 dark:text-brand-400 hover:underline font-semibold"
                 >
                   + Start New Chat
                 </button>

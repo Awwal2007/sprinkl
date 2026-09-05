@@ -132,7 +132,7 @@ export default function CreateGiveawayPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+    <div className="min-h-screen flex flex-col bg-dark-bg text-slate-900 dark:text-slate-100 transition-colors duration-150">
       <SEO
         title="Create Giveaway — Sprinkl Host"
         description="Create a new automated dual-currency giveaway with instant bank or crypto payouts."
@@ -144,25 +144,25 @@ export default function CreateGiveawayPage() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24 sm:pb-12 flex-1 w-full space-y-5 sm:space-y-6">
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs text-dark-muted hover:text-slate-200 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-dark-muted hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Dashboard</span>
         </Link>
 
-        <div className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl">
+        <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center">
               <Gift className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold text-white">Create New Giveaway</h1>
-              <p className="text-xs text-dark-muted">Funds will be locked from your wallet immediately upon creation</p>
+              <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Create New Giveaway</h1>
+              <p className="text-xs text-slate-500 dark:text-dark-muted">Funds will be locked from your wallet immediately upon creation</p>
             </div>
           </div>
 
           {error && (
-            <div className="p-4 mb-6 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold">
+            <div className="p-4 mb-6 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 text-xs font-semibold">
               {error}
             </div>
           )}
@@ -170,7 +170,7 @@ export default function CreateGiveawayPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Currency Choice */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-2">Choose Giveaway Currency</label>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Choose Giveaway Currency</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -180,21 +180,21 @@ export default function CreateGiveawayPage() {
                   }}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     currency === 'NGN'
-                      ? 'bg-brand-500/10 border-brand-500 text-white shadow-md'
-                      : 'bg-dark-bg border-dark-border text-slate-400 hover:border-slate-700'
+                      ? 'bg-brand-500/10 border-brand-500 text-slate-900 dark:text-white shadow-md'
+                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
                   }`}
                 >
-                  <div className="font-bold text-sm mb-1 text-white">Nigerian Naira (NGN)</div>
-                  <div className="text-xs text-dark-muted leading-relaxed">Paid via Flutterwave Transfers to NG Bank Accounts</div>
+                  <div className="font-bold text-sm mb-1 text-slate-900 dark:text-white">Nigerian Naira (NGN)</div>
+                  <div className="text-xs text-slate-500 dark:text-dark-muted leading-relaxed">Paid via Flutterwave Transfers to NG Bank Accounts</div>
                 </button>
 
-                <div className="relative p-4 rounded-xl border border-dark-border bg-dark-bg text-left opacity-60 cursor-not-allowed select-none">
+                <div className="relative p-4 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50 dark:bg-dark-bg text-left opacity-60 cursor-not-allowed select-none">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="font-bold text-sm mb-1 text-slate-400">Tether USDT (Crypto)</div>
-                      <div className="text-xs text-dark-muted leading-relaxed">Paid via TRC-20 / BEP-20 Hot Wallet</div>
+                      <div className="font-bold text-sm mb-1 text-slate-500 dark:text-slate-400">Tether USDT (Crypto)</div>
+                      <div className="text-xs text-slate-400 dark:text-dark-muted leading-relaxed">Paid via TRC-20 / BEP-20 Hot Wallet</div>
                     </div>
-                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0 mt-0.5">
+                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0 mt-0.5">
                       Upcoming
                     </span>
                   </div>
@@ -205,31 +205,31 @@ export default function CreateGiveawayPage() {
             {/* Campaign Details */}
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Giveaway Title</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Giveaway Title</label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-brand-500"
                   placeholder="e.g. ₦10,000 Weekend Cash Drop 🚀"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Description / Rules (Optional)</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Description / Rules (Optional)</label>
                 <textarea
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-brand-500"
                   placeholder="Add instructions (e.g. Retweet & follow @handle on Twitter before claiming)"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Amount per Person ({currency})
                   </label>
                   <input
@@ -239,7 +239,7 @@ export default function CreateGiveawayPage() {
                     required
                     value={amountPerRecipient}
                     onChange={(e) => setAmountPerRecipient(e.target.value)}
-                    className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono"
+                    className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono"
                   />
                   
                   {/* Quick preset buttons */}
@@ -252,8 +252,8 @@ export default function CreateGiveawayPage() {
                           onClick={() => setAmountPerRecipient(amt)}
                           className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border transition-colors ${
                             Number(amountPerRecipient) === amt
-                              ? 'bg-brand-500/15 border-brand-500 text-brand-400'
-                              : 'bg-dark-bg border-dark-border text-slate-400 hover:text-white hover:border-slate-600'
+                              ? 'bg-brand-500/15 border-brand-500 text-brand-700 dark:text-brand-400'
+                              : 'bg-slate-100 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-slate-600'
                           }`}
                         >
                           ₦{amt >= 1000 ? `${amt / 1000}k` : amt}
@@ -269,8 +269,8 @@ export default function CreateGiveawayPage() {
                           onClick={() => setAmountPerRecipient(amt)}
                           className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border transition-colors ${
                             Number(amountPerRecipient) === amt
-                              ? 'bg-brand-500/15 border-brand-500 text-brand-400'
-                              : 'bg-dark-bg border-dark-border text-slate-400 hover:text-white hover:border-slate-600'
+                              ? 'bg-brand-500/15 border-brand-500 text-brand-700 dark:text-brand-400'
+                              : 'bg-slate-100 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-slate-600'
                           }`}
                         >
                           ${amt}
@@ -278,7 +278,7 @@ export default function CreateGiveawayPage() {
                       ))}
                     </div>
                   )}
-                  <p className="text-[10px] text-dark-muted mt-1">
+                  <p className="text-[10px] text-slate-500 dark:text-dark-muted mt-1">
                     Min: {currency === 'NGN'
                       ? (isAdmin ? '₦100 (admin)' : '₦300')
                       : (isAdmin ? '$0.10 USDT (admin)' : '$0.20 USDT')
@@ -287,23 +287,23 @@ export default function CreateGiveawayPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Number of Winners</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Number of Winners</label>
                   <input
                     type="number"
                     min="1"
                     required
                     value={totalSlots}
                     onChange={(e) => setTotalSlots(e.target.value)}
-                    className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono"
+                    className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono"
                   />
-                  <p className="text-[10px] text-dark-muted mt-1">Minimum: 1 slot</p>
+                  <p className="text-[10px] text-slate-500 dark:text-dark-muted mt-1">Minimum: 1 slot</p>
                 </div>
               </div>
             </div>
 
             {/* Anti-abuse settings */}
-            <div className="bg-dark-bg p-4 rounded-xl border border-dark-border space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
+            <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-xl border border-slate-200 dark:border-dark-border space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
                 <ShieldCheck className="w-4 h-4 text-brand-500" />
                 <span>Anti-Abuse Safeguards</span>
               </div>
@@ -312,9 +312,9 @@ export default function CreateGiveawayPage() {
                   type="checkbox"
                   checked={restrictFirstTime}
                   onChange={(e) => setRestrictFirstTime(e.target.checked)}
-                  className="w-4 h-4 rounded bg-dark-card border-dark-border text-brand-500 focus:ring-0"
+                  className="w-4 h-4 rounded bg-white dark:bg-dark-card border-slate-300 dark:border-dark-border text-brand-500 focus:ring-0"
                 />
-                <span className="text-xs text-slate-300">
+                <span className="text-xs text-slate-700 dark:text-slate-300">
                   Restrict to first-time claimants only (prevents serial claims across platform)
                 </span>
               </label>
@@ -323,77 +323,77 @@ export default function CreateGiveawayPage() {
             {/* Fee Privilege Status */}
             {isWhale ? (
               <div className="bg-gradient-to-r from-purple-500/10 via-brand-500/10 to-teal-500/10 p-4 rounded-xl border border-purple-500/30 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-500 dark:text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-bold text-white">Whale Tier Discount Active</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">Whale Tier Discount Active</span>
                     <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-purple-500 text-white">
                       3.0% (Capped at {currency === 'NGN' ? '₦35,000' : '$35 USDT'})
                     </span>
                   </div>
-                  <p className="text-xs text-dark-muted mt-0.5">
+                  <p className="text-xs text-slate-600 dark:text-dark-muted mt-0.5">
                     High-volume campaign privilege: Reduced 3.0% platform fee with a maximum cap to maximize your return.
                   </p>
                 </div>
               </div>
             ) : isPromo ? (
               <div className="bg-gradient-to-r from-brand-500/10 via-emerald-500/10 to-teal-500/10 p-4 rounded-xl border border-brand-500/30 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 mt-0.5">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-bold text-white">New Creator Privilege Active</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">New Creator Privilege Active</span>
                     <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-brand-500 text-slate-950">
                       2.5% Fee
                     </span>
                   </div>
-                  <p className="text-xs text-dark-muted mt-0.5">
+                  <p className="text-xs text-slate-600 dark:text-dark-muted mt-0.5">
                     Enjoy a discounted 2.5% platform fee for your first 3 giveaways ({remainingPromoCount} promo giveaway{remainingPromoCount === 1 ? '' : 's'} remaining). Standard rate is 5.0%.
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="bg-slate-900/60 p-3.5 rounded-xl border border-dark-border flex items-center justify-between text-xs">
-                <span className="text-slate-300 font-semibold">Platform Fee:</span>
-                <span className="font-bold text-white bg-slate-800 px-2 py-0.5 rounded border border-dark-border">
+              <div className="bg-slate-100 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-200 dark:border-dark-border flex items-center justify-between text-xs">
+                <span className="text-slate-700 dark:text-slate-300 font-semibold">Platform Fee:</span>
+                <span className="font-bold text-slate-900 dark:text-white bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-300 dark:border-dark-border">
                   5.0% Standard
                 </span>
               </div>
             )}
 
             {/* Total Calculation Box */}
-            <div className="bg-slate-900/80 p-4 rounded-xl border border-dark-border space-y-2">
-              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-xs text-dark-muted">
+            <div className="bg-slate-50 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-200 dark:border-dark-border space-y-2">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-xs text-slate-500 dark:text-dark-muted">
                 <span>Available Host Balance:</span>
-                <span className="font-semibold text-slate-200">
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
                   {availableBalance.toLocaleString()} {currency}
                 </span>
               </div>
-              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-xs text-dark-muted">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-xs text-slate-500 dark:text-dark-muted">
                 <span>Prize Pool (to {totalSlots} winners):</span>
-                <span className="font-semibold text-slate-200">
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
                   {giftPool.toLocaleString()} {currency}
                 </span>
               </div>
-              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-xs text-dark-muted">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-xs text-slate-500 dark:text-dark-muted">
                 <span>
                   Platform Fee ({isWhale ? '3% Whale Cap' : isPromo ? '2.5% Promo' : '5% Standard'}):
                   {isFloorApplied && (
-                    <span className="text-[10px] text-amber-400 font-medium ml-1.5">
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium ml-1.5">
                       (Minimum floor fee)
                     </span>
                   )}
                 </span>
-                <span className="font-semibold text-brand-400 font-mono">
+                <span className="font-semibold text-brand-600 dark:text-brand-400 font-mono">
                   {platformFee.toLocaleString()} {currency}
                 </span>
               </div>
-              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-sm font-bold text-white pt-2 border-t border-dark-border">
+              <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 text-sm font-bold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-dark-border">
                 <span>Total Deducted from Wallet:</span>
-                <span className={`font-mono ${isInsufficient ? 'text-rose-400' : 'text-brand-400'}`}>
+                <span className={`font-mono ${isInsufficient ? 'text-rose-500 dark:text-rose-400' : 'text-brand-600 dark:text-brand-400'}`}>
                   {totalCost.toLocaleString()} {currency}
                 </span>
               </div>

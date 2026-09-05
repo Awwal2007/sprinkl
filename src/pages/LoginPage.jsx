@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Gift, Lock, Mail, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Gift, Lock, Mail, ArrowRight, Eye, EyeOff, AlertCircle, Sun, Moon } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
+import { useThemeStore } from '../store/useThemeStore';
 import { toast } from '../store/useNotificationStore';
 import SEO from '../components/SEO';
 
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const setAuth = useAuthStore((state) => state.setAuth);
+  const { resolvedTheme, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function LoginPage() {
   const isExpired = typeof window !== 'undefined' && window.location.search.includes('expired=true');
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative">
       <SEO
         title="Login to Sprinkl — Your Nigerian Giveaway Dashboard | NGN & USDT Payouts"
         description="Sign in to your Sprinkl account to manage your giveaways, track payouts, and view your wallet balance. Nigeria's #1 automated giveaway platform for cash and crypto."
@@ -79,6 +81,23 @@ export default function LoginPage() {
           { name: 'Sign In', path: '/login' },
         ]}
       />
+
+      {/* Theme Toggle Button */}
+      <div className="absolute top-4 right-4 z-20">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+          className="p-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white/90 dark:bg-dark-card/90 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-sm hover:shadow transition-all backdrop-blur-md"
+        >
+          {resolvedTheme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-600" />
+          )}
+        </button>
+      </div>
+
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-brand-500/5 rounded-full blur-3xl" />
@@ -91,23 +110,23 @@ export default function LoginPage() {
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 shadow-xl shadow-brand-500/30 group-hover:scale-105 transition-transform">
               <Gift className="w-6 h-6 stroke-[2.5]" />
             </div>
-            <span className="text-2xl font-extrabold text-white tracking-tight">Sprinkl</span>
+            <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Sprinkl</span>
           </Link>
           <p className="mt-2 text-sm text-dark-muted">Sign in to your host account</p>
         </div>
 
         <div className="bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl">
           {isExpired && !error && (
-            <div className="flex items-center gap-2 p-3 mb-5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium">
+            <div className="flex items-center gap-2 p-3 mb-5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-300 text-xs font-medium">
               <Lock className="w-4 h-4 shrink-0" />
               <span>Your session expired. Please sign in again for security.</span>
             </div>
           )}
 
           {error && (
-            <div className="p-4 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium space-y-2.5">
+            <div className="p-4 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-300 text-xs font-medium space-y-2.5">
               <div className="flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <AlertCircle className="w-4 h-4 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">{error}</p>
               </div>
               {unverifiedEmail && (
@@ -117,7 +136,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={handleResendVerification}
                     disabled={resending || resendSent}
-                    className="text-brand-400 hover:text-brand-300 font-bold underline transition-colors disabled:opacity-50 text-xs"
+                    className="text-brand-600 dark:text-brand-400 hover:text-brand-500 dark:hover:text-brand-300 font-bold underline transition-colors disabled:opacity-50 text-xs"
                   >
                     {resending ? 'Sending…' : resendSent ? 'Verification link sent ✓' : 'Resend link'}
                   </button>
@@ -129,7 +148,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="login-email">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="login-email">
                 Email Address
               </label>
               <div className="relative">
@@ -141,7 +160,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                   placeholder="host@example.com"
                 />
               </div>
@@ -150,12 +169,12 @@ export default function LoginPage() {
             {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-slate-300" htmlFor="login-password">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300" htmlFor="login-password">
                   Password
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="text-xs text-brand-400 hover:text-brand-300 font-medium transition-colors"
+                  className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-500 dark:hover:text-brand-300 font-medium transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -169,13 +188,13 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-muted hover:text-slate-300 transition-colors p-0.5"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-dark-muted hover:text-slate-600 dark:hover:text-slate-300 transition-colors p-0.5"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -204,7 +223,7 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-xs text-dark-muted">
             Don't have a host account?{' '}
-            <Link to="/signup" className="text-brand-400 font-semibold hover:text-brand-300 transition-colors">
+            <Link to="/signup" className="text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-500 dark:hover:text-brand-300 transition-colors">
               Create one in 60s
             </Link>
           </p>

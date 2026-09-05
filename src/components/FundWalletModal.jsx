@@ -157,39 +157,39 @@ export default function FundWalletModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-dark-card border border-dark-border rounded-t-3xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-t-3xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 dark:hover:text-white p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h3 className="text-xl font-bold text-white mb-1">Fund Your Wallet</h3>
-        <p className="text-xs text-dark-muted mb-5">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Fund Your Wallet</h3>
+        <p className="text-xs text-slate-500 dark:text-dark-muted mb-5">
           Top up your host balance to start creating giveaways.
         </p>
 
         {/* Currency Toggle */}
-        <div className="grid grid-cols-2 gap-2 bg-dark-bg p-1 rounded-xl border border-dark-border mb-5">
+        <div className="grid grid-cols-2 gap-2 bg-slate-100 dark:bg-dark-bg p-1 rounded-xl border border-slate-200 dark:border-dark-border mb-5">
           <button
             onClick={() => { setCurrency('NGN'); setMsg(null); }}
             className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
               currency === 'NGN'
                 ? 'bg-brand-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-slate-200'
+                : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <Building2 className="w-4 h-4" />
             <span>NGN (Naira)</span>
           </button>
           <div
-            className="py-2.5 px-3 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed select-none text-slate-400 bg-dark-bg/50"
+            className="py-2.5 px-3 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed select-none text-slate-400 bg-slate-200/50 dark:bg-dark-bg/50"
             title="Crypto deposits are currently upcoming"
           >
             <Coins className="w-4 h-4" />
             <span>USDT (Crypto)</span>
-            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20">
               Upcoming
             </span>
           </div>
@@ -199,8 +199,8 @@ export default function FundWalletModal({
         {msg && (
           <div className={`p-3 rounded-lg text-xs font-medium mb-4 flex items-start gap-2 ${
             msg.type === 'success'
-              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+              : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
           }`}>
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{msg.text}</span>
@@ -211,33 +211,33 @@ export default function FundWalletModal({
         {currency === 'NGN' && (
           <div className="space-y-4">
             {/* Primary Option: Flutterwave Instant Checkout (Card & Bank Transfer) */}
-            <div className="bg-dark-bg p-4 rounded-xl border border-dark-border space-y-3">
+            <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-xl border border-slate-200 dark:border-dark-border space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-200 font-bold flex items-center gap-1.5">
+                <span className="text-xs text-slate-800 dark:text-slate-200 font-bold flex items-center gap-1.5">
                   <span>Pay via Bank Transfer or Card</span>
                 </span>
-                <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">
+                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">
                   SECURE &amp; INSTANT
                 </span>
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-dark-muted mb-1">
+                <label className="block text-[11px] font-medium text-slate-600 dark:text-dark-muted mb-1">
                   Enter Deposit Amount (₦)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-sm text-dark-muted font-bold font-mono">₦</span>
+                  <span className="absolute left-3 top-2.5 text-sm text-slate-400 dark:text-dark-muted font-bold font-mono">₦</span>
                   <input
                     type="number"
                     min="1000"
                     step="500"
                     value={ngnAmount}
                     onChange={(e) => setNgnAmount(e.target.value)}
-                    className="w-full bg-dark-card border border-dark-border rounded-xl pl-8 pr-4 py-2.5 text-base font-mono font-bold text-white focus:outline-none focus:border-brand-500"
+                    className="w-full bg-white dark:bg-dark-card border border-slate-300 dark:border-dark-border rounded-xl pl-8 pr-4 py-2.5 text-base font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
                     placeholder="1000"
                   />
                 </div>
-                <div className="flex items-center justify-between mt-1 text-[10px] text-dark-muted">
+                <div className="flex items-center justify-between mt-1 text-[10px] text-slate-500 dark:text-dark-muted">
                   <span>Minimum: ₦1,000</span>
                   <span>Instant wallet credit</span>
                 </div>
@@ -252,8 +252,8 @@ export default function FundWalletModal({
                     onClick={() => setNgnAmount(String(val))}
                     className={`py-1 text-[11px] font-mono rounded-lg border transition-all ${
                       Number(ngnAmount) === val
-                        ? 'bg-brand-500/10 border-brand-500 text-brand-400 font-bold'
-                        : 'bg-dark-card border-dark-border text-slate-400 hover:text-white'
+                        ? 'bg-brand-500/15 border-brand-500 text-emerald-600 dark:text-brand-400 font-bold'
+                        : 'bg-white dark:bg-dark-card border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     ₦{(val / 1000).toLocaleString()}k
@@ -303,20 +303,20 @@ export default function FundWalletModal({
 
             {/* Dedicated Virtual Account info (if already generated) */}
             {hasDva && (
-              <div className="bg-dark-bg p-3.5 rounded-xl border border-dark-border">
-                <span className="text-[10px] text-dark-muted font-medium uppercase tracking-wider block mb-1">
+              <div className="bg-slate-50 dark:bg-dark-bg p-3.5 rounded-xl border border-slate-200 dark:border-dark-border">
+                <span className="text-[10px] text-slate-500 dark:text-dark-muted font-medium uppercase tracking-wider block mb-1">
                   Or Direct Transfer to Your Dedicated Account:
                 </span>
-                <p className="text-xs font-bold text-slate-200">{localDva.bankName}</p>
-                <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-dark-border">
-                  <span className="text-base font-mono font-black text-brand-400">
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{localDva.bankName}</p>
+                <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-slate-200 dark:border-dark-border">
+                  <span className="text-base font-mono font-black text-emerald-600 dark:text-brand-400">
                     {localDva.accountNumber}
                   </span>
                   <button
                     onClick={() => handleCopy(localDva.accountNumber, 'ngn-acct')}
-                    className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-white bg-slate-800 px-2 py-1 rounded"
+                    className="flex items-center gap-1 text-[11px] text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded transition-colors"
                   >
-                    {copied === 'ngn-acct' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    {copied === 'ngn-acct' ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
                     <span>{copied === 'ngn-acct' ? 'Copied' : 'Copy'}</span>
                   </button>
                 </div>
@@ -325,15 +325,15 @@ export default function FundWalletModal({
 
             {/* Dev-only sandbox simulation */}
             {IS_DEV && (
-              <div className="pt-2 border-t border-dark-border">
-                <p className="text-[10px] text-amber-400 font-bold mb-1">DEV SANDBOX TEST</p>
+              <div className="pt-2 border-t border-slate-200 dark:border-dark-border">
+                <p className="text-[10px] text-amber-500 dark:text-amber-400 font-bold mb-1">DEV SANDBOX TEST</p>
                 <div className="flex gap-2">
                   <button
                     onClick={handleSimulateNgnFund}
                     disabled={loading}
-                    className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                    className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
                   >
-                    <Zap className="w-3.5 h-3.5 text-brand-400" />
+                    <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-brand-400" />
                     <span>Instant Sandbox Credit (₦{Number(ngnAmount || 1000).toLocaleString()})</span>
                   </button>
                 </div>
@@ -349,7 +349,7 @@ export default function FundWalletModal({
               <div className="space-y-4">
                 {/* Network Selector */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     Select Blockchain Network
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -358,24 +358,24 @@ export default function FundWalletModal({
                       onClick={() => setSelectedChain('TRC20')}
                       className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center justify-center gap-0.5 ${
                         selectedChain === 'TRC20'
-                          ? 'border-brand-500 bg-brand-500/10 text-brand-400 shadow-sm'
-                          : 'border-dark-border bg-dark-bg text-slate-400 hover:text-slate-200'
+                          ? 'border-brand-500 bg-brand-500/10 text-emerald-600 dark:text-brand-400 shadow-sm'
+                          : 'border-slate-200 dark:border-dark-border bg-slate-50 dark:bg-dark-bg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                       }`}
                     >
-                      <span className="font-extrabold text-white">TRC20</span>
-                      <span className="text-[10px] text-dark-muted">Tron Network</span>
+                      <span className="font-extrabold text-slate-900 dark:text-white">TRC20</span>
+                      <span className="text-[10px] text-slate-500 dark:text-dark-muted">Tron Network</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setSelectedChain('BEP20')}
                       className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center justify-center gap-0.5 ${
                         selectedChain === 'BEP20'
-                          ? 'border-brand-500 bg-brand-500/10 text-brand-400 shadow-sm'
-                          : 'border-dark-border bg-dark-bg text-slate-400 hover:text-slate-200'
+                          ? 'border-brand-500 bg-brand-500/10 text-emerald-600 dark:text-brand-400 shadow-sm'
+                          : 'border-slate-200 dark:border-dark-border bg-slate-50 dark:bg-dark-bg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                       }`}
                     >
-                      <span className="font-extrabold text-white">BEP20</span>
-                      <span className="text-[10px] text-dark-muted">BNB Smart Chain</span>
+                      <span className="font-extrabold text-slate-900 dark:text-white">BEP20</span>
+                      <span className="text-[10px] text-slate-500 dark:text-dark-muted">BNB Smart Chain</span>
                     </button>
                   </div>
                 </div>
@@ -383,23 +383,23 @@ export default function FundWalletModal({
                 {/* Amount */}
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs font-semibold text-slate-300">
+                    <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                       Amount to Deposit (USDT)
                     </label>
-                    <span className="text-[10px] text-dark-muted">Min: $1.00 USDT</span>
+                    <span className="text-[10px] text-slate-500 dark:text-dark-muted">Min: $1.00 USDT</span>
                   </div>
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-muted font-bold text-sm">$</span>
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-dark-muted font-bold text-sm">$</span>
                     <input
                       type="number"
                       min="1"
                       step="any"
                       value={usdtAmount}
                       onChange={(e) => setUsdtAmount(e.target.value)}
-                      className="w-full bg-dark-bg border border-dark-border rounded-xl pl-8 pr-16 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-8 pr-16 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
                       placeholder="10.00"
                     />
-                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 dark:text-slate-400">
                       USDT
                     </span>
                   </div>
@@ -413,8 +413,8 @@ export default function FundWalletModal({
                         onClick={() => setUsdtAmount(amt)}
                         className={`flex-1 py-1 text-[11px] font-bold rounded-lg border transition-colors ${
                           usdtAmount === amt
-                            ? 'bg-brand-500/15 border-brand-500 text-brand-400'
-                            : 'bg-dark-bg border-dark-border text-slate-400 hover:text-white'
+                            ? 'bg-brand-500/15 border-brand-500 text-emerald-600 dark:text-brand-400'
+                            : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         ${amt}
@@ -443,24 +443,24 @@ export default function FundWalletModal({
                   )}
                 </button>
 
-                <p className="text-[11px] text-dark-muted text-center leading-relaxed">
+                <p className="text-[11px] text-slate-500 dark:text-dark-muted text-center leading-relaxed">
                   Automated deposit powered by OxaPay. Your wallet will credit automatically as soon as the transaction confirms on the blockchain.
                 </p>
               </div>
             ) : (
               /* Invoice Result State */
               <div className="space-y-4">
-                <div className="bg-dark-bg p-4 rounded-2xl border border-dark-border text-center space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-dark-border/60">
-                    <span className="text-xs text-dark-muted font-bold">Send Exactly</span>
-                    <span className="text-sm font-black text-white font-mono">
+                <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-2xl border border-slate-200 dark:border-dark-border text-center space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-dark-border/60">
+                    <span className="text-xs text-slate-500 dark:text-dark-muted font-bold">Send Exactly</span>
+                    <span className="text-sm font-black text-slate-900 dark:text-white font-mono">
                       {oxapayInvoice.amount} USDT
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pb-2 border-b border-dark-border/60">
-                    <span className="text-xs text-dark-muted font-bold">Network</span>
-                    <span className="text-xs font-black text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-dark-border/60">
+                    <span className="text-xs text-slate-500 dark:text-dark-muted font-bold">Network</span>
+                    <span className="text-xs font-black text-emerald-600 dark:text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20">
                       {oxapayInvoice.network || selectedChain}
                     </span>
                   </div>
@@ -468,14 +468,14 @@ export default function FundWalletModal({
                   {/* QR Code */}
                   {oxapayInvoice.qrCode && (
                     <div className="py-2 flex flex-col items-center">
-                      <div className="p-2.5 bg-white rounded-xl shadow-lg inline-block">
+                      <div className="p-2.5 bg-white rounded-xl shadow-lg inline-block border border-slate-200">
                         <img
                           src={oxapayInvoice.qrCode}
                           alt="USDT Deposit QR"
                           className="w-40 h-40 object-contain mx-auto"
                         />
                       </div>
-                      <span className="text-[10px] text-dark-muted mt-2">
+                      <span className="text-[10px] text-slate-500 dark:text-dark-muted mt-2">
                         Scan with your crypto wallet
                       </span>
                     </div>
@@ -484,20 +484,20 @@ export default function FundWalletModal({
                   {/* Payment Address */}
                   {oxapayInvoice.payAddress && (
                     <div className="space-y-1.5 text-left">
-                      <span className="text-[10px] text-dark-muted font-bold uppercase tracking-wider block">
+                      <span className="text-[10px] text-slate-500 dark:text-dark-muted font-bold uppercase tracking-wider block">
                         Deposit Address ({oxapayInvoice.network || selectedChain}):
                       </span>
-                      <div className="flex items-center justify-between gap-2 p-2.5 bg-slate-900 rounded-xl border border-dark-border">
-                        <span className="text-xs font-mono font-bold text-brand-400 break-all select-all">
+                      <div className="flex items-center justify-between gap-2 p-2.5 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-dark-border">
+                        <span className="text-xs font-mono font-bold text-emerald-600 dark:text-brand-400 break-all select-all">
                           {oxapayInvoice.payAddress}
                         </span>
                         <button
                           type="button"
                           onClick={() => handleCopy(oxapayInvoice.payAddress, 'usdt-address')}
-                          className="flex items-center gap-1 text-[11px] text-slate-300 hover:text-white bg-slate-800 px-2.5 py-1.5 rounded-lg shrink-0 transition-colors"
+                          className="flex items-center gap-1 text-[11px] text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-200 dark:bg-slate-800 px-2.5 py-1.5 rounded-lg shrink-0 transition-colors"
                         >
                           {copied === 'usdt-address' ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <Check className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                           ) : (
                             <Copy className="w-3.5 h-3.5" />
                           )}
@@ -513,15 +513,15 @@ export default function FundWalletModal({
                       href={oxapayInvoice.payLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors border border-dark-border mt-2"
+                      className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors border border-slate-200 dark:border-dark-border mt-2"
                     >
-                      <ExternalLink className="w-3.5 h-3.5 text-brand-400" />
+                      <ExternalLink className="w-3.5 h-3.5 text-emerald-600 dark:text-brand-400" />
                       <span>Open OxaPay Hosted Checkout</span>
                     </a>
                   )}
 
-                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] leading-relaxed flex items-start gap-2 text-left">
-                    <Clock className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-[11px] leading-relaxed flex items-start gap-2 text-left">
+                    <Clock className="w-4 h-4 shrink-0 mt-0.5 text-amber-500 dark:text-amber-400" />
                     <span>
                       Only send <strong>USDT</strong> via <strong>{oxapayInvoice.network || selectedChain}</strong>. Sending any other asset or wrong network will result in permanent loss of funds.
                     </span>
@@ -535,7 +535,7 @@ export default function FundWalletModal({
                       setOxapayInvoice(null);
                       setMsg(null);
                     }}
-                    className="text-xs text-slate-400 hover:text-white underline transition-colors"
+                    className="text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white underline transition-colors"
                   >
                     ← Change amount or network
                   </button>

@@ -15,16 +15,20 @@ import {
   Settings,
   KeyRound,
   ArrowUpRight,
+  Sun,
+  Moon,
+  Monitor,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import PaymentThresholdModal from '../components/PaymentThresholdModal';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
+import { useThemeStore } from '../store/useThemeStore';
 import { toast } from '../store/useNotificationStore';
 import SEO from '../components/SEO';
 
 // Tab IDs
-const TABS = ['profile', 'security'];
+const TABS = ['profile', 'security', 'appearance'];
 
 function TabButton({ id, activeTab, setActiveTab, icon: Icon, label }) {
   const active = activeTab === id;
@@ -33,8 +37,8 @@ function TabButton({ id, activeTab, setActiveTab, icon: Icon, label }) {
       onClick={() => setActiveTab(id)}
       className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
         active
-          ? 'bg-brand-500/15 text-brand-400 border border-brand-500/30'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
+          ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30'
+          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 border border-transparent'
       }`}
     >
       <Icon className="w-4 h-4" />
@@ -45,6 +49,7 @@ function TabButton({ id, activeTab, setActiveTab, icon: Icon, label }) {
 
 export default function SettingsPage() {
   const { user, setAuth, logout } = useAuthStore();
+  const { theme, setTheme, resolvedTheme } = useThemeStore();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('profile');
@@ -128,7 +133,7 @@ export default function SettingsPage() {
     : 'U';
 
   return (
-    <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 transition-colors duration-150">
       <SEO
         title="Settings & Profile — Sprinkl"
         description="Manage your account profile, security preferences, and payout thresholds."
@@ -142,16 +147,16 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3 mb-7">
           <Link
             to="/dashboard"
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl font-extrabold text-white flex items-center gap-2">
-              <Settings className="w-5 h-5 text-brand-400" />
+            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+              <Settings className="w-5 h-5 text-brand-500" />
               Account Settings
             </h1>
-            <p className="text-xs text-dark-muted mt-0.5">Manage your profile, security, and preferences</p>
+            <p className="text-xs text-slate-500 dark:text-dark-muted mt-0.5">Manage your profile, security, and preferences</p>
           </div>
         </div>
 
@@ -159,12 +164,12 @@ export default function SettingsPage() {
           {/* Sidebar */}
           <aside className="lg:col-span-1">
             {/* Avatar card */}
-            <div className="bg-dark-card border border-dark-border rounded-2xl p-5 mb-4 text-center">
+            <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl p-5 mb-4 text-center">
               <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-brand-500 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-xl shadow-brand-500/20">
                 {initials}
               </div>
-              <p className="font-bold text-white text-sm truncate">{user?.fullName}</p>
-              <p className="text-xs text-dark-muted truncate mt-0.5">{user?.email}</p>
+              <p className="font-bold text-slate-900 dark:text-white text-sm truncate">{user?.fullName}</p>
+              <p className="text-xs text-slate-500 dark:text-dark-muted truncate mt-0.5">{user?.email}</p>
               <div className="flex items-center justify-center gap-1.5 mt-2">
                 {user?.emailVerified ? (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
@@ -186,20 +191,21 @@ export default function SettingsPage() {
             </div>
 
             {/* Nav */}
-            <div className="bg-dark-card border border-dark-border rounded-2xl p-3 space-y-1">
+            <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl p-3 space-y-1">
               <TabButton id="profile" activeTab={activeTab} setActiveTab={setActiveTab} icon={User} label="Profile" />
               <TabButton id="security" activeTab={activeTab} setActiveTab={setActiveTab} icon={KeyRound} label="Security" />
-              <div className="pt-1 border-t border-dark-border mt-1">
+              <TabButton id="appearance" activeTab={activeTab} setActiveTab={setActiveTab} icon={Sun} label="Appearance" />
+              <div className="pt-1 border-t border-slate-200 dark:border-dark-border mt-1">
                 <Link
                   to="/dashboard"
-                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-colors"
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
                 >
                   <Wallet className="w-4 h-4" />
                   Dashboard
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign Out
@@ -212,44 +218,44 @@ export default function SettingsPage() {
           <div className="lg:col-span-3">
             {/* ── Profile Tab ── */}
             {activeTab === 'profile' && (
-              <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-dark-border flex items-center gap-2">
-                  <User className="w-4 h-4 text-brand-400" />
-                  <h2 className="font-bold text-white text-sm">Personal Information</h2>
+              <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-200 dark:border-dark-border flex items-center gap-2">
+                  <User className="w-4 h-4 text-brand-500" />
+                  <h2 className="font-bold text-slate-900 dark:text-white text-sm">Personal Information</h2>
                 </div>
 
                 <form onSubmit={handleSaveProfile} className="p-6 space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="settings-name">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="settings-name">
                         Full Name
                       </label>
                       <div className="relative">
-                        <User className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <User className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         <input
                           id="settings-name"
                           type="text"
                           required
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
-                          className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                          className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                           placeholder="Your full name"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="settings-phone">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="settings-phone">
                         Phone Number
                       </label>
                       <div className="relative">
-                        <Phone className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <Phone className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         <input
                           id="settings-phone"
                           type="tel"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                          className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                           placeholder="+234 801 234 5678"
                         />
                       </div>
@@ -258,37 +264,37 @@ export default function SettingsPage() {
 
                   {/* Email (read-only) */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                       Email Address
-                      <span className="ml-2 text-dark-muted font-normal">(Cannot be changed)</span>
+                      <span className="ml-2 text-slate-400 dark:text-dark-muted font-normal">(Cannot be changed)</span>
                     </label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <Mail className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="email"
                         disabled
                         value={user?.email || ''}
-                        className="w-full bg-slate-900/50 border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-dark-muted cursor-not-allowed"
+                        className="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-400 dark:text-dark-muted cursor-not-allowed"
                       />
                     </div>
                   </div>
 
                   {/* Payment Threshold info */}
-                  <div className="p-4 rounded-xl bg-dark-bg border border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-start gap-3">
-                      <ShieldCheck className="w-5 h-5 text-brand-400 mt-0.5 shrink-0" />
+                      <ShieldCheck className="w-5 h-5 text-brand-500 mt-0.5 shrink-0" />
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="text-xs font-bold text-white">Payment Threshold</p>
-                          <span className="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-brand-500/10 text-brand-400 border border-brand-500/20">
+                          <p className="text-xs font-bold text-slate-900 dark:text-white">Payment Threshold</p>
+                          <span className="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
                             ₦{((user?.kyc?.payoutReviewThreshold || 50000000) / 100).toLocaleString()} / drop
                           </span>
                         </div>
-                        <p className="text-[11px] text-dark-muted mt-1">
+                        <p className="text-[11px] text-slate-500 dark:text-dark-muted mt-1">
                           Current single-giveaway payout limit. High-volume giveaways above this amount require a threshold upgrade.
                         </p>
                         {user?.kyc?.requestStatus === 'pending' && (
-                          <span className="inline-block mt-1.5 text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
+                          <span className="inline-block mt-1.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
                             Pending request for ₦{((user?.kyc?.requestedThreshold || 0) / 100).toLocaleString()}
                           </span>
                         )}
@@ -297,7 +303,7 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => setShowThresholdModal(true)}
-                      className="self-start sm:self-center px-3.5 py-2 rounded-xl bg-dark-card hover:bg-slate-800 border border-dark-border text-xs font-bold text-slate-200 flex items-center gap-1.5 transition-colors shrink-0"
+                      className="self-start sm:self-center px-3.5 py-2 rounded-xl bg-white dark:bg-dark-card hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-dark-border text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition-colors shrink-0"
                     >
                       <ArrowUpRight className="w-3.5 h-3.5" />
                       <span>Request Increase</span>
@@ -330,20 +336,20 @@ export default function SettingsPage() {
             {activeTab === 'security' && (
               <div className="space-y-5">
                 {/* Change password */}
-                <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden">
-                  <div className="px-6 py-4 border-b border-dark-border flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-brand-400" />
-                    <h2 className="font-bold text-white text-sm">Change Password</h2>
+                <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-200 dark:border-dark-border flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-brand-500" />
+                    <h2 className="font-bold text-slate-900 dark:text-white text-sm">Change Password</h2>
                   </div>
 
                   <form onSubmit={handleChangePassword} className="p-6 space-y-4">
                     {/* Current password */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="cur-password">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="cur-password">
                         Current Password
                       </label>
                       <div className="relative">
-                        <Lock className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <Lock className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         <input
                           id="cur-password"
                           type={showCurrent ? 'text' : 'password'}
@@ -351,13 +357,13 @@ export default function SettingsPage() {
                           autoComplete="current-password"
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
-                          className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                          className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                           placeholder="••••••••"
                         />
                         <button
                           type="button"
                           onClick={() => setShowCurrent((v) => !v)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-muted hover:text-slate-300 transition-colors"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-dark-muted hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                           aria-label="Toggle current password visibility"
                         >
                           {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -367,11 +373,11 @@ export default function SettingsPage() {
 
                     {/* New password */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="sec-new-password">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="sec-new-password">
                         New Password
                       </label>
                       <div className="relative">
-                        <Lock className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <Lock className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         <input
                           id="sec-new-password"
                           type={showNew ? 'text' : 'password'}
@@ -380,13 +386,13 @@ export default function SettingsPage() {
                           autoComplete="new-password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                          className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                           placeholder="Min. 8 characters"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNew((v) => !v)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-muted hover:text-slate-300 transition-colors"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-dark-muted hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                           aria-label="Toggle new password visibility"
                         >
                           {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -404,7 +410,7 @@ export default function SettingsPage() {
                                   : newPassword.length >= 8
                                   ? 'bg-brand-400'
                                   : 'bg-amber-400'
-                                : 'bg-dark-border'
+                                : 'bg-slate-200 dark:bg-dark-border'
                             }`}
                           />
                         ))}
@@ -413,11 +419,11 @@ export default function SettingsPage() {
 
                     {/* Confirm new password */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="sec-confirm-password">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="sec-confirm-password">
                         Confirm New Password
                       </label>
                       <div className="relative">
-                        <Lock className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <Lock className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         <input
                           id="sec-confirm-password"
                           type={showConfirm ? 'text' : 'password'}
@@ -425,17 +431,17 @@ export default function SettingsPage() {
                           autoComplete="new-password"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className={`w-full bg-dark-bg border rounded-xl pl-10 pr-12 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none transition-colors ${
+                          className={`w-full bg-slate-50 dark:bg-dark-bg border rounded-xl pl-10 pr-12 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder-dark-muted focus:outline-none transition-colors ${
                             confirmPassword && confirmPassword !== newPassword
                               ? 'border-rose-500 focus:ring-1 focus:ring-rose-500/30'
-                              : 'border-dark-border focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30'
+                              : 'border-slate-300 dark:border-dark-border focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30'
                           }`}
                           placeholder="Repeat new password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirm((v) => !v)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-muted hover:text-slate-300 transition-colors"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-dark-muted hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                           aria-label="Toggle confirm password visibility"
                         >
                           {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -469,38 +475,144 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Session / account info */}
-                <div className="bg-dark-card border border-dark-border rounded-2xl p-5">
-                  <h3 className="font-bold text-sm text-white mb-3 flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-brand-400" />
+                <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl p-5">
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-brand-500" />
                     Account & Session Info
                   </h3>
-                  <div className="space-y-2 text-xs text-dark-muted">
+                  <div className="space-y-2 text-xs text-slate-500 dark:text-dark-muted">
                     <div className="flex justify-between items-center">
                       <span>Account Role</span>
-                      <span className="capitalize font-semibold text-slate-300">{user?.role}</span>
+                      <span className="capitalize font-semibold text-slate-700 dark:text-slate-300">{user?.role}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Email Verified</span>
-                      <span className={`font-semibold ${user?.emailVerified ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      <span className={`font-semibold ${user?.emailVerified ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                         {user?.emailVerified ? 'Yes' : 'No'}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Payment Threshold</span>
-                      <span className="font-mono font-semibold text-slate-300">
+                      <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">
                         ₦{((user?.kyc?.payoutReviewThreshold || 50000000) / 100).toLocaleString()}
                       </span>
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-dark-border">
+                  <div className="mt-4 pt-4 border-t border-slate-200 dark:border-dark-border">
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-2 text-sm font-semibold text-rose-400 hover:text-rose-300 transition-colors"
+                      className="flex items-center gap-2 text-sm font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
                       Sign Out of All Devices
                     </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Appearance Tab ── */}
+            {activeTab === 'appearance' && (
+              <div className="space-y-5">
+                <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-200 dark:border-dark-border flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sun className="w-4 h-4 text-brand-400" />
+                      <h2 className="font-bold text-slate-900 dark:text-white text-sm">Theme Appearance</h2>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/20">
+                      Active: {resolvedTheme === 'dark' ? 'Dark' : 'Light'}
+                    </span>
+                  </div>
+
+                  <div className="p-6 space-y-6">
+                    <p className="text-xs text-slate-600 dark:text-dark-muted leading-relaxed">
+                      Select your preferred theme. By default, Sprinkl is in light mode and automatically adapts if your phone or computer switches to dark mode.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                      {/* System / Auto */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTheme('system');
+                          toast.success('System theme detection active', 'Theme Updated');
+                        }}
+                        className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
+                          theme === 'system'
+                            ? 'bg-brand-500/10 border-brand-500 shadow-md ring-1 ring-brand-500/30'
+                            : 'bg-slate-50 dark:bg-dark-bg/60 border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center">
+                            <Monitor className="w-4 h-4" />
+                          </div>
+                          {theme === 'system' && (
+                            <span className="w-2 h-2 rounded-full bg-brand-500 shadow-sm shadow-brand-500" />
+                          )}
+                        </div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">System (Auto)</div>
+                        <p className="text-[11px] text-slate-500 dark:text-dark-muted mt-1 leading-normal">
+                          Matches your phone or computer theme automatically
+                        </p>
+                      </button>
+
+                      {/* Light Mode */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTheme('light');
+                          toast.success('Switched to Light Mode', 'Theme Updated');
+                        }}
+                        className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
+                          theme === 'light'
+                            ? 'bg-brand-500/10 border-brand-500 shadow-md ring-1 ring-brand-500/30'
+                            : 'bg-slate-50 dark:bg-dark-bg/60 border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center">
+                            <Sun className="w-4 h-4" />
+                          </div>
+                          {theme === 'light' && (
+                            <span className="w-2 h-2 rounded-full bg-brand-500 shadow-sm shadow-brand-500" />
+                          )}
+                        </div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Light Mode</div>
+                        <p className="text-[11px] text-slate-500 dark:text-dark-muted mt-1 leading-normal">
+                          Clean, high-contrast, crisp daytime reading interface
+                        </p>
+                      </button>
+
+                      {/* Dark Mode */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTheme('dark');
+                          toast.success('Switched to Dark Mode', 'Theme Updated');
+                        }}
+                        className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
+                          theme === 'dark'
+                            ? 'bg-brand-500/10 border-brand-500 shadow-md ring-1 ring-brand-500/30'
+                            : 'bg-slate-50 dark:bg-dark-bg/60 border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center">
+                            <Moon className="w-4 h-4" />
+                          </div>
+                          {theme === 'dark' && (
+                            <span className="w-2 h-2 rounded-full bg-brand-500 shadow-sm shadow-brand-500" />
+                          )}
+                        </div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">Dark Mode</div>
+                        <p className="text-[11px] text-slate-500 dark:text-dark-muted mt-1 leading-normal">
+                          Sleek, low-light, battery-saving dark interface
+                        </p>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

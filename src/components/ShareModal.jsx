@@ -15,33 +15,33 @@ export default function ShareModal({ isOpen, onClose, publicUrl, title }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-dark-card border border-dark-border rounded-2xl max-w-sm w-full p-6 shadow-2xl relative text-center animate-in fade-in zoom-in duration-200">
+      <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl max-w-sm w-full p-6 shadow-2xl relative text-center animate-in fade-in zoom-in duration-200">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+          className="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="w-12 h-12 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center mx-auto mb-3">
+        <div className="w-12 h-12 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center mx-auto mb-3">
           <Share2 className="w-6 h-6" />
         </div>
 
-        <h3 className="text-lg font-bold text-white mb-1">Share Giveaway</h3>
-        <p className="text-xs text-dark-muted mb-5 line-clamp-1">{title}</p>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Share Giveaway</h3>
+        <p className="text-xs text-slate-500 dark:text-dark-muted mb-5 line-clamp-1">{title}</p>
 
         {/* QR Code Container */}
-        <div className="bg-white p-4 rounded-xl inline-block shadow-inner mb-5">
+        <div className="bg-white p-4 rounded-xl inline-block shadow-inner mb-5 border border-slate-100">
           <QRCodeSVG value={publicUrl} size={160} level="H" includeMargin={false} />
         </div>
 
         {/* URL Box */}
-        <div className="bg-dark-bg p-2.5 rounded-xl border border-dark-border flex items-center gap-2 mb-4 text-left">
+        <div className="bg-slate-50 dark:bg-dark-bg p-2.5 rounded-xl border border-slate-200 dark:border-dark-border flex items-center gap-2 mb-4 text-left">
           <input
             type="text"
             readOnly
             value={publicUrl}
-            className="bg-transparent text-xs text-slate-300 font-mono flex-1 outline-none truncate"
+            className="bg-transparent text-xs text-slate-700 dark:text-slate-300 font-mono flex-1 outline-none truncate"
           />
           <button
             onClick={handleCopy}
@@ -56,7 +56,7 @@ export default function ShareModal({ isOpen, onClose, publicUrl, title }) {
           href={publicUrl}
           target="_blank"
           rel="noreferrer"
-          className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center justify-center gap-1.5 transition-colors"
+          className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 transition-colors"
         >
           <ExternalLink className="w-4 h-4" />
           <span>Open Public Claim Page</span>

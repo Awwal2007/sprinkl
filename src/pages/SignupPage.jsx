@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Gift, Lock, Mail, User, Phone, ArrowRight, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Gift, Lock, Mail, User, Phone, ArrowRight, CheckCircle2, Eye, EyeOff, Sun, Moon } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
+import { useThemeStore } from '../store/useThemeStore';
 import SEO from '../components/SEO';
 
 export default function SignupPage() {
@@ -17,6 +18,7 @@ export default function SignupPage() {
   const [emailSent, setEmailSent] = useState(false);
 
   const setAuth = useAuthStore((state) => state.setAuth);
+  const { resolvedTheme, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -42,7 +44,7 @@ export default function SignupPage() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+      <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative">
         <SEO
           title="Sign Up Free — Start Your First Giveaway on Sprinkl Nigeria | NGN & USDT"
           description="Create a free Sprinkl account and launch your first giveaway in 60 seconds. Instantly pay winners to Nigerian bank accounts (NGN) or crypto wallets (USDT). No fraud. No double-claims. Nigeria's #1 giveaway platform."
@@ -52,14 +54,31 @@ export default function SignupPage() {
             { name: 'Sign Up', path: '/signup' },
           ]}
         />
+
+        {/* Theme Toggle Button */}
+        <div className="absolute top-4 right-4 z-20">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+            className="p-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white/90 dark:bg-dark-card/90 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-sm hover:shadow transition-all backdrop-blur-md"
+          >
+            {resolvedTheme === 'dark' ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-slate-600" />
+            )}
+          </button>
+        </div>
+
         <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-10 shadow-2xl text-center">
-          <div className="w-16 h-16 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center mx-auto mb-5">
+          <div className="w-16 h-16 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 dark:text-brand-400 flex items-center justify-center mx-auto mb-5">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-extrabold text-white mb-2">Check Your Email!</h2>
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-white mb-2">Check Your Email!</h2>
           <p className="text-sm text-dark-muted leading-relaxed mb-2">
             We sent a verification link to{' '}
-            <strong className="text-slate-200">{email}</strong>.
+            <strong className="text-slate-800 dark:text-slate-200">{email}</strong>.
           </p>
           <p className="text-xs text-dark-muted mb-8">
             Click the link to activate your account. The link expires in 24 hours. Check your spam folder if you don't see it.
@@ -77,7 +96,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative">
       <SEO
         title="Sign Up Free — Start Your First Giveaway on Sprinkl Nigeria | NGN & USDT"
         description="Create a free Sprinkl account and launch your first giveaway in 60 seconds. Instantly pay winners to Nigerian bank accounts (NGN) or crypto wallets (USDT). No fraud. No double-claims. Nigeria's #1 giveaway platform."
@@ -87,6 +106,23 @@ export default function SignupPage() {
           { name: 'Sign Up', path: '/signup' },
         ]}
       />
+
+      {/* Theme Toggle Button */}
+      <div className="absolute top-4 right-4 z-20">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+          className="p-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white/90 dark:bg-dark-card/90 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-sm hover:shadow transition-all backdrop-blur-md"
+        >
+          {resolvedTheme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-600" />
+          )}
+        </button>
+      </div>
+
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-brand-500/5 rounded-full blur-3xl" />
@@ -99,14 +135,14 @@ export default function SignupPage() {
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 shadow-xl shadow-brand-500/30 group-hover:scale-105 transition-transform">
               <Gift className="w-6 h-6 stroke-[2.5]" />
             </div>
-            <span className="text-2xl font-extrabold text-white tracking-tight">Sprinkl</span>
+            <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Sprinkl</span>
           </Link>
           <p className="mt-2 text-sm text-dark-muted">Create your free host account</p>
         </div>
 
         <div className="bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl">
           {error && (
-            <div className="p-3 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">
+            <div className="p-3 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-medium">
               {error}
             </div>
           )}
@@ -114,7 +150,7 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="signup-name">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="signup-name">
                 Full Name
               </label>
               <div className="relative">
@@ -125,7 +161,7 @@ export default function SignupPage() {
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                   placeholder="Chinedu Okonkwo"
                 />
               </div>
@@ -133,7 +169,7 @@ export default function SignupPage() {
 
             {/* Email */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="signup-email">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="signup-email">
                 Email Address
               </label>
               <div className="relative">
@@ -145,7 +181,7 @@ export default function SignupPage() {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                   placeholder="chinedu@example.com"
                 />
               </div>
@@ -153,7 +189,7 @@ export default function SignupPage() {
 
             {/* Phone */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="signup-phone">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="signup-phone">
                 Phone Number{' '}
                 <span className="font-normal text-dark-muted">(Optional)</span>
               </label>
@@ -164,7 +200,7 @@ export default function SignupPage() {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                   placeholder="+234 801 234 5678"
                 />
               </div>
@@ -172,7 +208,7 @@ export default function SignupPage() {
 
             {/* Password */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="signup-password">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="signup-password">
                 Password
               </label>
               <div className="relative">
@@ -185,13 +221,13 @@ export default function SignupPage() {
                   autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                   placeholder="Min. 8 characters"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-muted hover:text-slate-300 transition-colors p-0.5"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-dark-muted hover:text-slate-600 dark:hover:text-slate-300 transition-colors p-0.5"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -205,11 +241,11 @@ export default function SignupPage() {
                     className={`h-1 flex-1 rounded-full transition-all ${
                       password.length >= i * 3
                         ? password.length >= 12
-                          ? 'bg-emerald-400'
+                          ? 'bg-emerald-500 dark:bg-emerald-400'
                           : password.length >= 8
-                          ? 'bg-brand-400'
-                          : 'bg-amber-400'
-                        : 'bg-dark-border'
+                          ? 'bg-brand-500 dark:bg-brand-400'
+                          : 'bg-amber-500 dark:bg-amber-400'
+                        : 'bg-slate-200 dark:bg-dark-border'
                     }`}
                   />
                 ))}
@@ -238,7 +274,7 @@ export default function SignupPage() {
 
           <p className="mt-6 text-center text-xs text-dark-muted">
             Already registered?{' '}
-            <Link to="/login" className="text-brand-400 font-semibold hover:text-brand-300 transition-colors">
+            <Link to="/login" className="text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-500 dark:hover:text-brand-300 transition-colors">
               Sign In
             </Link>
           </p>

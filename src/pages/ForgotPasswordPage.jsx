@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Gift, Mail, KeyRound, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Gift, Mail, KeyRound, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle2, Sun, Moon } from 'lucide-react';
 import api from '../api/client';
+import { useThemeStore } from '../store/useThemeStore';
 import SEO from '../components/SEO';
 
 // Step indicator component
@@ -15,13 +16,13 @@ function StepDot({ step, current, label }) {
           done
             ? 'bg-brand-500 border-brand-500 text-slate-950'
             : active
-            ? 'bg-brand-500/20 border-brand-500 text-brand-400'
-            : 'bg-transparent border-dark-border text-dark-muted'
+            ? 'bg-brand-500/20 border-brand-500 text-brand-600 dark:text-brand-400'
+            : 'bg-transparent border-slate-300 dark:border-dark-border text-slate-400 dark:text-dark-muted'
         }`}
       >
         {done ? <CheckCircle2 className="w-4 h-4" /> : step}
       </div>
-      <span className={`text-[10px] font-semibold ${active ? 'text-brand-400' : done ? 'text-slate-400' : 'text-dark-muted'}`}>
+      <span className={`text-[10px] font-semibold ${active ? 'text-brand-600 dark:text-brand-400' : done ? 'text-slate-600 dark:text-slate-400' : 'text-slate-400 dark:text-dark-muted'}`}>
         {label}
       </span>
     </div>
@@ -30,6 +31,7 @@ function StepDot({ step, current, label }) {
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
+  const { resolvedTheme, toggleTheme } = useThemeStore();
   const [step, setStep] = useState(1); // 1=email, 2=code, 3=new password
   const [email, setEmail] = useState('');
   const [code, setCode] = useState(['', '', '', '', '', '']);
@@ -44,7 +46,7 @@ export default function ForgotPasswordPage() {
   const [resendCooldown, setResendCooldown] = useState(0);
   const codeInputsRef = useRef([]);
 
-  // Countdown for resend
+  // Countdown timer for resend code
   useEffect(() => {
     if (resendCooldown > 0) {
       const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
@@ -99,7 +101,7 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     const fullCode = code.join('');
     if (fullCode.length < 6) {
-      setError('Please enter the complete 6-digit code.');
+      setError('Please enter the full 6-digit code.');
       return;
     }
     setError(null);
@@ -118,12 +120,12 @@ export default function ForgotPasswordPage() {
   // Step 3 — set new password
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters.');
-      return;
-    }
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match.');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters.');
       return;
     }
     setError(null);
@@ -155,7 +157,7 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white dark:bg-dark-bg flex items-center justify-center p-4 relative">
         <SEO
           title="Password Reset Successful — Sprinkl"
           description="Your password has been successfully updated on Sprinkl."
@@ -165,17 +167,34 @@ export default function ForgotPasswordPage() {
             { name: 'Reset Password', path: '/forgot-password' },
           ]}
         />
-        <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-2xl p-8 shadow-2xl text-center">
+
+        {/* Theme Toggle Button */}
+        <div className="absolute top-4 right-4 z-20">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+            className="p-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white/90 dark:bg-dark-card/90 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-sm hover:shadow transition-all backdrop-blur-md"
+          >
+            {resolvedTheme === 'dark' ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-slate-600" />
+            )}
+          </button>
+        </div>
+
+        <div className="max-w-md w-full bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl p-8 shadow-2xl text-center">
           <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
-            <CheckCircle2 className="w-8 h-8 text-brand-400" />
+            <CheckCircle2 className="w-8 h-8 text-brand-500 dark:text-brand-400" />
           </div>
-          <h2 className="text-xl font-extrabold text-white mb-2">Password Reset!</h2>
-          <p className="text-sm text-dark-muted mb-8">
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-white mb-2">Password Reset!</h2>
+          <p className="text-sm text-slate-600 dark:text-dark-muted mb-8">
             Your password has been successfully updated. You can now sign in with your new credentials.
           </p>
           <button
             onClick={() => navigate('/login')}
-            className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all"
+            className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white font-extrabold rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all"
           >
             <span>Sign In</span>
             <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -186,7 +205,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white dark:bg-dark-bg flex items-center justify-center p-4 relative">
       <SEO
         title="Reset Password — Sprinkl Host Account"
         description="Reset your Sprinkl host account password securely with our 6-digit OTP verification."
@@ -196,6 +215,23 @@ export default function ForgotPasswordPage() {
           { name: 'Reset Password', path: '/forgot-password' },
         ]}
       />
+
+      {/* Theme Toggle Button */}
+      <div className="absolute top-4 right-4 z-20">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+          className="p-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white/90 dark:bg-dark-card/90 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-sm hover:shadow transition-all backdrop-blur-md"
+        >
+          {resolvedTheme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-600" />
+          )}
+        </button>
+      </div>
+
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] bg-brand-500/5 rounded-full blur-3xl" />
@@ -208,23 +244,23 @@ export default function ForgotPasswordPage() {
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 shadow-xl shadow-brand-500/30 group-hover:scale-105 transition-transform">
               <Gift className="w-6 h-6 stroke-[2.5]" />
             </div>
-            <span className="text-2xl font-extrabold text-white tracking-tight">Sprinkl</span>
+            <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Sprinkl</span>
           </Link>
-          <p className="mt-2 text-sm text-dark-muted">Reset your password</p>
+          <p className="mt-2 text-sm text-slate-500 dark:text-dark-muted">Reset your password</p>
         </div>
 
-        <div className="bg-dark-card border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl">
+        <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl">
           {/* Step indicator */}
           <div className="flex items-center justify-center gap-3 mb-7">
             <StepDot step={1} current={step} label="Email" />
-            <div className={`h-px flex-1 max-w-[40px] transition-all ${step > 1 ? 'bg-brand-500' : 'bg-dark-border'}`} />
+            <div className={`h-px flex-1 max-w-[40px] transition-all ${step > 1 ? 'bg-brand-500' : 'bg-slate-200 dark:bg-dark-border'}`} />
             <StepDot step={2} current={step} label="Verify" />
-            <div className={`h-px flex-1 max-w-[40px] transition-all ${step > 2 ? 'bg-brand-500' : 'bg-dark-border'}`} />
+            <div className={`h-px flex-1 max-w-[40px] transition-all ${step > 2 ? 'bg-brand-500' : 'bg-slate-200 dark:bg-dark-border'}`} />
             <StepDot step={3} current={step} label="New Password" />
           </div>
 
           {error && (
-            <div className="p-3 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">
+            <div className="p-3 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-medium">
               {error}
             </div>
           )}
@@ -234,20 +270,20 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleRequestCode} className="space-y-5">
               <div className="text-center">
                 <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
-                  <Mail className="w-6 h-6 text-brand-400" />
+                  <Mail className="w-6 h-6 text-brand-500 dark:text-brand-400" />
                 </div>
-                <h2 className="text-base font-extrabold text-white">Forgot Password?</h2>
-                <p className="text-xs text-dark-muted mt-1">
+                <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Forgot Password?</h2>
+                <p className="text-xs text-slate-600 dark:text-dark-muted mt-1">
                   Enter your registered email and we'll send a 6-digit code to reset your password.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="fp-email">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="fp-email">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Mail className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     id="fp-email"
                     type="email"
@@ -255,7 +291,7 @@ export default function ForgotPasswordPage() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                    className="w-full bg-white dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                     placeholder="host@example.com"
                   />
                 </div>
@@ -276,9 +312,9 @@ export default function ForgotPasswordPage() {
                 )}
               </button>
 
-              <p className="text-center text-xs text-dark-muted">
+              <p className="text-center text-xs text-slate-600 dark:text-dark-muted">
                 Remembered it?{' '}
-                <Link to="/login" className="text-brand-400 font-semibold hover:text-brand-300">
+                <Link to="/login" className="text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-500 dark:hover:text-brand-300">
                   Sign In
                 </Link>
               </p>
@@ -290,12 +326,12 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleVerifyCode} className="space-y-5">
               <div className="text-center">
                 <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
-                  <KeyRound className="w-6 h-6 text-brand-400" />
+                  <KeyRound className="w-6 h-6 text-brand-500 dark:text-brand-400" />
                 </div>
-                <h2 className="text-base font-extrabold text-white">Enter Reset Code</h2>
-                <p className="text-xs text-dark-muted mt-1">
+                <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Enter Reset Code</h2>
+                <p className="text-xs text-slate-600 dark:text-dark-muted mt-1">
                   A 6-digit code was sent to{' '}
-                  <span className="text-slate-300 font-semibold">{email}</span>.
+                  <span className="text-slate-800 dark:text-slate-300 font-semibold">{email}</span>.
                   It expires in 15 minutes.
                 </p>
               </div>
@@ -312,7 +348,7 @@ export default function ForgotPasswordPage() {
                     value={digit}
                     onChange={(e) => handleCodeChange(i, e.target.value)}
                     onKeyDown={(e) => handleCodeKeyDown(i, e)}
-                    className="w-11 h-12 text-center text-xl font-extrabold bg-dark-bg border-2 border-dark-border rounded-xl text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all"
+                    className="w-11 h-12 text-center text-xl font-extrabold bg-white dark:bg-dark-bg border-2 border-slate-300 dark:border-dark-border rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-all"
                   />
                 ))}
               </div>
@@ -336,7 +372,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="text-dark-muted hover:text-slate-300 flex items-center gap-1 transition-colors"
+                  className="text-slate-500 dark:text-dark-muted hover:text-slate-900 dark:hover:text-slate-300 flex items-center gap-1 transition-colors"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   Change email
@@ -345,7 +381,7 @@ export default function ForgotPasswordPage() {
                   type="button"
                   onClick={handleResend}
                   disabled={resendCooldown > 0 || loading}
-                  className="text-brand-400 hover:text-brand-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="text-brand-600 dark:text-brand-400 hover:text-brand-500 dark:hover:text-brand-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
                 </button>
@@ -358,20 +394,20 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleResetPassword} className="space-y-5">
               <div className="text-center">
                 <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
-                  <Lock className="w-6 h-6 text-brand-400" />
+                  <Lock className="w-6 h-6 text-brand-500 dark:text-brand-400" />
                 </div>
-                <h2 className="text-base font-extrabold text-white">Set New Password</h2>
-                <p className="text-xs text-dark-muted mt-1">
+                <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Set New Password</h2>
+                <p className="text-xs text-slate-600 dark:text-dark-muted mt-1">
                   Choose a strong password. You'll be signed out of all devices.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="new-password">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="new-password">
                   New Password
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Lock className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     id="new-password"
                     type={showNew ? 'text' : 'password'}
@@ -380,13 +416,13 @@ export default function ForgotPasswordPage() {
                     autoComplete="new-password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                    className="w-full bg-white dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-10 pr-12 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-dark-muted focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
                     placeholder="Min. 8 characters"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNew((v) => !v)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-muted hover:text-slate-300 transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-dark-muted hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                     aria-label={showNew ? 'Hide password' : 'Show password'}
                   >
                     {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -395,11 +431,11 @@ export default function ForgotPasswordPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5" htmlFor="confirm-password">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="confirm-password">
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Lock className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     id="confirm-password"
                     type={showConfirm ? 'text' : 'password'}
@@ -407,24 +443,24 @@ export default function ForgotPasswordPage() {
                     autoComplete="new-password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`w-full bg-dark-bg border rounded-xl pl-10 pr-12 py-2.5 text-sm text-white placeholder-dark-muted focus:outline-none transition-colors ${
+                    className={`w-full bg-white dark:bg-dark-bg border rounded-xl pl-10 pr-12 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-dark-muted focus:outline-none transition-colors ${
                       confirmPassword && confirmPassword !== newPassword
                         ? 'border-rose-500 focus:ring-1 focus:ring-rose-500/30'
-                        : 'border-dark-border focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30'
+                        : 'border-slate-300 dark:border-dark-border focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30'
                     }`}
                     placeholder="Repeat password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirm((v) => !v)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-dark-muted hover:text-slate-300 transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-dark-muted hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                     aria-label={showConfirm ? 'Hide password' : 'Show password'}
                   >
                     {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 {confirmPassword && confirmPassword !== newPassword && (
-                  <p className="text-[11px] text-rose-400 mt-1">Passwords do not match</p>
+                  <p className="text-[11px] text-rose-500 dark:text-rose-400 mt-1">Passwords do not match</p>
                 )}
               </div>
 

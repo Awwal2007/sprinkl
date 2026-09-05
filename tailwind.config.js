@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -17,10 +18,19 @@ export default {
           900: '#064e3b',
         },
         dark: {
-          bg: '#0b0f17',
-          card: '#131b2e',
-          border: '#1e293b',
-          muted: '#64748b',
+          bg: 'rgb(var(--color-bg) / <alpha-value>)',
+          card: 'rgb(var(--color-card) / <alpha-value>)',
+          border: 'rgb(var(--color-border) / <alpha-value>)',
+          muted: 'rgb(var(--color-muted) / <alpha-value>)',
+        },
+        surface: {
+          subtle: 'rgb(var(--color-surface-subtle) / <alpha-value>)',
+          elevated: 'rgb(var(--color-surface-elevated) / <alpha-value>)',
+        },
+        content: {
+          primary: 'rgb(var(--color-text-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--color-text-secondary) / <alpha-value>)',
+          muted: 'rgb(var(--color-text-muted) / <alpha-value>)',
         },
       },
       fontFamily: {

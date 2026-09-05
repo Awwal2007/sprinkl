@@ -140,7 +140,7 @@ export default function GiveawayDetailPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+    <div className="min-h-screen flex flex-col bg-dark-bg text-slate-900 dark:text-slate-100 transition-colors duration-150">
       <SEO
         title={data?.giveaway?.title ? `${data.giveaway.title} — Giveaway Management | Sprinkl` : 'Giveaway Management — Sprinkl'}
         description="Monitor giveaway claims, payout transactions, and participant verification in real time."
@@ -152,23 +152,23 @@ export default function GiveawayDetailPage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-5 sm:space-y-6">
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs text-dark-muted hover:text-slate-200 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-dark-muted hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Dashboard</span>
         </Link>
 
         {/* Giveaway Header Card */}
-        <div className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 lg:p-8 space-y-5">
+        <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 lg:p-8 space-y-5 shadow-sm">
           {/* Title + Actions */}
           <div className="flex flex-col gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <StatusBadge status={giveaway.status} />
-                <span className="text-xs font-mono font-bold text-dark-muted">ID: {giveaway.slug}</span>
+                <span className="text-xs font-mono font-bold text-slate-500 dark:text-dark-muted">ID: {giveaway.slug}</span>
               </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white">{giveaway.title}</h1>
-              {giveaway.description && <p className="text-xs text-dark-muted mt-1">{giveaway.description}</p>}
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white">{giveaway.title}</h1>
+              {giveaway.description && <p className="text-xs text-slate-500 dark:text-dark-muted mt-1">{giveaway.description}</p>}
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -184,7 +184,7 @@ export default function GiveawayDetailPage() {
                 <button
                   onClick={handleCancel}
                   disabled={cancelling}
-                  className="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                  className="flex-1 sm:flex-none px-3.5 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
                 >
                   <Ban className="w-4 h-4" />
                   <span>{cancelling ? 'Cancelling...' : 'Cancel Giveaway'}</span>
@@ -204,7 +204,7 @@ export default function GiveawayDetailPage() {
               )}
 
               {giveaway.status === 'cancelled' && giveaway.fundsReleased && (
-                <div className="px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-1.5">
+                <div className="px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Funds Transferred to Main Wallet</span>
                 </div>
@@ -213,28 +213,28 @@ export default function GiveawayDetailPage() {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t border-dark-border">
-            <div className="bg-dark-bg p-3 sm:p-3.5 rounded-xl border border-dark-border">
-              <span className="text-[10px] text-dark-muted uppercase font-semibold">Amount / Person</span>
-              <p className="text-base sm:text-lg font-bold text-white mt-0.5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t border-slate-200 dark:border-dark-border">
+            <div className="bg-slate-50 dark:bg-dark-bg p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-dark-border">
+              <span className="text-[10px] text-slate-500 dark:text-dark-muted uppercase font-semibold">Amount / Person</span>
+              <p className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-0.5">
                 {formatCurrency(giveaway.amountPerRecipient, giveaway.currency)}
               </p>
             </div>
-            <div className="bg-dark-bg p-3 sm:p-3.5 rounded-xl border border-dark-border">
-              <span className="text-[10px] text-dark-muted uppercase font-semibold">Slots Claimed</span>
-              <p className="text-base sm:text-lg font-bold text-brand-400 mt-0.5">
+            <div className="bg-slate-50 dark:bg-dark-bg p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-dark-border">
+              <span className="text-[10px] text-slate-500 dark:text-dark-muted uppercase font-semibold">Slots Claimed</span>
+              <p className="text-base sm:text-lg font-bold text-brand-600 dark:text-brand-400 mt-0.5">
                 {giveaway.slotsClaimed} / {giveaway.totalSlots}
               </p>
             </div>
-            <div className="bg-dark-bg p-3 sm:p-3.5 rounded-xl border border-dark-border">
-              <span className="text-[10px] text-dark-muted uppercase font-semibold">Total Budget</span>
-              <p className="text-base sm:text-lg font-bold text-white mt-0.5">
+            <div className="bg-slate-50 dark:bg-dark-bg p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-dark-border">
+              <span className="text-[10px] text-slate-500 dark:text-dark-muted uppercase font-semibold">Total Budget</span>
+              <p className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mt-0.5">
                 {formatCurrency(giveaway.totalReservedAmount, giveaway.currency)}
               </p>
             </div>
-            <div className="bg-dark-bg p-3 sm:p-3.5 rounded-xl border border-dark-border">
-              <span className="text-[10px] text-dark-muted uppercase font-semibold">Distributed</span>
-              <p className="text-base sm:text-lg font-bold text-emerald-400 mt-0.5">
+            <div className="bg-slate-50 dark:bg-dark-bg p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-dark-border">
+              <span className="text-[10px] text-slate-500 dark:text-dark-muted uppercase font-semibold">Distributed</span>
+              <p className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                 {formatCurrency(
                   claims
                     ? claims
@@ -249,13 +249,13 @@ export default function GiveawayDetailPage() {
         </div>
 
         {/* Real-time Claims Feed */}
-        <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6">
+        <section className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4 gap-2">
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-white">Live Claim Stream</h2>
-              <p className="text-xs text-dark-muted">Real-time payouts initiated to claimants</p>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Live Claim Stream</h2>
+              <p className="text-xs text-slate-500 dark:text-dark-muted">Real-time payouts initiated to claimants</p>
             </div>
-            <span className="text-[10px] bg-brand-500/10 text-brand-400 border border-brand-500/20 px-2 py-0.5 rounded font-bold animate-pulse shrink-0">
+            <span className="text-[10px] bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20 px-2 py-0.5 rounded font-bold animate-pulse shrink-0">
               LIVE
             </span>
           </div>
@@ -265,19 +265,19 @@ export default function GiveawayDetailPage() {
               {/* Mobile Cards */}
               <div className="sm:hidden space-y-3">
                 {claims.map((c) => (
-                  <div key={c._id} className="bg-dark-bg rounded-xl border border-dark-border p-3 space-y-2">
+                  <div key={c._id} className="bg-slate-50 dark:bg-dark-bg rounded-xl border border-slate-200 dark:border-dark-border p-3 space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-sm text-white truncate">{c.claimantName}</span>
+                      <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">{c.claimantName}</span>
                       <StatusBadge status={c.status} />
                     </div>
-                    <p className="text-[11px] font-mono text-dark-muted break-all">
+                    <p className="text-[11px] font-mono text-slate-500 dark:text-dark-muted break-all">
                       {c.currency === 'NGN'
                         ? `${c.destination.bankName} — ${c.destination.accountNumber}`
                         : c.destination.walletAddress}
                     </p>
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-brand-400 font-mono">{c.payoutReference || 'Pending...'}</span>
-                      <span className="text-dark-muted">
+                      <span className="text-brand-600 dark:text-brand-400 font-mono font-semibold">{c.payoutReference || 'Pending...'}</span>
+                      <span className="text-slate-500 dark:text-dark-muted">
                         {new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
@@ -289,7 +289,7 @@ export default function GiveawayDetailPage() {
               <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                    <tr className="border-b border-slate-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-slate-500 dark:text-dark-muted">
                       <th className="py-2.5 px-3">Claimant Name</th>
                       <th className="py-2.5 px-3">Destination</th>
                       <th className="py-2.5 px-3">Status</th>
@@ -297,11 +297,11 @@ export default function GiveawayDetailPage() {
                       <th className="py-2.5 px-3 text-right">Time</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-dark-border text-xs">
+                  <tbody className="divide-y divide-slate-200 dark:divide-dark-border text-xs">
                     {claims.map((c) => (
-                      <tr key={c._id} className="hover:bg-slate-800/30">
-                        <td className="py-3 px-3 font-semibold text-white">{c.claimantName}</td>
-                        <td className="py-3 px-3 font-mono text-dark-muted max-w-[200px] truncate">
+                      <tr key={c._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30">
+                        <td className="py-3 px-3 font-semibold text-slate-900 dark:text-white">{c.claimantName}</td>
+                        <td className="py-3 px-3 font-mono text-slate-500 dark:text-dark-muted max-w-[200px] truncate">
                           {c.currency === 'NGN'
                             ? `${c.destination.bankName} - ${c.destination.accountNumber}`
                             : c.destination.walletAddress}
@@ -309,10 +309,10 @@ export default function GiveawayDetailPage() {
                         <td className="py-3 px-3">
                           <StatusBadge status={c.status} />
                         </td>
-                        <td className="py-3 px-3 font-mono text-xs text-brand-400">
+                        <td className="py-3 px-3 font-mono text-xs text-brand-600 dark:text-brand-400 font-semibold">
                           {c.payoutReference || 'Pending...'}
                         </td>
-                        <td className="py-3 px-3 text-right text-dark-muted">
+                        <td className="py-3 px-3 text-right text-slate-500 dark:text-dark-muted">
                           {new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </td>
                       </tr>
@@ -322,7 +322,7 @@ export default function GiveawayDetailPage() {
               </div>
             </>
           ) : (
-            <div className="text-center py-10 text-xs text-dark-muted">
+            <div className="text-center py-10 text-xs text-slate-500 dark:text-dark-muted">
               No claims submitted yet. Share the link to start distributing funds!
             </div>
           )}

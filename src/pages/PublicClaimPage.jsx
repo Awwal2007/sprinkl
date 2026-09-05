@@ -198,18 +198,18 @@ export default function PublicClaimPage() {
 
   if (!giveawayData) {
     return (
-      <div className="min-h-screen bg-dark-bg flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-dark-bg flex flex-col items-center justify-center p-4 transition-colors duration-150">
         <SEO
           title="Giveaway Not Found — Sprinkl"
           description="This giveaway link is invalid or has ended."
           canonical={`/g/${slug}`}
           noIndex={true}
         />
-        <div className="bg-dark-card p-6 rounded-3xl border border-dark-border max-w-sm w-full text-center space-y-4 shadow-2xl">
-          <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
+        <div className="bg-white dark:bg-dark-card p-6 rounded-3xl border border-slate-200 dark:border-dark-border max-w-sm w-full text-center space-y-4 shadow-2xl">
+          <AlertCircle className="w-10 h-10 text-rose-500 dark:text-rose-400 mx-auto" />
           <div>
-            <h2 className="text-lg font-bold text-white mb-1">Giveaway Not Available</h2>
-            <p className="text-xs text-dark-muted">This giveaway link is invalid or has ended.</p>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Giveaway Not Available</h2>
+            <p className="text-xs text-slate-500 dark:text-dark-muted">This giveaway link is invalid or has ended.</p>
           </div>
           <div className="pt-2">
             <Link
@@ -226,7 +226,7 @@ export default function PublicClaimPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg text-slate-100 flex flex-col items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen bg-dark-bg text-slate-900 dark:text-slate-100 flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-150">
       <SEO
         title={seoTitle}
         description={seoDescription}
@@ -237,40 +237,40 @@ export default function PublicClaimPage() {
         ]}
       />
       {/* Container */}
-      <div className="max-w-md w-full bg-dark-card border border-dark-border rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
+      <div className="max-w-md w-full bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
         {/* Top Glow Accent */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-brand-500/20 blur-3xl rounded-full pointer-events-none" />
 
         {/* Host Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-[11px] font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-600 dark:text-brand-400 text-[11px] font-semibold">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Verified Host: {giveawayData.hostName}</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             {giveawayData.title}
           </h1>
 
           {giveawayData.description && (
-            <p className="text-xs text-dark-muted line-clamp-3 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-dark-muted line-clamp-3 leading-relaxed">
               {giveawayData.description}
             </p>
           )}
         </div>
 
         {/* Amount Card (No slots shown as requested) */}
-        <div className="bg-dark-bg p-5 rounded-2xl border border-dark-border text-center">
-          <span className="text-[10px] text-dark-muted uppercase font-bold tracking-wider block mb-1">
+        <div className="bg-slate-50 dark:bg-dark-bg p-5 rounded-2xl border border-slate-200 dark:border-dark-border text-center">
+          <span className="text-[10px] text-slate-500 dark:text-dark-muted uppercase font-bold tracking-wider block mb-1">
             Amount You Receive
           </span>
-          <p className="text-3xl sm:text-4xl font-black text-brand-400 font-mono">
+          <p className="text-3xl sm:text-4xl font-black text-brand-600 dark:text-brand-400 font-mono">
             {formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)}
           </p>
         </div>
 
         {error && (
-          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold flex items-start gap-2">
+          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 text-xs font-semibold flex items-start gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -279,17 +279,17 @@ export default function PublicClaimPage() {
         {/* State A: Already Claimed from this browser */}
         {alreadyClaimed ? (
           <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-2xl p-6 text-center space-y-4 animate-in fade-in">
-            <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
               <CheckCircle2 className="w-7 h-7" />
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                 ALREADY CLAIMED
               </span>
-              <h3 className="text-base sm:text-lg font-extrabold text-white pt-2">
+              <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white pt-2">
                 You've Already Claimed!
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-xs mx-auto">
                 This browser has already claimed from this giveaway. Each participant is limited to one claim per drop.
               </p>
             </div>
@@ -306,17 +306,17 @@ export default function PublicClaimPage() {
         ) : giveawayData.isFullyClaimed || giveawayData.status === 'completed' || giveawayData.slotsClaimed >= giveawayData.totalSlots ? (
           /* State B: Fully Claim (Claimant limit reached / completed) */
           <div className="bg-amber-500/10 border border-amber-500/25 rounded-2xl p-6 text-center space-y-4 animate-in fade-in">
-            <div className="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto shadow-lg shadow-amber-500/10">
+            <div className="w-12 h-12 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-lg shadow-amber-500/10">
               <Gift className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 tracking-wider">
+              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 tracking-wider">
                 FULLY CLAIM
               </span>
-              <h3 className="text-base sm:text-lg font-extrabold text-white pt-2">
+              <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white pt-2">
                 Fully Claimed
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-xs mx-auto">
                 All {giveawayData.totalSlots} available slot{giveawayData.totalSlots === 1 ? '' : 's'} for this giveaway have already been claimed. Follow the host for future drops!
               </p>
             </div>
@@ -333,35 +333,35 @@ export default function PublicClaimPage() {
         ) : giveawayData.isCancelled ? (
           /* State C: Cancelled */
           <div className="bg-rose-500/10 border border-rose-500/25 rounded-2xl p-6 text-center space-y-4 animate-in fade-in">
-            <div className="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-full bg-rose-500/20 text-rose-500 dark:text-rose-400 flex items-center justify-center mx-auto">
               <AlertCircle className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">
+              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30">
                 CANCELLED
               </span>
-              <h3 className="text-base sm:text-lg font-extrabold text-white pt-2">
+              <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white pt-2">
                 Giveaway Cancelled
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-xs mx-auto">
                 This giveaway campaign has been cancelled by the host.
               </p>
             </div>
           </div>
         ) : giveawayData.isExpired ? (
           /* State D: Expired */
-          <div className="bg-slate-800/80 border border-dark-border rounded-2xl p-6 text-center space-y-4 animate-in fade-in">
-            <div className="w-12 h-12 rounded-full bg-slate-700/50 text-slate-300 flex items-center justify-center mx-auto">
+          <div className="bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-dark-border rounded-2xl p-6 text-center space-y-4 animate-in fade-in">
+            <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 flex items-center justify-center mx-auto">
               <AlertCircle className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-slate-700 text-slate-300 border border-slate-600">
+              <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600">
                 EXPIRED
               </span>
-              <h3 className="text-base sm:text-lg font-extrabold text-white pt-2">
+              <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white pt-2">
                 Giveaway Expired
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-xs mx-auto">
                 The time limit for this giveaway has elapsed.
               </p>
             </div>
@@ -374,19 +374,19 @@ export default function PublicClaimPage() {
               <>
                 {/* Typeable / Searchable Bank Selector */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     Select or Type Bank Name
                   </label>
 
                   {bankName ? (
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-dark-bg border border-brand-500/50 text-white shadow-sm">
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-brand-500/50 text-slate-900 dark:text-white shadow-sm">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
+                        <div className="w-7 h-7 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400">
                           <Building2 className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-white">{bankName}</p>
-                          <p className="text-[10px] text-dark-muted font-mono">Code: {bankCode}</p>
+                          <p className="text-xs font-bold text-slate-900 dark:text-white">{bankName}</p>
+                          <p className="text-[10px] text-slate-500 dark:text-dark-muted font-mono">Code: {bankCode}</p>
                         </div>
                       </div>
                       <button
@@ -397,7 +397,7 @@ export default function PublicClaimPage() {
                           setBankQuery('');
                           setResolvedName('');
                         }}
-                        className="text-xs text-brand-400 hover:text-brand-300 font-semibold px-2.5 py-1 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 transition-colors"
+                        className="text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-semibold px-2.5 py-1 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 transition-colors"
                       >
                         Change
                       </button>
@@ -405,7 +405,7 @@ export default function PublicClaimPage() {
                   ) : (
                     <div className="relative">
                       <div className="relative">
-                        <Search className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <Search className="w-4 h-4 text-slate-400 dark:text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         <input
                           type="text"
                           value={bankQuery}
@@ -414,14 +414,14 @@ export default function PublicClaimPage() {
                             setShowBankDropdown(true);
                           }}
                           onFocus={() => setShowBankDropdown(true)}
-                          className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 placeholder:text-dark-muted"
+                          className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
                           placeholder="Search e.g. OPay, Kuda, GTBank, Zenith..."
                         />
                       </div>
 
                       {/* Dropdown Results */}
                       {showBankDropdown && filteredBanks.length > 0 && (
-                        <div className="absolute z-50 left-0 right-0 mt-1 bg-dark-card border border-dark-border rounded-xl shadow-2xl max-h-52 overflow-y-auto divide-y divide-dark-border/50">
+                        <div className="absolute z-50 left-0 right-0 mt-1 bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-xl shadow-2xl max-h-52 overflow-y-auto divide-y divide-slate-100 dark:divide-dark-border/50">
                           {filteredBanks.map((b) => (
                             <button
                               key={b.code}
@@ -432,10 +432,10 @@ export default function PublicClaimPage() {
                                 setShowBankDropdown(false);
                                 setBankQuery('');
                               }}
-                              className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:bg-brand-500/10 hover:text-brand-400 transition-colors flex items-center justify-between"
+                              className="w-full text-left px-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 hover:bg-brand-500/10 hover:text-brand-600 dark:hover:text-brand-400 transition-colors flex items-center justify-between"
                             >
                               <span className="font-semibold">{b.name}</span>
-                              <span className="text-[10px] text-dark-muted font-mono">{b.code}</span>
+                              <span className="text-[10px] text-slate-500 dark:text-dark-muted font-mono">{b.code}</span>
                             </button>
                           ))}
                         </div>
@@ -453,7 +453,7 @@ export default function PublicClaimPage() {
                               setShowBankDropdown(false);
                               setBankQuery('');
                             }}
-                            className="text-[11px] px-2.5 py-1 rounded-lg bg-dark-bg border border-dark-border text-slate-300 hover:border-brand-500 hover:text-brand-400 font-medium transition-all"
+                            className="text-[11px] px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-dark-bg border border-slate-200 dark:border-dark-border text-slate-700 dark:text-slate-300 hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400 font-medium transition-all"
                           >
                             {qb.name}
                           </button>
@@ -465,7 +465,7 @@ export default function PublicClaimPage() {
 
                 {/* Account Number */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     10-Digit Account Number
                   </label>
                   <input
@@ -474,36 +474,36 @@ export default function PublicClaimPage() {
                     required
                     value={accountNumber}
                     onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
-                    className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-mono tracking-wider"
+                    className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono tracking-wider"
                     placeholder="0123456789"
                   />
                 </div>
 
                 {/* Resolving / Name Resolution Feedback */}
                 {resolving && (
-                  <div className="text-xs text-brand-400 flex items-center gap-2 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20 animate-pulse">
-                    <div className="w-3.5 h-3.5 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
+                  <div className="text-xs text-brand-600 dark:text-brand-400 flex items-center gap-2 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20 animate-pulse">
+                    <div className="w-3.5 h-3.5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
                     <span>Verifying account with bank registry...</span>
                   </div>
                 )}
 
                 {resolvedName && (
-                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs space-y-1 shadow-inner">
+                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs space-y-1 shadow-inner">
                     <div className="flex items-center gap-1.5 font-bold">
                       <CheckCircle2 className="w-4 h-4" />
                       <span>Verified Account Name</span>
                     </div>
-                    <p className="text-sm font-extrabold text-white tracking-tight uppercase">
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight uppercase">
                       {resolvedName}
                     </p>
-                    <p className="text-[10px] text-emerald-400/80">
+                    <p className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80">
                       Funds will be dispatched directly to this bank account instantly upon claim.
                     </p>
                   </div>
                 )}
 
                 {resolveErr && (
-                  <div className="text-xs text-rose-400 font-medium p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                  <div className="text-xs text-rose-500 dark:text-rose-400 font-medium p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
                     {resolveErr}
                   </div>
                 )}
@@ -514,7 +514,7 @@ export default function PublicClaimPage() {
             {giveawayData.currency === 'USDT' && (
               <>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     Select USDT Network
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -525,8 +525,8 @@ export default function PublicClaimPage() {
                         onClick={() => setChain(c)}
                         className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                           chain === c
-                            ? 'bg-brand-500/10 border-brand-500 text-brand-400'
-                            : 'bg-dark-bg border-dark-border text-slate-400 hover:border-slate-700'
+                            ? 'bg-brand-500/10 border-brand-500 text-brand-600 dark:text-brand-400'
+                            : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
                         }`}
                       >
                         <Coins className="w-3.5 h-3.5" />
@@ -537,7 +537,7 @@ export default function PublicClaimPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                     {chain} USDT Wallet Address
                   </label>
                   <input
@@ -545,10 +545,10 @@ export default function PublicClaimPage() {
                     required
                     value={walletAddress}
                     onChange={(e) => setWalletAddress(e.target.value)}
-                    className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500 font-mono"
+                    className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono"
                     placeholder={chain === 'TRC20' ? 'T...' : '0x...'}
                   />
-                  <p className="text-[10px] text-amber-400/80 mt-1">
+                  <p className="text-[10px] text-amber-600 dark:text-amber-400/80 mt-1">
                     Warning: Double check your address. Transfers are irreversible once broadcast on-chain.
                   </p>
                 </div>
@@ -576,21 +576,21 @@ export default function PublicClaimPage() {
           </form>
         )}
 
-        <p className="text-center text-[10px] text-dark-muted">
-          Secured by <strong className="text-slate-300">Sprinkl Engine</strong> • 1 Claim Per Destination
+        <p className="text-center text-[10px] text-slate-500 dark:text-dark-muted">
+          Secured by <strong className="text-slate-800 dark:text-slate-300">Sprinkl Engine</strong> • 1 Claim Per Destination
         </p>
       </div>
 
       {/* Under-Card Viral Hook: Want to create yours? */}
       <div className="mt-4 text-center max-w-md w-full">
-        <div className="p-3.5 sm:px-5 rounded-2xl bg-dark-card/90 border border-dark-border/80 backdrop-blur-md shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+        <div className="p-3.5 sm:px-5 rounded-2xl bg-white/95 dark:bg-dark-card/90 border border-slate-200 dark:border-dark-border/80 backdrop-blur-md shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center shrink-0 border border-brand-500/20">
+            <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 border border-brand-500/20">
               <Gift className="w-4 h-4 stroke-[2.5]" />
             </div>
             <div>
-              <p className="text-xs font-black text-white">Want to create yours?</p>
-              <p className="text-[10px] text-dark-muted">Host instant giveaways in NGN or USDT</p>
+              <p className="text-xs font-black text-slate-900 dark:text-white">Want to create yours?</p>
+              <p className="text-[10px] text-slate-500 dark:text-dark-muted">Host instant giveaways in NGN or USDT</p>
             </div>
           </div>
           <Link
