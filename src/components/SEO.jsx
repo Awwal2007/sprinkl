@@ -4,10 +4,10 @@ import { Helmet } from 'react-helmet-async';
 const BASE_URL = 'https://www.sprinkl.biz';
 
 export default function SEO({
-  title = 'Sprinkl — Automated Cash & Crypto Giveaways in Nigeria',
-  description = "Sprinkl is Nigeria's #1 automated dual-currency giveaway platform. Pay winners directly to bank accounts (NGN) or crypto wallets (USDT). Zero double-claims.",
+  title = 'Sprinkl — Automated Cash, Crypto & VTU Airtime Giveaways in Nigeria',
+  description = "Sprinkl is Nigeria's #1 automated giveaway platform. Pay winners directly to bank accounts (NGN), crypto wallets (USDT), or instant VTU mobile airtime (MTN, Airtel, Glo, 9mobile). Zero double-claims.",
   canonical = '/',
-  keywords = 'giveaway platform Nigeria, Nigerian giveaway website, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria',
+  keywords = 'giveaway platform Nigeria, VTU airtime giveaway, airtime drop Nigeria, MTN airtime giveaway, Airtel airtime giveaway, Glo airtime drop, 9mobile recharge Nigeria, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria',
   ogImage = 'https://www.sprinkl.biz/og-sprinkl.png',
   ogType = 'website',
   noIndex = false,

@@ -25,6 +25,7 @@ import {
   MessageSquare,
   Mail,
   FileText,
+  Smartphone,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
@@ -44,50 +45,57 @@ export default function LandingPage() {
   // Interactive calculator computations
   const totalBudget = recipientsCount * amountPerRecipient;
   const formattedBudget =
-    calcCurrency === 'NGN'
-      ? `₦${totalBudget.toLocaleString()}`
-      : `$${totalBudget.toLocaleString()} USDT`;
+    calcCurrency === 'USDT'
+      ? `$${totalBudget.toLocaleString()} USDT`
+      : `₦${totalBudget.toLocaleString()}${calcCurrency === 'AIRTIME' ? ' Airtime' : ''}`;
 
   const formattedPerRecipient =
-    calcCurrency === 'NGN'
-      ? `₦${amountPerRecipient.toLocaleString()}`
-      : `$${amountPerRecipient.toLocaleString()} USDT`;
+    calcCurrency === 'USDT'
+      ? `$${amountPerRecipient.toLocaleString()} USDT`
+      : `₦${amountPerRecipient.toLocaleString()}${calcCurrency === 'AIRTIME' ? ' Airtime' : ''}`;
 
   // Pre-configured recipient presets
   const recipientPresets = [10, 25, 50, 100, 250];
   const ngnAmountPresets = [500, 1000, 2500, 5000, 10000];
+  const airtimeAmountPresets = [50, 100, 200, 500, 1000];
   const usdtAmountPresets = [0.2, 0.5, 1, 5, 10];
 
   const isWhaleCalc =
-    (calcCurrency === 'NGN' && totalBudget >= 1000000) ||
+    ((calcCurrency === 'NGN' || calcCurrency === 'AIRTIME') && totalBudget >= 1000000) ||
     (calcCurrency === 'USDT' && totalBudget >= 1000);
 
   let calculatedPromoFee = totalBudget * (isWhaleCalc ? 0.03 : 0.025);
-  const minPromoFloor = calcCurrency === 'NGN' ? 150 : 0.50;
-  const maxWhaleCap = isWhaleCalc ? (calcCurrency === 'NGN' ? 35000 : 35) : Infinity;
+  const minPromoFloor = (calcCurrency === 'NGN' || calcCurrency === 'AIRTIME') ? 150 : 0.50;
+  const maxWhaleCap = isWhaleCalc ? ((calcCurrency === 'NGN' || calcCurrency === 'AIRTIME') ? 35000 : 35) : Infinity;
   const promoFee = Math.min(maxWhaleCap, Math.max(minPromoFloor, calculatedPromoFee));
 
   const handleCurrencyChange = (curr) => {
     setCalcCurrency(curr);
-    setAmountPerRecipient(curr === 'NGN' ? 2500 : 10);
+    if (curr === 'NGN') setAmountPerRecipient(2500);
+    else if (curr === 'AIRTIME') setAmountPerRecipient(200);
+    else setAmountPerRecipient(10);
   };
 
   const faqs = [
     {
       q: 'How does Sprinkl guarantee zero double-claims?',
-      a: 'Sprinkl enforces database-level unique compound indexes at the database engine level on recipient bank account numbers and crypto wallet addresses per giveaway. Once a bank account or wallet address has received a payout for a specific giveaway, any subsequent request targeting the same destination is rejected atomically before funds are moved.'
+      a: 'Sprinkl enforces database-level unique compound indexes at the database engine level on recipient bank account numbers, crypto wallet addresses, and mobile phone numbers per giveaway. Once a destination has received a payout for a specific giveaway, any subsequent request targeting the same destination is rejected atomically before funds are moved.'
     },
     {
       q: 'Which currencies and payment rails are supported?',
-      a: 'We support Nigerian Naira (NGN) via Flutterwave automated bank transfers to all Nigerian commercial and microfinance banks (OPay, Kuda, Moniepoint, PalmPay, GTBank, Zenith, etc.) and Tether USD (USDT) on TRC-20 (Tron) and BEP-20 (Binance Smart Chain).'
+      a: 'We support 3 primary rails: 1) Nigerian Naira (NGN) via Flutterwave automated bank transfers to all Nigerian commercial and microfinance banks (OPay, Kuda, Moniepoint, PalmPay, GTBank, Zenith, etc.), 2) Instant VTU Mobile Airtime recharge to all major Nigerian networks (MTN, Airtel, Glo, 9mobile), and 3) Tether USD (USDT) on TRC-20 (Tron) and BEP-20 (Binance Smart Chain).'
+    },
+    {
+      q: 'How do VTU Airtime giveaways work?',
+      a: 'Hosts can launch airtime giveaways starting from as low as ₦50 per recipient (funded directly from their NGN balance). Claimants simply enter their phone number and choose their network (MTN, Airtel, Glo, 9mobile), and Sprinkl automatically recharges their SIM via Flutterwave Bills in under 2 seconds. Single-claim validation prevents the same phone number from claiming multiple times.'
     },
     {
       q: 'What are the minimum amounts?',
-      a: 'For NGN giveaways, the minimum payout per winner is ₦300 and the minimum wallet deposit is ₦1,000. For USDT giveaways, the minimum payout per winner is $0.20 USDT and the minimum wallet deposit is $2 USDT. These floors protect your margins by ensuring transfer fees are always covered.'
+      a: 'For VTU Airtime drops, the minimum payout is just ₦50 per winner. For NGN bank transfer giveaways, the minimum payout is ₦300 (min deposit ₦1,000). For USDT crypto giveaways, the minimum payout is $0.20 USDT (min deposit $2 USDT). These floors protect your margins and ensure transfer fees are always covered.'
     },
     {
       q: 'How fast do winners receive their funds?',
-      a: 'Payouts are executed instantly via background queuing engines the moment the recipient clicks “Claim”. Nigerian bank transfers typically credit in under 2 seconds, and USDT on-chain payouts broadcast immediately to the network.'
+      a: 'Payouts are executed instantly via background queuing engines the moment the recipient clicks “Claim”. Nigerian bank transfers and VTU airtime recharges typically credit in under 2 seconds, and USDT on-chain payouts broadcast immediately to the network.'
     },
     {
       q: 'What happens to leftover funds if a giveaway expires?',
@@ -95,20 +103,21 @@ export default function LandingPage() {
     },
     {
       q: 'Can I restrict who can participate in my giveaway?',
-      a: 'Yes! When creating a giveaway, you can configure restrictions such as first-time claimants only, phone number OTP verification, and optional secret passcodes.'
+      a: 'Yes! When creating a giveaway, you can configure restrictions such as first-time claimants only (admin-verified), phone number OTP verification, and optional secret passcodes.'
     },
     {
       q: 'How do I fund my host wallet to start?',
-      a: 'Hosts can instantly fund their NGN balance via Flutterwave (card or bank transfer with minimum ₦1,000), as well as dedicated crypto deposit addresses for USDT (minimum $2).'
+      a: 'Hosts can instantly fund their NGN balance via Flutterwave (card, USSD, or direct bank transfer with minimum ₦1,000) which powers both bank payouts and VTU airtime giveaways, as well as dedicated crypto deposit addresses for USDT (minimum $2).'
     }
   ];
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-900 dark:text-slate-100 selection:bg-brand-500 selection:text-slate-950 font-sans transition-colors duration-150">
       <SEO
-        title="Sprinkl — Automated Cash & Crypto Giveaways in Nigeria"
-        description="Sprinkl is Nigeria's #1 automated dual-currency giveaway platform. Pay winners directly to bank accounts (NGN) or crypto wallets (USDT). Zero double-claims guaranteed."
+        title="Sprinkl — Automated Cash, Crypto & VTU Airtime Giveaways in Nigeria"
+        description="Sprinkl is Nigeria's #1 automated giveaway platform. Pay winners directly to bank accounts (NGN), crypto wallets (USDT), or instant VTU mobile airtime (MTN, Airtel, Glo, 9mobile). Zero double-claims guaranteed."
         canonical="/"
+        keywords="giveaway platform Nigeria, VTU airtime giveaway, airtime drop Nigeria, MTN airtime giveaway, Airtel airtime giveaway, Glo airtime drop, 9mobile recharge Nigeria, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria"
         breadcrumbs={[{ name: 'Home', path: '/' }]}
       />
       <Navbar />
@@ -128,7 +137,7 @@ export default function LandingPage() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/25 text-brand-600 dark:text-brand-400 text-xs font-bold mb-6 tracking-wide shadow-inner">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Dual-Currency Giveaway Distribution Platform — Powered by Sprinkl.biz</span>
+                <span>Multi-Rail Giveaway Platform: NGN Banks • VTU Airtime • USDT Crypto</span>
               </div>
 
               {/* Main Heading (Single H1 for SEO) */}
@@ -136,7 +145,7 @@ export default function LandingPage() {
                 id="hero-heading"
                 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 leading-[1.08]"
               >
-                Sprinkl — Automated Cash &amp; Crypto Giveaways{' '}
+                Automated Cash, Crypto &amp; VTU Airtime Giveaways{' '}
                 <br className="hidden sm:inline" />
                 <span className="text-emerald-600 dark:text-emerald-400 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-200 bg-clip-text text-transparent font-extrabold inline-block drop-shadow-sm">
                   With Zero Double-Claims.
@@ -146,9 +155,10 @@ export default function LandingPage() {
               {/* Subheading */}
               <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 dark:text-dark-muted mb-8 leading-relaxed">
                 Sprinkl lets creators, brands, and communities fund an in-app vault in{' '}
-                <strong className="text-slate-900 dark:text-white font-semibold">NGN (Flutterwave)</strong> or{' '}
-                <strong className="text-slate-900 dark:text-white font-semibold">USDT (TRC-20 / BEP-20)</strong>, generate a
-                single claim link, and disburse instant payouts directly to recipient accounts with mathematical fraud protection.
+                <strong className="text-slate-900 dark:text-white font-semibold">NGN (Banks)</strong>,{' '}
+                <strong className="text-slate-900 dark:text-white font-semibold">VTU Mobile Airtime (MTN, Airtel, Glo, 9mobile)</strong>, or{' '}
+                <strong className="text-slate-900 dark:text-white font-semibold">USDT (Crypto)</strong>, generate a
+                single claim link, and disburse instant payouts directly to recipient accounts or phone numbers with mathematical fraud protection.
               </p>
 
               {/* CTAs */}
@@ -178,6 +188,10 @@ export default function LandingPage() {
                   <span>Instant Flutterwave Bank Transfers</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-emerald-500" />
+                  <span>Instant VTU Airtime (All Networks)</span>
+                </div>
+                <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-brand-500" />
                   <span>USDT TRC-20 & BEP-20 Multi-Chain</span>
                 </div>
@@ -204,7 +218,7 @@ export default function LandingPage() {
                     Weekend Creator Cash Drop #42
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-dark-muted">
-                    Created by @techbro • Direct to Bank Payouts
+                    Created by @techbro • Direct to Bank & Airtime Payouts
                   </p>
                 </div>
 
@@ -248,21 +262,21 @@ export default function LandingPage() {
 
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-dark-border/60">
                   <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-dark-muted mb-1">
-                    <span className="font-semibold text-slate-800 dark:text-slate-300">Chidinma O.</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-mono">4s ago</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-300">Zainab B.</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-mono">3s ago</span>
                   </div>
-                  <p className="text-xs font-black text-slate-900 dark:text-white">₦2,500 &bull; OPay</p>
-                  <p className="text-[10px] text-brand-600 dark:text-brand-400 mt-1 flex items-center gap-1 font-semibold">
-                    <Check className="w-3 h-3" /> Paid Instantly
+                  <p className="text-xs font-black text-slate-900 dark:text-white">₦500 &bull; MTN Airtime</p>
+                  <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1 font-semibold">
+                    <Smartphone className="w-3 h-3" /> Recharged Instantly
                   </p>
                 </div>
 
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-dark-border/60">
                   <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-dark-muted mb-1">
-                    <span className="font-semibold text-slate-800 dark:text-slate-300">Emeka D.</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-mono">12s ago</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-300">Chidinma O.</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-mono">8s ago</span>
                   </div>
-                  <p className="text-xs font-black text-slate-900 dark:text-white">₦2,500 &bull; GTBank</p>
+                  <p className="text-xs font-black text-slate-900 dark:text-white">₦2,500 &bull; OPay</p>
                   <p className="text-[10px] text-brand-600 dark:text-brand-400 mt-1 flex items-center gap-1 font-semibold">
                     <Check className="w-3 h-3" /> Paid Instantly
                   </p>
@@ -319,36 +333,48 @@ export default function LandingPage() {
               {/* Currency Selector */}
               <div className="mb-6 sm:mb-8">
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-dark-muted mb-2.5">
-                  Select Payout Currency
+                  Select Payout Currency &amp; Rail
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
                   <button
                     type="button"
                     onClick={() => handleCurrencyChange('NGN')}
-                    className={`py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all border text-sm sm:text-base ${
+                    className={`py-3 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border text-xs sm:text-sm ${
                       calcCurrency === 'NGN'
                         ? 'bg-brand-500/15 border-brand-500 text-brand-700 dark:text-brand-300 shadow-md'
                         : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
-                    <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-black shrink-0">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-black shrink-0">
                       ₦
                     </span>
-                    <span className="truncate">Nigerian Naira (NGN)</span>
+                    <span className="truncate">NGN Bank Payout</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCurrencyChange('AIRTIME')}
+                    className={`py-3 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border text-xs sm:text-sm ${
+                      calcCurrency === 'AIRTIME'
+                        ? 'bg-emerald-500/15 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-md'
+                        : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Smartphone className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <span className="truncate">VTU Mobile Airtime</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleCurrencyChange('USDT')}
-                    className={`py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2.5 transition-all border text-sm sm:text-base ${
+                    className={`py-3 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border text-xs sm:text-sm ${
                       calcCurrency === 'USDT'
                         ? 'bg-teal-500/15 border-teal-500 text-teal-700 dark:text-teal-300 shadow-md'
                         : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
-                    <span className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-300 flex items-center justify-center text-xs font-black shrink-0">
+                    <span className="w-5 h-5 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-300 flex items-center justify-center text-xs font-black shrink-0">
                       $
                     </span>
-                    <span className="truncate">Tether USD (Crypto USDT)</span>
+                    <span className="truncate">Tether USDT Crypto</span>
                   </button>
                 </div>
               </div>
@@ -397,7 +423,7 @@ export default function LandingPage() {
                   <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white">{formattedPerRecipient}</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {(calcCurrency === 'NGN' ? ngnAmountPresets : usdtAmountPresets).map((val) => (
+                  {(calcCurrency === 'AIRTIME' ? airtimeAmountPresets : calcCurrency === 'NGN' ? ngnAmountPresets : usdtAmountPresets).map((val) => (
                     <button
                       key={val}
                       type="button"
@@ -408,7 +434,7 @@ export default function LandingPage() {
                           : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-dark-border text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
                       }`}
                     >
-                      {calcCurrency === 'NGN' ? `₦${val.toLocaleString()}` : `$${val} USDT`}
+                      {calcCurrency === 'USDT' ? `$${val} USDT` : `₦${val.toLocaleString()}`}
                     </button>
                   ))}
                 </div>
@@ -424,9 +450,9 @@ export default function LandingPage() {
                   <div>
                     <p className="text-[11px] sm:text-xs text-slate-500 dark:text-dark-muted font-medium">Platform Fee</p>
                     <p className="text-lg sm:text-xl font-black text-brand-600 dark:text-brand-400">
-                      {calcCurrency === 'NGN'
-                        ? `₦${Math.round(promoFee).toLocaleString()}`
-                        : `$${promoFee.toFixed(2)}`}
+                      {calcCurrency === 'USDT'
+                        ? `$${promoFee.toFixed(2)}`
+                        : `₦${Math.round(promoFee).toLocaleString()}`}
                     </p>
                     <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold truncate">
                       {isWhaleCalc ? '3.0% Whale Cap' : '2.5% New Host Promo'}
@@ -435,7 +461,9 @@ export default function LandingPage() {
                   <div>
                     <p className="text-[11px] sm:text-xs text-slate-500 dark:text-dark-muted font-medium">Payout Latency</p>
                     <p className="text-lg sm:text-xl font-black text-teal-600 dark:text-teal-300">&lt; 2 Seconds</p>
-                    <p className="text-[10px] text-slate-500 dark:text-dark-muted">Automated Settlement</p>
+                    <p className="text-[10px] text-slate-500 dark:text-dark-muted">
+                      {calcCurrency === 'AIRTIME' ? 'Direct SIM Recharge' : 'Automated Settlement'}
+                    </p>
                   </div>
                   <div>
                     <p className="text-[11px] sm:text-xs text-slate-500 dark:text-dark-muted font-medium">Anti-Duplicate</p>
@@ -446,7 +474,7 @@ export default function LandingPage() {
 
                 <div className="mt-4 pt-3 border-t border-slate-200 dark:border-dark-border/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-dark-muted text-center sm:text-left">
                   <span>
-                    Min payout: <strong>₦300 / $0.20 USDT</strong> per winner &bull; Standard fee: <strong>5.0%</strong> (3% on drops &gt;₦1M / $1k)
+                    Min payout: <strong>₦50 (Airtime) &bull; ₦300 (Bank) &bull; $0.20 (USDT)</strong> per winner &bull; Standard fee: <strong>5.0%</strong> (3% on drops &gt;₦1M / $1k)
                   </span>
                   <span className="text-brand-600 dark:text-brand-400 font-bold">Unclaimed funds automatically refunded</span>
                 </div>
@@ -558,7 +586,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Fund Your In-App Vault</h3>
                 <p className="text-xs text-slate-600 dark:text-dark-muted leading-relaxed">
-                  Deposit NGN instantly via Flutterwave checkout, or transfer USDT to your secure TRC-20 or BEP-20 address.
+                  Deposit NGN instantly via Flutterwave (powers both bank payouts and VTU airtime drops), or transfer USDT to your secure TRC-20 or BEP-20 address.
                 </p>
               </div>
 
@@ -567,7 +595,7 @@ export default function LandingPage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-black text-xl flex items-center justify-center mb-6">
                   2
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Set Rules & Share Link</h3>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Set Rules &amp; Share Link</h3>
                 <p className="text-xs text-slate-600 dark:text-dark-muted leading-relaxed">
                   Choose payout amounts, slot limits, and optional anti-abuse restrictions. Share your unique link or dynamic QR code anywhere.
                 </p>
@@ -580,7 +608,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Instant Automated Payouts</h3>
                 <p className="text-xs text-slate-600 dark:text-dark-muted leading-relaxed">
-                  Winners enter their bank details or wallet address. The Sprinkl ledger validates single-claim rights and transfers cash in seconds.
+                  Winners enter their bank details, phone number, or wallet address. The Sprinkl ledger validates single-claim rights and transfers cash or airtime in seconds.
                 </p>
               </div>
             </div>
@@ -606,7 +634,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">Automated Settlement</h3>
                 <p className="text-xs text-slate-600 dark:text-dark-muted leading-relaxed">
-                  Real-time disbursement queues powered by Flutterwave Transfer API and blockchain RPC nodes without manual interventions.
+                  Real-time disbursement queues powered by Flutterwave Transfer &amp; Bills API and blockchain RPC nodes without manual interventions.
                 </p>
               </div>
 
@@ -616,17 +644,17 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">Zero Double-Claim Engine</h3>
                 <p className="text-xs text-slate-600 dark:text-dark-muted leading-relaxed">
-                  Database ACID transactions and compound uniqueness constraints guarantee the same recipient account can never claim twice.
+                  Database ACID transactions and compound uniqueness constraints guarantee the same recipient account or phone number can never claim twice.
                 </p>
               </div>
 
               <div className="bg-white dark:bg-dark-card p-6 rounded-2xl border border-slate-200 dark:border-dark-border hover:border-brand-500/40 transition-colors shadow-sm">
                 <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-4">
-                  <Coins className="w-6 h-6" />
+                  <Smartphone className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">Dual Currency Flexibility</h3>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">Triple Payout Rails</h3>
                 <p className="text-xs text-slate-600 dark:text-dark-muted leading-relaxed">
-                  Serve both local Nigerian audiences (NGN bank accounts) and global crypto audiences (USDT TRC-20 & BEP-20) from one unified platform.
+                  Deliver prizes via Nigerian Bank Transfers (NGN), Instant VTU Mobile Airtime (MTN, Airtel, Glo, 9mobile), or Crypto (USDT TRC-20 &amp; BEP-20) from one unified platform.
                 </p>
               </div>
 
@@ -838,10 +866,13 @@ export default function LandingPage() {
 
             {/* Currency Rails */}
             <div>
-              <p className="text-xs font-bold uppercase text-slate-900 dark:text-white tracking-wider mb-3">Currencies</p>
+              <p className="text-xs font-bold uppercase text-slate-900 dark:text-white tracking-wider mb-3">Payout Rails</p>
               <ul className="space-y-2">
                 <li>
-                  <span className="hover:text-slate-900 dark:hover:text-slate-300 transition-colors">Nigerian Naira (NGN)</span>
+                  <span className="hover:text-slate-900 dark:hover:text-slate-300 transition-colors">Nigerian Naira (NGN Bank)</span>
+                </li>
+                <li>
+                  <span className="hover:text-slate-900 dark:hover:text-slate-300 transition-colors">VTU Airtime (MTN, Airtel, Glo, 9mobile)</span>
                 </li>
                 <li>
                   <span className="hover:text-slate-900 dark:hover:text-slate-300 transition-colors">Tether USDT (TRC-20)</span>
@@ -850,7 +881,7 @@ export default function LandingPage() {
                   <span className="hover:text-slate-900 dark:hover:text-slate-300 transition-colors">Tether USDT (BEP-20)</span>
                 </li>
                 <li>
-                  <span className="hover:text-slate-900 dark:hover:text-slate-300 transition-colors">Flutterwave NGN Rails</span>
+                  <span className="hover:text-slate-900 dark:hover:text-slate-300 transition-colors">Flutterwave Automated Rails</span>
                 </li>
               </ul>
             </div>

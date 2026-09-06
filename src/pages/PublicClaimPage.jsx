@@ -27,6 +27,19 @@ const detectCarrier = (phone) => {
   return null;
 };
 
+const getDeviceFingerprint = () => {
+  try {
+    let fp = localStorage.getItem('sprinkl_device_id');
+    if (!fp) {
+      fp = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now().toString(36);
+      localStorage.setItem('sprinkl_device_id', fp);
+    }
+    return fp;
+  } catch {
+    return 'dev_' + Math.random().toString(36).substring(2, 11);
+  }
+};
+
 export default function PublicClaimPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -214,6 +227,8 @@ export default function PublicClaimPage() {
           walletAddress,
         };
       }
+
+      payload.deviceFingerprint = getDeviceFingerprint();
 
       const res = await api.post(`/g/${slug}/claim`, payload);
       const claimId = res.data.claim.id;

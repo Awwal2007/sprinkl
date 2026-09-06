@@ -369,24 +369,26 @@ export default function CreateGiveawayPage() {
               </div>
             </div>
 
-            {/* Anti-abuse settings */}
-            <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-xl border border-slate-200 dark:border-dark-border space-y-3">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
-                <ShieldCheck className="w-4 h-4 text-brand-500" />
-                <span>Anti-Abuse Safeguards</span>
+            {/* Anti-abuse settings (Super Admin Only) */}
+            {isAdmin && (
+              <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-xl border border-slate-200 dark:border-dark-border space-y-3">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
+                  <ShieldCheck className="w-4 h-4 text-brand-500" />
+                  <span>Anti-Abuse Safeguards (Admin Mode)</span>
+                </div>
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={restrictFirstTime}
+                    onChange={(e) => setRestrictFirstTime(e.target.checked)}
+                    className="w-4 h-4 rounded bg-white dark:bg-dark-card border-slate-300 dark:border-dark-border text-brand-500 focus:ring-0 cursor-pointer"
+                  />
+                  <span className="text-xs text-slate-700 dark:text-slate-300">
+                    Restrict to first-time claimants only (prevents serial claims across platform)
+                  </span>
+                </label>
               </div>
-              <label className="flex items-center gap-3 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={restrictFirstTime}
-                  onChange={(e) => setRestrictFirstTime(e.target.checked)}
-                  className="w-4 h-4 rounded bg-white dark:bg-dark-card border-slate-300 dark:border-dark-border text-brand-500 focus:ring-0 cursor-pointer"
-                />
-                <span className="text-xs text-slate-700 dark:text-slate-300">
-                  Restrict to first-time claimants only (prevents serial claims across platform)
-                </span>
-              </label>
-            </div>
+            )}
 
             {/* Fee Privilege Status */}
             {isWhale ? (
