@@ -26,7 +26,8 @@ const isAppRoute = (pathname) =>
   APP_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'));
 
 export default function Navbar() {
-  const { user, logout } = useAuthStore();
+  const { user, accessToken, logout } = useAuthStore();
+  const isAuthenticated = Boolean(user && accessToken && user.emailVerified !== false);
   const { openChat } = useSupportStore();
   const { resolvedTheme, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
@@ -230,7 +231,7 @@ export default function Navbar() {
               )}
             </button>
 
-            {user ? (
+            {isAuthenticated ? (
               /* User Avatar Dropdown (for Desktop) */
               <div className="relative" ref={desktopAvatarRef}>
                 <button
@@ -358,7 +359,7 @@ export default function Navbar() {
 
             {onAppRoute ? (
               /* IN DASHBOARD: Profile avatar dropdown only */
-              user && (
+              isAuthenticated && (
                 <div className="relative" ref={mobileAvatarRef}>
                   <button
                     onClick={() => setAvatarOpen((o) => !o)}
@@ -509,7 +510,7 @@ export default function Navbar() {
                 </button>
               </div>
 
-              {user ? (
+              {isAuthenticated ? (
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-sm shadow-md shrink-0">
@@ -620,7 +621,7 @@ export default function Navbar() {
                 </button>
               </div>
 
-              {user && (
+              {isAuthenticated && (
                 <div className="pt-2 border-t border-slate-200 dark:border-white/[0.08]">
                   <button
                     onClick={handleLogout}

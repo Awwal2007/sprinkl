@@ -94,6 +94,18 @@ api.interceptors.response.use(
       }
     }
 
+    if (error.response?.status === 403 && (error.response?.data?.code === 'EMAIL_NOT_VERIFIED' || error.response?.data?.emailVerified === false)) {
+      if (!isLoginRoute && !originalRequest?.url?.includes('/auth/resend-verification')) {
+        useAuthStore.getState().logout();
+        if (typeof window !== 'undefined') {
+          const path = window.location.pathname;
+          if (path !== '/login' && path !== '/signup' && path !== '/verify-email') {
+            window.location.href = '/login';
+          }
+        }
+      }
+    }
+
     return Promise.reject(error);
   }
 );

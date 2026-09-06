@@ -35,6 +35,7 @@ function isTokenValid(token) {
 function ProtectedRoute({ children }) {
   const token = useAuthStore((state) => state.accessToken);
   const refreshToken = useAuthStore((state) => state.refreshToken);
+  const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
   if (!token) {
@@ -45,6 +46,12 @@ function ProtectedRoute({ children }) {
   if (!isTokenValid(token) && !refreshToken) {
     logout();
     return <Navigate to="/login?expired=true" replace />;
+  }
+
+  // If user is not verified, require verification before allowing access
+  if (user && user.emailVerified === false) {
+    logout();
+    return <Navigate to="/login" replace />;
   }
 
   return children;

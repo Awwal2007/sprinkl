@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Gift, Lock, Mail, User, Phone, ArrowRight, CheckCircle2, Eye, EyeOff, Sun, Moon } from 'lucide-react';
+import { Gift, Lock, Mail, User, Phone, ArrowRight, CheckCircle2, Eye, EyeOff, Sun, Moon, AlertCircle, Home } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { useThemeStore } from '../store/useThemeStore';
@@ -16,8 +16,10 @@ export default function SignupPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
+  const [resendError, setResendError] = useState(null);
 
-  const setAuth = useAuthStore((state) => state.setAuth);
   const { resolvedTheme, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
 
@@ -32,8 +34,9 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      const res = await api.post('/auth/signup', { fullName, email, phone, password });
-      setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
+      await api.post('/auth/signup', { fullName, email, phone, password });
+      // Security: Ensure any lingering auth session is cleared. User must verify email before logging in.
+      useAuthStore.getState().logout();
       setEmailSent(true);
     } catch (err) {
       setError(err.response?.data?.error || 'Signup failed. Please check your details.');
@@ -42,17 +45,28 @@ export default function SignupPage() {
     }
   };
 
+  const handleResend = async () => {
+    if (resending) return;
+    setResending(true);
+    setResendError(null);
+    try {
+      await api.post('/auth/resend-verification', { email });
+      setResendSent(true);
+    } catch (err) {
+      setResendError(err.response?.data?.error || 'Failed to resend email. Please try again.');
+    } finally {
+      setResending(false);
+    }
+  };
+
   if (emailSent) {
     return (
       <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative">
         <SEO
-          title="Sign Up Free — Start Your First Giveaway on Sprinkl Nigeria | NGN & USDT"
-          description="Create a free Sprinkl account and launch your first giveaway in 60 seconds. Instantly pay winners to Nigerian bank accounts (NGN) or crypto wallets (USDT). No fraud. No double-claims. Nigeria's #1 giveaway platform."
+          title="Verify Email — Sprinkl Nigeria"
+          description="Please verify your email address to activate your Sprinkl account."
           canonical="/signup"
-          breadcrumbs={[
-            { name: 'Home', path: '/' },
-            { name: 'Sign Up', path: '/signup' },
-          ]}
+          noIndex={true}
         />
 
         {/* Theme Toggle Button */}
@@ -61,7 +75,7 @@ export default function SignupPage() {
             type="button"
             onClick={toggleTheme}
             aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
-            className="p-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white/90 dark:bg-dark-card/90 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-sm hover:shadow transition-all backdrop-blur-md"
+            className="p-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white/90 dark:bg-dark-card/90 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-sm hover:shadow transition-all backdrop-blur-md cursor-pointer"
           >
             {resolvedTheme === 'dark' ? (
               <Sun className="w-4 h-4 text-amber-400" />
@@ -75,21 +89,53 @@ export default function SignupPage() {
           <div className="w-16 h-16 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 dark:text-brand-400 flex items-center justify-center mx-auto mb-5">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-extrabold text-slate-900 dark:text-white mb-2">Check Your Email!</h2>
-          <p className="text-sm text-dark-muted leading-relaxed mb-2">
-            We sent a verification link to{' '}
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-white mb-2">Verify Your Email Address</h2>
+          <p className="text-sm text-dark-muted leading-relaxed mb-4">
+            We sent an account activation link to{' '}
             <strong className="text-slate-800 dark:text-slate-200">{email}</strong>.
           </p>
-          <p className="text-xs text-dark-muted mb-8">
-            Click the link to activate your account. The link expires in 24 hours. Check your spam folder if you don't see it.
+
+          <div className="bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs rounded-xl p-3.5 mb-6 text-left space-y-1">
+            <p className="font-bold flex items-center gap-1.5">
+              <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+              <span>Verification Required to Log In</span>
+            </p>
+            <p className="text-[11px] leading-relaxed text-slate-600 dark:text-dark-muted">
+              For security, your account cannot be accessed or logged into until you confirm your email. Please check your inbox and click the verification link.
+            </p>
+          </div>
+
+          {resendError && (
+            <div className="p-3 mb-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-medium text-left">
+              {resendError}
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="w-full py-3 bg-brand-500 hover:bg-brand-400 active:bg-brand-600 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Home className="w-4 h-4 stroke-[2.5]" />
+              <span>Go to Home</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resending || resendSent}
+              className="w-full py-2.5 bg-slate-100 dark:bg-dark-bg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-dark-border text-xs font-semibold rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              {resending ? 'Sending…' : resendSent ? 'Verification link sent ✓' : "Didn't receive the email? Resend"}
+            </button>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-dark-muted">
+            Already verified your email?{' '}
+            <Link to="/login" className="text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-500 dark:hover:text-brand-300 transition-colors">
+              Sign In
+            </Link>
           </p>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all"
-          >
-            <span>Continue to Dashboard</span>
-            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-          </button>
         </div>
       </div>
     );

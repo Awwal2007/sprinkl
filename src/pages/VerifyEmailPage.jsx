@@ -30,7 +30,9 @@ export default function VerifyEmailPage() {
         setLoading(true);
         const res = await api.post('/auth/verify-email', { token });
         setSuccess(true);
-        if (user) {
+        if (res.data.accessToken && res.data.user) {
+          setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
+        } else if (user) {
           setAuth({ ...user, emailVerified: true }, accessToken);
         }
       } catch (err) {
