@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { CheckCircle2, Clock, Share2, Sparkles, ArrowLeft, ExternalLink, Gift, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Clock, Share2, Sparkles, ArrowLeft, ExternalLink, Gift, ArrowRight, Copy, Check } from 'lucide-react';
 import api from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import SEO from '../components/SEO';
@@ -11,6 +11,7 @@ export default function ClaimSuccessPage() {
   const location = useLocation();
 
   const [claim, setClaim] = useState(location.state?.claim || null);
+  const [copiedRef, setCopiedRef] = useState(false);
 
   useEffect(() => {
     // Fire celebratory confetti!
@@ -35,8 +36,9 @@ export default function ClaimSuccessPage() {
   }, [slug, claimId]);
 
   const formatCurrency = (amount, currency) => {
-    if (currency === 'NGN') return `₦${(amount / 100).toLocaleString()}`;
-    return `${(amount / 1000000).toLocaleString()} USDT`;
+    if (currency === 'USDT') return `${(amount / 1000000).toLocaleString()} USDT`;
+    if (currency === 'AIRTIME') return `₦${(amount / 100).toLocaleString()} Airtime`;
+    return `₦${(amount / 100).toLocaleString()}`;
   };
 
   const isFailed = claim?.status === 'failed';
@@ -64,11 +66,17 @@ export default function ClaimSuccessPage() {
 
         <div className="space-y-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-            {isFailed ? 'Payout Failed' : isPaid ? 'Claim Paid!' : 'Claim Submitted!'}
+            {isFailed
+              ? 'Payout Failed'
+              : isPaid
+              ? (claim?.currency === 'AIRTIME' ? 'Airtime Recharged!' : 'Claim Paid!')
+              : (claim?.currency === 'AIRTIME' ? 'Recharge Dispatched!' : 'Claim Submitted!')}
           </h1>
           <p className="text-xs text-slate-500 dark:text-dark-muted">
             {isFailed
-              ? 'The payout transfer could not be completed by Flutterwave.'
+              ? 'The payout transfer could not be completed by the provider.'
+              : claim?.currency === 'AIRTIME'
+              ? `Airtime credit has been dispatched to ${claim?.destination?.phoneNumber || 'your phone'} (${claim?.destination?.network || 'VTU'}).`
               : claim?.successMessage || 'Funds transfer initiated directly to your destination.'}
           </p>
         </div>
@@ -90,17 +98,40 @@ export default function ClaimSuccessPage() {
             </span>
           </div>
 
+          {claim?.currency === 'AIRTIME' && claim?.destination?.phoneNumber && (
+            <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200 dark:border-dark-border">
+              <span className="text-slate-500 dark:text-dark-muted font-medium">Recharged Line</span>
+              <span className="font-mono text-slate-700 dark:text-slate-300 font-bold text-[11px]">
+                {claim?.destination?.network || 'VTU'} • {claim?.destination?.phoneNumber}
+              </span>
+            </div>
+          )}
+
           <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200 dark:border-dark-border">
             <span className="text-slate-500 dark:text-dark-muted font-medium">Payout Status</span>
             <StatusBadge status={claim?.status || 'processing'} />
           </div>
 
           {claim?.payoutReference && (
-            <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200 dark:border-dark-border">
-              <span className="text-slate-500 dark:text-dark-muted font-medium">Reference Code</span>
-              <span className="font-mono text-slate-700 dark:text-slate-300 font-bold text-[11px] truncate max-w-[180px]">
-                {claim.payoutReference}
-              </span>
+            <div className="flex items-center justify-between gap-2 text-xs pt-2 border-t border-slate-200 dark:border-dark-border">
+              <span className="text-slate-500 dark:text-dark-muted font-medium shrink-0">Reference Code</span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(claim.payoutReference);
+                  setCopiedRef(true);
+                  setTimeout(() => setCopiedRef(false), 2000);
+                }}
+                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-200/70 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 font-mono text-slate-800 dark:text-slate-200 font-bold text-[11px] transition-all max-w-[200px] truncate active:scale-95 touch-manipulation"
+                title="Click to copy payout reference"
+              >
+                <span className="truncate">{claim.payoutReference}</span>
+                {copiedRef ? (
+                  <Check className="w-3 h-3 text-emerald-500 shrink-0" />
+                ) : (
+                  <Copy className="w-3 h-3 text-slate-400 shrink-0" />
+                )}
+              </button>
             </div>
           )}
         </div>

@@ -96,8 +96,9 @@ export default function GiveawayDetailPage() {
   const publicUrl = `${window.location.origin}/g/${giveaway.slug}`;
 
   const formatCurrency = (amount, currency) => {
-    if (currency === 'NGN') return `₦${(amount / 100).toLocaleString()}`;
-    return `${(amount / 1000000).toLocaleString()} USDT`;
+    if (currency === 'USDT') return `${(amount / 1000000).toLocaleString()} USDT`;
+    if (currency === 'AIRTIME') return `₦${(amount / 100).toLocaleString()} Airtime`;
+    return `₦${(amount / 100).toLocaleString()}`;
   };
 
   const handleCancel = async () => {
@@ -165,6 +166,11 @@ export default function GiveawayDetailPage() {
             <div>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <StatusBadge status={giveaway.status} />
+                {giveaway.currency === 'AIRTIME' && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
+                    📱 VTU Airtime
+                  </span>
+                )}
                 <span className="text-xs font-mono font-bold text-slate-500 dark:text-dark-muted">ID: {giveaway.slug}</span>
               </div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white">{giveaway.title}</h1>
@@ -271,7 +277,9 @@ export default function GiveawayDetailPage() {
                       <StatusBadge status={c.status} />
                     </div>
                     <p className="text-[11px] font-mono text-slate-500 dark:text-dark-muted break-all">
-                      {c.currency === 'NGN'
+                      {c.currency === 'AIRTIME'
+                        ? `📱 ${c.destination.network || 'VTU'} — ${c.destination.phoneNumber}`
+                        : c.currency === 'NGN'
                         ? `${c.destination.bankName} — ${c.destination.accountNumber}`
                         : c.destination.walletAddress}
                     </p>
@@ -302,7 +310,9 @@ export default function GiveawayDetailPage() {
                       <tr key={c._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/30">
                         <td className="py-3 px-3 font-semibold text-slate-900 dark:text-white">{c.claimantName}</td>
                         <td className="py-3 px-3 font-mono text-slate-500 dark:text-dark-muted max-w-[200px] truncate">
-                          {c.currency === 'NGN'
+                          {c.currency === 'AIRTIME'
+                            ? `📱 ${c.destination.network || 'VTU'} - ${c.destination.phoneNumber}`
+                            : c.currency === 'NGN'
                             ? `${c.destination.bankName} - ${c.destination.accountNumber}`
                             : c.destination.walletAddress}
                         </td>

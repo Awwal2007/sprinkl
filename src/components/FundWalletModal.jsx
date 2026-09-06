@@ -396,7 +396,7 @@ export default function FundWalletModal({
                       step="any"
                       value={usdtAmount}
                       onChange={(e) => setUsdtAmount(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-8 pr-16 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-8 pr-16 py-3 text-base sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
                       placeholder="10.00"
                     />
                     <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 dark:text-slate-400">
@@ -405,16 +405,16 @@ export default function FundWalletModal({
                   </div>
 
                   {/* Preset quick buttons */}
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex gap-1.5 sm:gap-2 mt-2">
                     {['5', '10', '25', '50', '100'].map((amt) => (
                       <button
                         key={amt}
                         type="button"
                         onClick={() => setUsdtAmount(amt)}
-                        className={`flex-1 py-1 text-[11px] font-bold rounded-lg border transition-colors ${
+                        className={`flex-1 min-h-[32px] py-1.5 text-[11px] font-bold rounded-lg border transition-all active:scale-95 touch-manipulation ${
                           usdtAmount === amt
-                            ? 'bg-brand-500/15 border-brand-500 text-emerald-600 dark:text-brand-400'
-                            : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-brand-500/20 border-brand-500 text-brand-600 dark:text-brand-400'
+                            : 'border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-slate-700'
                         }`}
                       >
                         ${amt}

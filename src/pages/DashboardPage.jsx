@@ -66,11 +66,10 @@ export default function DashboardPage() {
   });
 
   const formatCurrency = (amount, currency) => {
-    if (currency === 'NGN') {
-      return `₦${(amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    } else {
+    if (currency === 'USDT') {
       return `${(amount / 1000000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
     }
+    return `₦${(amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   // Check if there are cancelled giveaways with pending unspent funds
@@ -78,7 +77,7 @@ export default function DashboardPage() {
     const rawReserved = walletData?.balances?.[curr]?.reserved || 0;
     if (rawReserved <= 0) return false;
     return giveawaysData?.some(
-      (g) => g.currency === curr && g.status === 'cancelled' && !g.fundsReleased
+      (g) => (g.currency === curr || (curr === 'NGN' && g.currency === 'AIRTIME')) && g.status === 'cancelled' && !g.fundsReleased
     );
   };
 
@@ -320,6 +319,11 @@ export default function DashboardPage() {
                             <div className="space-y-2 min-w-0">
                               <div className="flex flex-wrap items-center gap-2">
                                 <StatusBadge status={g.status} />
+                                {g.currency === 'AIRTIME' && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
+                                    📱 VTU Airtime
+                                  </span>
+                                )}
                                 <h3 className="text-sm font-bold text-slate-900 dark:text-white break-words sm:truncate max-w-full">
                                   {g.title}
                                 </h3>
