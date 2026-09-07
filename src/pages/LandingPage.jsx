@@ -79,6 +79,14 @@ export default function LandingPage() {
 
   const faqs = [
     {
+      q: 'Is Sprinkl Giveaway real and legitimate in Nigeria? (Sprinkl NG)',
+      a: 'Yes! Sprinkl (officially operating at https://www.sprinkl.biz, also commonly searched as Sprinkl NG or Sprinkl Nigeria) is an authentic, verified automated giveaway and reward distribution infrastructure in Nigeria. Sprinkl is not affiliated with Sproxil verification codes, SoKlin promotions, or lawn sprinklers. Verified hosts escrow real funds in advance, and winners receive instant payouts directly to their personal bank accounts (NGN via Flutterwave), VTU mobile airtime (MTN, Airtel, Glo, 9mobile), or crypto wallets (USDT) with zero fees charged to claimants.'
+    },
+    {
+      q: 'What is Sprinkl Nigeria (Sprinkl NG)?',
+      a: 'Sprinkl Nigeria is an automated multi-rail reward and giveaway platform designed for creators, brands, and influencers. It completely eliminates manual transfers, DM screenshots, and favoritism by automatically disbursing cash and airtime directly to winners the moment they claim.'
+    },
+    {
       q: 'How does Sprinkl guarantee zero double-claims?',
       a: 'Sprinkl enforces database-level unique compound indexes at the database engine level on recipient bank account numbers, crypto wallet addresses, and mobile phone numbers per giveaway. Once a destination has received a payout for a specific giveaway, any subsequent request targeting the same destination is rejected atomically before funds are moved.'
     },
@@ -115,10 +123,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-900 dark:text-slate-100 selection:bg-brand-500 selection:text-slate-950 font-sans transition-colors duration-150">
       <SEO
-        title="Sprinkl — Automated Cash, Crypto & VTU Airtime Giveaways in Nigeria"
-        description="Sprinkl is Nigeria's #1 automated giveaway platform. Pay winners directly to bank accounts (NGN), crypto wallets (USDT), or instant VTU mobile airtime (MTN, Airtel, Glo, 9mobile). Zero double-claims guaranteed."
+        title="Sprinkl Nigeria (Sprinkl NG) — #1 Automated Giveaway Platform in Nigeria"
+        description="Sprinkl Nigeria (Sprinkl NG / Sprinkl.biz) is Nigeria's official automated giveaway platform. Pay winners directly to bank accounts (NGN), crypto wallets (USDT), or instant VTU airtime (MTN, Airtel, Glo, 9mobile). Zero double-claims guaranteed."
         canonical="/"
-        keywords="giveaway platform Nigeria, VTU airtime giveaway, airtime drop Nigeria, MTN airtime giveaway, Airtel airtime giveaway, Glo airtime drop, 9mobile recharge Nigeria, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria"
+        keywords="sprinkl, sprinkl ng, sprinkl nigeria, sprinkl giveaway, sprinkl giveaway nigeria, sprinkl giveaway ng, sprinkl.biz, sprinkl biz, sprinkl cash drop nigeria, sprinkl airtime nigeria, sprinkl legit nigeria, giveaway platform Nigeria, VTU airtime giveaway, airtime drop Nigeria, MTN airtime giveaway, Airtel airtime giveaway, Glo airtime drop, 9mobile recharge Nigeria, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria"
         breadcrumbs={[{ name: 'Home', path: '/' }]}
       />
       <Navbar />

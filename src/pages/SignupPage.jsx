@@ -132,8 +132,8 @@ export default function SignupPage() {
 
           <p className="mt-6 text-center text-xs text-dark-muted">
             Already verified your email?{' '}
-            <Link to="/login" className="text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-500 dark:hover:text-brand-300 transition-colors">
-              Sign In
+            <Link to="/" className="text-brand-600 dark:text-brand-400 font-semibold hover:text-brand-500 dark:hover:text-brand-300 transition-colors">
+              Go Home
             </Link>
           </p>
         </div>

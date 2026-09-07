@@ -5,10 +5,23 @@ Allow: /privacy-policy
 Allow: /signup
 Allow: /login
 Allow: /g/
+Allow: /llms.txt
 Allow: /favicon*
 Allow: /*.png$
 Allow: /*.ico$
 Allow: /*.svg$
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /verify-email
+
+User-agent: Google-Extended
+Allow: /
+Allow: /privacy
+Allow: /signup
+Allow: /login
+Allow: /g/
+Allow: /llms.txt
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /api/
@@ -30,10 +43,54 @@ Allow: /privacy-policy
 Allow: /signup
 Allow: /login
 Allow: /g/
+Allow: /llms.txt
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /api/
 Disallow: /verify-email
+
+# AI Search & Indexing Crawlers (Google AI Overview, Perplexity, ChatGPT, Claude)
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+
+User-agent: Applebot-Extended
+Allow: /
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
 
 User-agent: *
 Allow: /
@@ -42,23 +99,11 @@ Allow: /privacy-policy
 Allow: /signup
 Allow: /login
 Allow: /g/
+Allow: /llms.txt
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /api/
 Disallow: /verify-email
 
-# Block AI training bots
-User-agent: GPTBot
-Disallow: /
-
-User-agent: ChatGPT-User
-Disallow: /
-
-User-agent: CCBot
-Disallow: /
-
-User-agent: anthropic-ai
-Disallow: /
-
-# Canonical Sitemap location
+# Sitemaps & Machine-Readable AI Knowledge
 Sitemap: https://www.sprinkl.biz/sitemap.xml
