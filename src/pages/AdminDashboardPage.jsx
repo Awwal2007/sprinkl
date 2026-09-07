@@ -580,35 +580,35 @@ export default function AdminDashboardPage() {
               {/* NGN Revenue */}
               <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-emerald-500/5 blur-2xl pointer-events-none" />
-                <p className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted font-bold mb-1">
+                <p className="text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold mb-1">
                   NGN Platform Fee Profit
                 </p>
                 <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
                   {formatCurrency(reportData?.revenue?.NGN || 0, 'NGN')}
                 </p>
-                <p className="text-[11px] text-gray-500 dark:text-dark-muted mt-2">
-                  Payout volume: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(reportData?.payouts?.NGN || 0, 'NGN')}</strong>
+                <p className="text-[11px] text-gray-600 dark:text-slate-300 mt-2 font-medium">
+                  Payout volume: <strong className="text-gray-950 dark:text-white font-bold">{formatCurrency(reportData?.payouts?.NGN || 0, 'NGN')}</strong>
                 </p>
               </div>
 
               {/* USDT Revenue */}
               <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-cyan-500/5 blur-2xl pointer-events-none" />
-                <p className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted font-bold mb-1">
+                <p className="text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold mb-1">
                   USDT Platform Fee Profit
                 </p>
                 <p className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-400">
                   {formatCurrency(reportData?.revenue?.USDT || 0, 'USDT')}
                 </p>
-                <p className="text-[11px] text-gray-500 dark:text-dark-muted mt-2">
-                  Payout volume: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(reportData?.payouts?.USDT || 0, 'USDT')}</strong>
+                <p className="text-[11px] text-gray-600 dark:text-slate-300 mt-2 font-medium">
+                  Payout volume: <strong className="text-gray-950 dark:text-white font-bold">{formatCurrency(reportData?.payouts?.USDT || 0, 'USDT')}</strong>
                 </p>
               </div>
 
               {/* Campaigns & Conversion */}
               <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-brand-500/5 blur-2xl pointer-events-none" />
-                <p className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted font-bold mb-1">
+                <p className="text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold mb-1">
                   Campaigns &amp; Claims
                 </p>
                 <div className="flex items-baseline gap-2">
@@ -619,22 +619,22 @@ export default function AdminDashboardPage() {
                     ({reportData?.giveaways?.active || 0} active)
                   </span>
                 </div>
-                <p className="text-[11px] text-gray-500 dark:text-dark-muted mt-2">
-                  Slots: <strong className="text-gray-900 dark:text-slate-200">{reportData?.giveaways?.totalSlotsClaimed || 0} / {reportData?.giveaways?.totalSlots || 0}</strong> ({reportData?.giveaways?.claimRate || 0}% conversion)
+                <p className="text-[11px] text-gray-600 dark:text-slate-300 mt-2 font-medium">
+                  Slots: <strong className="text-gray-950 dark:text-white font-bold">{reportData?.giveaways?.totalSlotsClaimed || 0} / {reportData?.giveaways?.totalSlots || 0}</strong> ({reportData?.giveaways?.claimRate || 0}% conversion)
                 </p>
               </div>
 
               {/* Users & Live Support Desk */}
               <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-purple-500/5 blur-2xl pointer-events-none" />
-                <p className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted font-bold mb-1">
+                <p className="text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold mb-1">
                   Registered Users &amp; Queue
                 </p>
                 <div className="flex items-baseline gap-2">
                   <p className="text-2xl sm:text-3xl font-black text-gray-950 dark:text-white">
                     {reportData?.users?.total || 0}
                   </p>
-                  <span className="text-xs text-gray-500 dark:text-dark-muted">
+                  <span className="text-xs font-semibold text-gray-600 dark:text-slate-300">
                     ({reportData?.users?.verified || 0} verified)
                   </span>
                 </div>
@@ -653,7 +653,7 @@ export default function AdminDashboardPage() {
                     Flagged High-Volume Host Accounts (AML Review)
                   </h2>
                 </div>
-                <span className="text-xs text-gray-500 dark:text-dark-muted">
+                <span className="text-xs font-semibold text-gray-700 dark:text-slate-300">
                   Threshold: ₦500,000 / $1,000 USDT
                 </span>
               </div>
@@ -666,7 +666,7 @@ export default function AdminDashboardPage() {
                   <div className="hidden sm:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
+                        <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold bg-gray-50/70 dark:bg-transparent">
                           <th className="py-2.5 px-3">Host Name</th>
                           <th className="py-2.5 px-3">Email</th>
                           <th className="py-2.5 px-3">NGN Paid Out</th>
@@ -685,7 +685,7 @@ export default function AdminDashboardPage() {
                     {flagData.map((f) => (
                       <div key={f.user._id} className="bg-gray-50 dark:bg-dark-bg rounded-xl border border-gray-200 dark:border-dark-border p-3.5 space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-sm text-gray-950 dark:text-white">{f.user.fullName}</span>
+                          <span className="font-bold text-sm text-gray-950 dark:text-white">{f.user.fullName || f.user.name || 'Unnamed Host'}</span>
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                               f.isFlagged
@@ -696,10 +696,10 @@ export default function AdminDashboardPage() {
                             {f.isFlagged ? 'FLAGGED' : 'NORMAL'}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-dark-muted">{f.user.email}</p>
+                        <p className="text-xs font-medium text-gray-600 dark:text-slate-300">{f.user.email}</p>
                         <div className="flex gap-4 text-xs font-mono">
-                          <span>NGN: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(f.stats.totalNgnPaid, 'NGN')}</strong></span>
-                          <span>USDT: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(f.stats.totalUsdtPaid, 'USDT')}</strong></span>
+                          <span className="text-gray-600 dark:text-slate-400">NGN: <strong className="text-gray-950 dark:text-white">{formatCurrency(f.stats.totalNgnPaid, 'NGN')}</strong></span>
+                          <span className="text-gray-600 dark:text-slate-400">USDT: <strong className="text-gray-950 dark:text-white">{formatCurrency(f.stats.totalUsdtPaid, 'USDT')}</strong></span>
                         </div>
                       </div>
                     ))}
@@ -709,7 +709,7 @@ export default function AdminDashboardPage() {
                   <div className="hidden sm:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
+                        <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold bg-gray-50/70 dark:bg-transparent">
                           <th className="py-2.5 px-3">Host Name</th>
                           <th className="py-2.5 px-3">Email</th>
                           <th className="py-2.5 px-3">NGN Paid Out</th>
@@ -720,12 +720,12 @@ export default function AdminDashboardPage() {
                       <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
                         {flagData.map((f) => (
                           <tr key={f.user._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
-                            <td className="py-3 px-3 font-semibold text-gray-950 dark:text-white">{f.user.fullName}</td>
-                            <td className="py-3 px-3 text-gray-500 dark:text-dark-muted">{f.user.email}</td>
-                            <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
+                            <td className="py-3 px-3 font-bold text-gray-950 dark:text-white">{f.user.fullName || f.user.name || 'Unnamed Host'}</td>
+                            <td className="py-3 px-3 text-gray-600 dark:text-slate-300 font-medium">{f.user.email}</td>
+                            <td className="py-3 px-3 font-mono font-bold text-gray-950 dark:text-white">
                               {formatCurrency(f.stats.totalNgnPaid, 'NGN')}
                             </td>
-                            <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
+                            <td className="py-3 px-3 font-mono font-bold text-gray-950 dark:text-white">
                               {formatCurrency(f.stats.totalUsdtPaid, 'USDT')}
                             </td>
                             <td className="py-3 px-3 text-right">
@@ -746,7 +746,7 @@ export default function AdminDashboardPage() {
                   </div>
                 </>
               ) : (
-                <p className="text-xs text-gray-500 dark:text-dark-muted py-4 text-center">No host accounts currently flagged.</p>
+                <p className="text-xs text-gray-600 dark:text-slate-400 py-4 text-center">No host accounts currently flagged.</p>
               )}
             </section>
           </div>
@@ -1193,7 +1193,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold bg-gray-50/70 dark:bg-transparent">
                         <th className="py-3 px-3">Title &amp; Slug</th>
                         <th className="py-3 px-3">Host</th>
                         <th className="py-3 px-3">Currency</th>
@@ -1208,24 +1208,24 @@ export default function AdminDashboardPage() {
                         <tr key={g._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
                           <td className="py-3.5 px-3">
                             <p className="font-bold text-gray-950 dark:text-white line-clamp-1">{g.title}</p>
-                            <p className="text-[10px] font-mono text-gray-500 dark:text-dark-muted">/g/{g.slug}</p>
+                            <p className="text-[10px] font-mono text-gray-600 dark:text-slate-400">/g/{g.slug}</p>
                           </td>
                           <td className="py-3.5 px-3">
-                            <p className="font-semibold text-gray-900 dark:text-slate-200">{g.host?.fullName || 'N/A'}</p>
-                            <p className="text-[10px] text-gray-500 dark:text-dark-muted">{g.host?.email}</p>
+                            <p className="font-bold text-gray-950 dark:text-white">{g.host?.fullName || 'N/A'}</p>
+                            <p className="text-[10px] text-gray-600 dark:text-slate-300 font-medium">{g.host?.email}</p>
                           </td>
-                          <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">{g.currency}</td>
-                          <td className="py-3.5 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
+                          <td className="py-3.5 px-3 font-bold text-gray-950 dark:text-white">{g.currency}</td>
+                          <td className="py-3.5 px-3 font-mono font-bold text-gray-950 dark:text-white">
                             {formatCurrency(g.amountPerRecipient, g.currency)}
                           </td>
                           <td className="py-3.5 px-3 font-mono">
                             <span className="text-brand-600 dark:text-brand-400 font-bold">{g.slotsClaimed}</span>
-                            <span className="text-gray-500 dark:text-dark-muted"> / {g.totalSlots}</span>
+                            <span className="text-gray-600 dark:text-slate-400 font-medium"> / {g.totalSlots}</span>
                           </td>
                           <td className="py-3.5 px-3">
                             <StatusBadge status={g.status} />
                           </td>
-                          <td className="py-3.5 px-3 text-right text-gray-500 dark:text-dark-muted whitespace-nowrap">
+                          <td className="py-3.5 px-3 text-right text-gray-600 dark:text-slate-400 font-medium whitespace-nowrap">
                             {new Date(g.createdAt).toLocaleDateString()}
                           </td>
                         </tr>
@@ -1390,7 +1390,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold bg-gray-50/70 dark:bg-transparent">
                         <th className="py-3 px-3">Provider</th>
                         <th className="py-3 px-3">Reference</th>
                         <th className="py-3 px-3">Direction</th>
@@ -1403,13 +1403,13 @@ export default function AdminDashboardPage() {
                       {txData.transactions.map((t) => (
                         <tr key={t._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
                           <td className="py-3 px-3 uppercase font-bold text-brand-600 dark:text-brand-400">{t.provider}</td>
-                          <td className="py-3 px-3 font-mono text-xs text-gray-700 dark:text-slate-300">{t.providerReference}</td>
+                          <td className="py-3 px-3 font-mono text-xs text-gray-900 dark:text-slate-200 font-medium">{t.providerReference}</td>
                           <td className="py-3 px-3 capitalize font-semibold">
                             <span className={t.direction === 'inbound' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                               {t.direction}
                             </span>
                           </td>
-                          <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-100">
+                          <td className="py-3 px-3 font-mono font-bold text-gray-950 dark:text-white">
                             {formatCurrency(t.amount, t.currency, t.provider)}
                           </td>
                           <td className="py-3 px-3">
@@ -1417,7 +1417,7 @@ export default function AdminDashboardPage() {
                               {t.status.toUpperCase()}
                             </span>
                           </td>
-                          <td className="py-3 px-3 text-right text-gray-500 dark:text-dark-muted font-mono whitespace-nowrap">
+                          <td className="py-3 px-3 text-right text-gray-600 dark:text-slate-400 font-mono whitespace-nowrap">
                             {new Date(t.createdAt).toLocaleString()}
                           </td>
                         </tr>
@@ -1594,7 +1594,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold bg-gray-50/70 dark:bg-transparent">
                         <th className="py-3 px-3">Giveaway Title</th>
                         <th className="py-3 px-3">Beneficiary Destination</th>
                         <th className="py-3 px-3">Amount</th>
@@ -1606,21 +1606,21 @@ export default function AdminDashboardPage() {
                     <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
                       {claimsData.claims.map((c) => (
                         <tr key={c._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
-                          <td className="py-3 px-3 font-semibold text-gray-950 dark:text-white max-w-[220px] truncate">
+                          <td className="py-3 px-3 font-bold text-gray-950 dark:text-white max-w-[220px] truncate">
                             {c.giveaway?.title || 'Giveaway'}
                           </td>
                           <td className="py-3 px-3 font-mono text-xs">
-                            <p className="font-bold text-gray-900 dark:text-slate-200">
+                            <p className="font-bold text-gray-950 dark:text-white">
                               {c.destination?.details?.accountName || c.destination?.details?.bankName || 'Direct Destination'}
                             </p>
-                            <p className="text-[10px] text-gray-500 dark:text-dark-muted truncate max-w-[280px]">
+                            <p className="text-[10px] text-gray-600 dark:text-slate-300 font-medium truncate max-w-[280px]">
                               {c.destination?.details?.accountNumber || c.destination?.details?.address || c.destination?.normalized}
                             </p>
                           </td>
                           <td className="py-3 px-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">
                             {formatCurrency(c.amount, c.currency || c.giveaway?.currency || 'NGN')}
                           </td>
-                          <td className="py-3 px-3 font-bold text-gray-900 dark:text-white">{c.currency || c.giveaway?.currency || 'NGN'}</td>
+                          <td className="py-3 px-3 font-bold text-gray-950 dark:text-white">{c.currency || c.giveaway?.currency || 'NGN'}</td>
                           <td className="py-3 px-3">
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
@@ -1632,7 +1632,7 @@ export default function AdminDashboardPage() {
                               {c.status.toUpperCase()}
                             </span>
                           </td>
-                          <td className="py-3 px-3 text-right text-gray-500 dark:text-dark-muted font-mono whitespace-nowrap">
+                          <td className="py-3 px-3 text-right text-gray-600 dark:text-slate-400 font-mono whitespace-nowrap">
                             {new Date(c.createdAt).toLocaleString()}
                           </td>
                         </tr>
@@ -1797,7 +1797,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold bg-gray-50/70 dark:bg-transparent">
                         <th className="py-3 px-3">User</th>
                         <th className="py-3 px-3">Role</th>
                         <th className="py-3 px-3">Email Verified</th>
@@ -1812,7 +1812,7 @@ export default function AdminDashboardPage() {
                         <tr key={u._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
                           <td className="py-3 px-3">
                             <p className="font-bold text-gray-950 dark:text-white">{u.fullName}</p>
-                            <p className="text-[10px] text-gray-500 dark:text-dark-muted">{u.email}</p>
+                            <p className="text-[10px] text-gray-600 dark:text-slate-300 font-medium">{u.email}</p>
                           </td>
                           <td className="py-3 px-3">
                             <span
@@ -1868,14 +1868,14 @@ export default function AdminDashboardPage() {
                                 className="font-mono font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
                               >
                                 <span>₦{((u.kyc?.payoutReviewThreshold || 50000000) / 100).toLocaleString()}</span>
-                                <span className="text-[10px] text-gray-400 dark:text-dark-muted">✎</span>
+                                <span className="text-[10px] text-gray-500 dark:text-slate-400">✎</span>
                               </button>
                             )}
                           </td>
-                          <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
+                          <td className="py-3 px-3 font-mono font-bold text-gray-950 dark:text-white">
                             {formatCurrency(u.balances?.NGN?.available || 0, 'NGN')}
                           </td>
-                          <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
+                          <td className="py-3 px-3 font-mono font-bold text-gray-950 dark:text-white">
                             {formatCurrency(u.balances?.USDT?.available || 0, 'USDT')}
                           </td>
                           <td className="py-3 px-3 text-right">
@@ -2008,7 +2008,7 @@ export default function AdminDashboardPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold bg-gray-50/70 dark:bg-transparent">
                         <th className="py-3 px-3">User</th>
                         <th className="py-3 px-3">Current Limit</th>
                         <th className="py-3 px-3">Requested Limit</th>
@@ -2028,16 +2028,16 @@ export default function AdminDashboardPage() {
                           <tr key={r._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
                             <td className="py-3 px-3">
                               <p className="font-bold text-gray-950 dark:text-white">{r.fullName}</p>
-                              <p className="text-[10px] text-gray-500 dark:text-dark-muted">{r.email}</p>
+                              <p className="text-[10px] text-gray-600 dark:text-slate-300 font-medium">{r.email}</p>
                             </td>
-                            <td className="py-3 px-3 font-mono text-gray-700 dark:text-slate-300">
+                            <td className="py-3 px-3 font-mono font-bold text-gray-950 dark:text-white">
                               ₦{currentNaira}
                             </td>
                             <td className="py-3 px-3 font-mono font-bold text-amber-600 dark:text-amber-400">
                               ₦{requestedNaira}
                             </td>
                             <td className="py-3 px-3 max-w-xs">
-                              <p className="text-xs text-gray-700 dark:text-slate-300 truncate" title={r.kyc?.requestReason}>
+                              <p className="text-xs text-gray-800 dark:text-slate-200 font-medium truncate" title={r.kyc?.requestReason}>
                                 {r.kyc?.requestReason || '—'}
                               </p>
                             </td>
