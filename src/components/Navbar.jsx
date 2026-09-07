@@ -19,6 +19,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useSupportStore } from '../store/useSupportStore';
 import { useThemeStore } from '../store/useThemeStore';
 import { toast, confirmDialog } from '../store/useNotificationStore';
+import { SprinklSocialBar } from './SocialLinks';
 
 /** Routes considered "app" / dashboard routes */
 const APP_ROUTES = ['/dashboard', '/settings', '/admin'];
@@ -126,9 +127,11 @@ export default function Navbar() {
             }}
             aria-label="Sprinkl Home"
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
-              <Gift className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
-            </div>
+            <img
+              src="/sprinkl-logo.png"
+              alt="Sprinkl"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform"
+            />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-base sm:text-xl tracking-tight text-slate-900 dark:text-white">Sprinkl</span>
@@ -619,6 +622,13 @@ export default function Navbar() {
                     Online
                   </span>
                 </button>
+
+                <div className="pt-3 border-t border-slate-200 dark:border-white/[0.08] space-y-2">
+                  <p className="text-[10px] uppercase font-bold text-slate-400 dark:text-dark-muted tracking-widest px-1">
+                    Official Community
+                  </p>
+                  <SprinklSocialBar />
+                </div>
               </div>
 
               {isAuthenticated && (

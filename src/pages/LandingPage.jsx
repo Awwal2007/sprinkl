@@ -30,6 +30,7 @@ import {
 import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 import { useSupportStore } from '../store/useSupportStore';
+import { SprinklSocialBar } from '../components/SocialLinks';
 
 export default function LandingPage() {
   const { openChat } = useSupportStore();
@@ -828,17 +829,24 @@ export default function LandingPage() {
             {/* Brand Column */}
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-slate-950 font-black">
-                  <Gift className="w-4 h-4 stroke-[2.5]" />
-                </div>
+                <img
+                  src="/sprinkl-logo.png"
+                  alt="Sprinkl Logo"
+                  className="w-8 h-8 rounded-lg object-contain shadow-sm"
+                />
                 <span className="font-extrabold text-lg text-slate-900 dark:text-white">Sprinkl</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-dark-muted max-w-sm mb-4 leading-relaxed">
                 Automated dual-currency giveaway distribution infrastructure for creators, brands, and digital communities across Nigeria and globally.
               </p>
-              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold text-[11px]">
+              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold text-[11px] mb-4">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>All systems operational &bull; 99.98% Uptime</span>
+              </div>
+
+              <div>
+                <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-2">Connect with Sprinkl</p>
+                <SprinklSocialBar />
               </div>
             </div>
 

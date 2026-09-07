@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { X, Copy, Check, Share2, ExternalLink } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { SocialShareButtons } from './SocialLinks';
 
-export default function ShareModal({ isOpen, onClose, publicUrl, title }) {
+export default function ShareModal({ isOpen, onClose, publicUrl, title, amountText = '' }) {
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
@@ -18,7 +19,7 @@ export default function ShareModal({ isOpen, onClose, publicUrl, title }) {
       <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl max-w-sm w-full p-6 shadow-2xl relative text-center animate-in fade-in zoom-in duration-200">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -28,15 +29,25 @@ export default function ShareModal({ isOpen, onClose, publicUrl, title }) {
         </div>
 
         <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Share Giveaway</h3>
-        <p className="text-xs text-slate-500 dark:text-dark-muted mb-5 line-clamp-1">{title}</p>
+        <p className="text-xs text-slate-500 dark:text-dark-muted mb-4 line-clamp-1">{title}</p>
 
         {/* QR Code Container */}
-        <div className="bg-white p-4 rounded-xl inline-block shadow-inner mb-5 border border-slate-100">
-          <QRCodeSVG value={publicUrl} size={160} level="H" includeMargin={false} />
+        <div className="bg-white p-3.5 rounded-xl inline-block shadow-inner mb-4 border border-slate-100">
+          <QRCodeSVG value={publicUrl} size={150} level="H" includeMargin={false} />
+        </div>
+
+        {/* Direct Social Media Sharing */}
+        <div className="mb-4 text-left">
+          <SocialShareButtons
+            url={publicUrl}
+            title={title}
+            amountText={amountText}
+            buttonSize="sm"
+          />
         </div>
 
         {/* URL Box */}
-        <div className="bg-slate-50 dark:bg-dark-bg p-2.5 rounded-xl border border-slate-200 dark:border-dark-border flex items-center gap-2 mb-4 text-left">
+        <div className="bg-slate-50 dark:bg-dark-bg p-2 rounded-xl border border-slate-200 dark:border-dark-border flex items-center gap-2 mb-3 text-left">
           <input
             type="text"
             readOnly
@@ -45,7 +56,7 @@ export default function ShareModal({ isOpen, onClose, publicUrl, title }) {
           />
           <button
             onClick={handleCopy}
-            className="px-3 py-1.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs rounded-lg flex items-center gap-1 transition-colors shrink-0"
+            className="px-3 py-1.5 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-slate-950 font-bold text-xs rounded-lg flex items-center gap-1 transition-colors shrink-0 cursor-pointer"
           >
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Copied' : 'Copy'}</span>

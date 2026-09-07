@@ -344,6 +344,7 @@ export default function GiveawayDetailPage() {
         onClose={() => setIsShareOpen(false)}
         publicUrl={publicUrl}
         title={giveaway.title}
+        amountText={formatCurrency(giveaway.amountPerRecipient, giveaway.currency)}
       />
     </div>
   );

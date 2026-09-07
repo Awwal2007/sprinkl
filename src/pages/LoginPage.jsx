@@ -107,9 +107,11 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 group">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 shadow-xl shadow-brand-500/30 group-hover:scale-105 transition-transform">
-              <Gift className="w-6 h-6 stroke-[2.5]" />
-            </div>
+            <img
+              src="/sprinkl-logo.png"
+              alt="Sprinkl Logo"
+              className="w-11 h-11 rounded-2xl object-contain shadow-xl shadow-brand-500/30 group-hover:scale-105 transition-transform"
+            />
             <span className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Sprinkl</span>
           </Link>
           <p className="mt-2 text-sm text-dark-muted">Sign in to your host account</p>

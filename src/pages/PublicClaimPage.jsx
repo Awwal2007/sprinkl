@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Gift, ShieldCheck, CheckCircle2, AlertCircle, Building2, Coins, ArrowRight, Sparkles, Search, Smartphone, Check } from 'lucide-react';
 import api from '../api/client';
 import SEO from '../components/SEO';
+import { SocialShareButtons } from '../components/SocialLinks';
 
 const detectCarrier = (phone) => {
   if (!phone) return null;
@@ -756,13 +757,29 @@ export default function PublicClaimPage() {
         </p>
       </div>
 
+      {/* Share Giveaway with Friends */}
+      {giveawayData && !giveawayData.isCancelled && (
+        <div className="mt-3 max-w-md w-full">
+          <div className="p-3.5 sm:px-4 rounded-2xl bg-white/95 dark:bg-dark-card/90 border border-slate-200 dark:border-dark-border/80 shadow-md">
+            <SocialShareButtons
+              url={`/g/${slug}`}
+              title={giveawayData.title}
+              amountText={formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)}
+              buttonSize="sm"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Under-Card Viral Hook: Want to create yours? */}
-      <div className="mt-4 text-center max-w-md w-full">
+      <div className="mt-3 text-center max-w-md w-full">
         <div className="p-3.5 sm:px-5 rounded-2xl bg-white/95 dark:bg-dark-card/90 border border-slate-200 dark:border-dark-border/80 backdrop-blur-md shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 border border-brand-500/20">
-              <Gift className="w-4 h-4 stroke-[2.5]" />
-            </div>
+            <img
+              src="/sprinkl-logo.png"
+              alt="Sprinkl"
+              className="w-8 h-8 rounded-xl object-contain shrink-0 shadow-sm"
+            />
             <div>
               <p className="text-xs font-black text-slate-900 dark:text-white">Want to create yours?</p>
               <p className="text-[10px] text-slate-500 dark:text-dark-muted">Host instant giveaways in NGN or USDT</p>

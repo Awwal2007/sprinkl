@@ -5,6 +5,7 @@ import { CheckCircle2, Clock, Share2, Sparkles, ArrowLeft, ExternalLink, Gift, A
 import api from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import SEO from '../components/SEO';
+import { SocialShareButtons } from '../components/SocialLinks';
 
 export default function ClaimSuccessPage() {
   const { slug, claimId } = useParams();
@@ -136,12 +137,26 @@ export default function ClaimSuccessPage() {
           )}
         </div>
 
+        {/* Share with Friends via Socials */}
+        {!isFailed && (
+          <div className="bg-slate-50 dark:bg-dark-bg p-4 rounded-2xl border border-slate-200 dark:border-dark-border text-left">
+            <SocialShareButtons
+              url={`/g/${slug}`}
+              title="I just received my instant giveaway prize on Sprinkl! 🎁"
+              amountText={formatCurrency(claim?.amount || 0, claim?.currency || 'NGN')}
+              buttonSize="sm"
+            />
+          </div>
+        )}
+
         {/* Viral Growth Hook: Want to create yours? */}
         <div className="bg-gradient-to-br from-brand-500/10 via-slate-50 to-emerald-500/5 dark:from-brand-500/15 dark:via-dark-card dark:to-dark-bg border border-brand-500/20 dark:border-brand-500/30 rounded-2xl p-5 text-left space-y-3 relative overflow-hidden shadow-xl shadow-brand-500/5 group">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-500 text-slate-950 flex items-center justify-center font-black shadow-md shadow-brand-500/20 shrink-0 group-hover:scale-105 transition-transform">
-              <Gift className="w-5 h-5 stroke-[2.5]" />
-            </div>
+            <img
+              src="/sprinkl-logo.png"
+              alt="Sprinkl"
+              className="w-10 h-10 rounded-xl object-contain shadow-md shadow-brand-500/20 shrink-0 group-hover:scale-105 transition-transform"
+            />
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-brand-400 block">
                 Loved this instant payout?
