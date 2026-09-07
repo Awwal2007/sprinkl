@@ -63,7 +63,7 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative">
         <SEO
-          title="Verify Email — Sprinkl Nigeria"
+          title="Verify Email — Sprinkl"
           description="Please verify your email address to activate your Sprinkl account."
           canonical="/signup"
           noIndex={true}
@@ -144,7 +144,7 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative">
       <SEO
-        title="Sign Up Free — Start Your First Giveaway on Sprinkl Nigeria | NGN & USDT"
+        title="Sign Up Free — Start Your First Giveaway on Sprinkl"
         description="Create a free Sprinkl account and launch your first giveaway in 60 seconds. Instantly pay winners to Nigerian bank accounts (NGN) or crypto wallets (USDT). No fraud. No double-claims. Nigeria's #1 giveaway platform."
         canonical="/signup"
         breadcrumbs={[

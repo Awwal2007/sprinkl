@@ -1,4 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
+
+function StatCounter({ value, prefix = "", suffix = "", isFloat = false }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => {
+    if (isFloat) return prefix + latest.toFixed(1) + suffix;
+    return prefix + Math.floor(latest).toLocaleString() + suffix;
+  });
+
+  useEffect(() => {
+    if (isInView) {
+      animate(count, value, { duration: 2, ease: "easeOut" });
+    }
+  }, [count, value, isInView]);
+
+  return <motion.span ref={ref}>{rounded}</motion.span>;
+}
 import { Link } from 'react-router-dom';
 import {
   Gift,
@@ -123,7 +142,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-900 dark:text-slate-100 selection:bg-brand-500 selection:text-slate-950 font-sans transition-colors duration-150">
       <SEO
-        title="Sprinkl Nigeria (Sprinkl NG) — #1 Automated Giveaway Platform in Nigeria"
+        title="Sprinkl — Automated Cash & Crypto Giveaways in Nigeria"
         description="Sprinkl Nigeria (Sprinkl NG / Sprinkl.biz) is Nigeria's official automated giveaway platform. Pay winners directly to bank accounts (NGN), crypto wallets (USDT), or instant VTU airtime (MTN, Airtel, Glo, 9mobile). Zero double-claims guaranteed."
         canonical="/"
         keywords="sprinkl, sprinkl ng, sprinkl nigeria, sprinkl giveaway, sprinkl giveaway nigeria, sprinkl giveaway ng, sprinkl.biz, sprinkl biz, sprinkl cash drop nigeria, sprinkl airtime nigeria, sprinkl legit nigeria, giveaway platform Nigeria, VTU airtime giveaway, airtime drop Nigeria, MTN airtime giveaway, Airtel airtime giveaway, Glo airtime drop, 9mobile recharge Nigeria, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria"
@@ -154,7 +173,7 @@ export default function LandingPage() {
                 id="hero-heading"
                 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 leading-[1.08]"
               >
-                Automated Cash, Crypto &amp; VTU Airtime Giveaways{' '}
+                Send Cash & Crypto Giveaways{' '}
                 <br className="hidden sm:inline" />
                 <span className="text-emerald-600 dark:text-emerald-400 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-200 bg-clip-text text-transparent font-extrabold inline-block drop-shadow-sm">
                   With Zero Double-Claims.
@@ -303,19 +322,27 @@ export default function LandingPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div className="p-4">
-                <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-1">₦45M+</p>
+                <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-1">
+                  <StatCounter value={45} prefix="₦" suffix="M+" />
+                </p>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-dark-muted font-medium">Cash & Crypto Disbursed</p>
               </div>
               <div className="p-4">
-                <p className="text-3xl sm:text-4xl font-extrabold text-brand-600 dark:text-brand-400 mb-1">14,200+</p>
+                <p className="text-3xl sm:text-4xl font-extrabold text-brand-600 dark:text-brand-400 mb-1">
+                  <StatCounter value={14200} suffix="+" />
+                </p>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-dark-muted font-medium">Verified Claimants</p>
               </div>
               <div className="p-4">
-                <p className="text-3xl sm:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400 mb-1">0%</p>
+                <p className="text-3xl sm:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400 mb-1">
+                  <StatCounter value={0} suffix="%" />
+                </p>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-dark-muted font-medium">Double-Claim Incidents</p>
               </div>
               <div className="p-4">
-                <p className="text-3xl sm:text-4xl font-extrabold text-teal-600 dark:text-teal-300 mb-1">&lt; 1.8s</p>
+                <p className="text-3xl sm:text-4xl font-extrabold text-teal-600 dark:text-teal-300 mb-1">
+                  <StatCounter value={1.8} prefix="< " suffix="s" isFloat={true} />
+                </p>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-dark-muted font-medium">Average Payout Latency</p>
               </div>
             </div>

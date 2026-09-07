@@ -122,10 +122,10 @@ export default function PublicClaimPage() {
 
   // Dynamic SEO metadata
   const seoTitle = giveawayData
-    ? `Claim "${giveawayData.title}" Giveaway — Win Cash or Airtime | Sprinkl Nigeria`
-    : 'Claim Your Giveaway Prize — Instant Payout | Sprinkl Nigeria';
+    ? `Claim "${giveawayData.title}" Giveaway — Win Cash or Airtime | Sprinkl`
+    : 'Claim Your Giveaway Prize — Instant Payout | Sprinkl';
   const seoDescription = giveawayData
-    ? `You've been invited to claim a prize from "${giveawayData.title}" on Sprinkl! ${giveawayData.currency === 'AIRTIME' ? 'Receive instant airtime recharge to your SIM line.' : giveawayData.currency === 'NGN' ? 'Receive Nigerian Naira directly to your bank account.' : 'Receive USDT crypto to your wallet.'} 100% automated. No fraud. Powered by Sprinkl Nigeria.`
+    ? `You've been invited to claim a prize from "${giveawayData.title}" on Sprinkl! ${giveawayData.currency === 'AIRTIME' ? 'Receive instant airtime recharge to your SIM line.' : giveawayData.currency === 'NGN' ? 'Receive Nigerian Naira directly to your bank account.' : 'Receive USDT crypto to your wallet.'} 100% automated. No fraud. Powered by Sprinkl.`
     : 'Claim your giveaway prize instantly on Sprinkl. Receive Nigerian Naira to your bank account, airtime recharge, or USDT crypto. 100% automated and fraud-proof.';
 
   // Fetch Banks for NGN
