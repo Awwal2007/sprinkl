@@ -394,22 +394,53 @@ export default function AdminDashboardPage() {
   };
 
 
-  const formatCurrency = (amount, currency) => {
-    if (currency === 'NGN') {
+  const formatCurrency = (amount, currency, provider) => {
+    let curr = (currency || '').toUpperCase();
+    if (!curr) {
+      if (provider && ['tron', 'bsc'].includes(provider.toLowerCase())) {
+        curr = 'USDT';
+      } else {
+        curr = 'NGN';
+      }
+    }
+
+    if (curr === 'NGN') {
       return `₦${((amount || 0) / 100).toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`;
-    } else {
+    }
+    if (curr === 'AIRTIME') {
+      return `₦${((amount || 0) / 100).toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      })} (Airtime)`;
+    }
+    if (curr === 'USDT') {
       return `$${((amount || 0) / 1000000).toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })} USDT`;
     }
+    return `₦${((amount || 0) / 100).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
+
+  const getTxStatusBadge = (status) => {
+    const s = (status || '').toLowerCase();
+    if (s === 'success' || s === 'paid') {
+      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+    }
+    if (s === 'pending') {
+      return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+    }
+    return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-slate-100 transition-colors duration-150">
       <SEO
         title="Admin Command Center — Sprinkl"
         description="Sprinkl Platform Management & Operations Command Center"
@@ -420,7 +451,7 @@ export default function AdminDashboardPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 w-full space-y-4 sm:space-y-6">
         {/* Top Header & Admin Welcome */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-dark-border/70">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-gray-200 dark:border-dark-border/70">
           <div className="flex items-start justify-between gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-brand-500 to-emerald-400 text-slate-950 flex items-center justify-center font-black shadow-lg shadow-brand-500/20 shrink-0">
@@ -428,14 +459,14 @@ export default function AdminDashboardPage() {
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  <h1 className="text-base sm:text-2xl font-black text-white tracking-tight truncate sm:whitespace-normal">
+                  <h1 className="text-base sm:text-2xl font-black text-gray-950 dark:text-white tracking-tight truncate sm:whitespace-normal">
                     Sprinkl Command Center
                   </h1>
-                  <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
+                  <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 shrink-0">
                     Platform Admin
                   </span>
                 </div>
-                <p className="text-[11px] sm:text-xs text-dark-muted mt-0.5 leading-relaxed hidden sm:block">
+                <p className="text-[11px] sm:text-xs text-gray-600 dark:text-dark-muted mt-0.5 leading-relaxed hidden sm:block">
                   Full platform tracking &bull; Live human chat desk &bull; AML &amp; Ledger audits
                 </p>
               </div>
@@ -452,7 +483,7 @@ export default function AdminDashboardPage() {
                 refetchUsers();
                 toast.success('Refreshed all platform feeds', 'Data Updated');
               }}
-              className="sm:hidden p-2.5 bg-dark-card hover:bg-slate-800 border border-dark-border rounded-xl text-slate-300 hover:text-white transition-all shadow-sm shrink-0 active:scale-95"
+              className="sm:hidden p-2.5 bg-white dark:bg-dark-card hover:bg-gray-100 dark:hover:bg-slate-800 border border-gray-200 dark:border-dark-border rounded-xl text-gray-700 dark:text-slate-300 hover:text-gray-950 dark:hover:text-white transition-all shadow-sm shrink-0 active:scale-95"
               title="Refresh feeds"
               aria-label="Refresh data"
             >
@@ -461,7 +492,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Mobile subtext */}
-          <p className="text-[11px] text-dark-muted leading-relaxed sm:hidden -mt-1">
+          <p className="text-[11px] text-gray-600 dark:text-dark-muted leading-relaxed sm:hidden -mt-1">
             Full platform tracking &bull; Live human chat desk &bull; AML &amp; Ledger audits
           </p>
 
@@ -477,7 +508,7 @@ export default function AdminDashboardPage() {
                 refetchUsers();
                 toast.success('Refreshed all platform feeds', 'Data Updated');
               }}
-              className="px-3.5 py-2 bg-dark-card hover:bg-slate-800 border border-dark-border rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+              className="px-3.5 py-2 bg-white dark:bg-dark-card hover:bg-gray-100 dark:hover:bg-slate-800 border border-gray-200 dark:border-dark-border rounded-xl text-xs font-bold text-gray-700 dark:text-slate-300 hover:text-gray-950 dark:hover:text-white transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Refresh Feeds</span>
@@ -486,7 +517,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* ─── Navigation Tabs Bar (Horizontal scroll on mobile) ─── */}
-        <div className="flex overflow-x-auto no-scrollbar gap-1.5 p-1.5 bg-dark-card/60 border border-dark-border/80 rounded-2xl overscroll-x-contain touch-pan-x scroll-smooth">
+        <div className="flex overflow-x-auto no-scrollbar gap-1.5 p-1.5 bg-white/80 dark:bg-dark-card/60 border border-gray-200/80 dark:border-dark-border/80 rounded-2xl overscroll-x-contain touch-pan-x scroll-smooth shadow-sm">
           {[
             { id: 'overview', label: 'Overview & Reports', icon: TrendingUp },
             {
@@ -520,7 +551,7 @@ export default function AdminDashboardPage() {
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${
                   isActive
                     ? 'bg-brand-500 text-slate-950 shadow-md shadow-brand-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    : 'text-gray-600 dark:text-slate-400 hover:text-gray-950 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800/60'
                 }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
@@ -528,7 +559,7 @@ export default function AdminDashboardPage() {
                 {tab.badge !== undefined && tab.badge > 0 && (
                   <span
                     className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
-                      isActive ? 'bg-slate-950 text-white' : 'bg-brand-500/20 text-brand-400'
+                      isActive ? 'bg-slate-950 text-white' : 'bg-brand-500/20 text-brand-600 dark:text-brand-400'
                     }`}
                   >
                     {tab.badge}
@@ -547,82 +578,82 @@ export default function AdminDashboardPage() {
             {/* Platform Revenue & Disbursed Volume KPIs */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {/* NGN Revenue */}
-              <div className="bg-dark-card border border-dark-border rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden group">
+              <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-emerald-500/5 blur-2xl pointer-events-none" />
-                <p className="text-[11px] uppercase tracking-wider text-dark-muted font-bold mb-1">
+                <p className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted font-bold mb-1">
                   NGN Platform Fee Profit
                 </p>
-                <p className="text-2xl sm:text-3xl font-black text-emerald-400">
+                <p className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
                   {formatCurrency(reportData?.revenue?.NGN || 0, 'NGN')}
                 </p>
-                <p className="text-[11px] text-dark-muted mt-2">
-                  Payout volume: <strong className="text-slate-200">{formatCurrency(reportData?.payouts?.NGN || 0, 'NGN')}</strong>
+                <p className="text-[11px] text-gray-500 dark:text-dark-muted mt-2">
+                  Payout volume: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(reportData?.payouts?.NGN || 0, 'NGN')}</strong>
                 </p>
               </div>
 
               {/* USDT Revenue */}
-              <div className="bg-dark-card border border-dark-border rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden group">
+              <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-cyan-500/5 blur-2xl pointer-events-none" />
-                <p className="text-[11px] uppercase tracking-wider text-dark-muted font-bold mb-1">
+                <p className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted font-bold mb-1">
                   USDT Platform Fee Profit
                 </p>
-                <p className="text-2xl sm:text-3xl font-black text-cyan-400">
+                <p className="text-2xl sm:text-3xl font-black text-cyan-600 dark:text-cyan-400">
                   {formatCurrency(reportData?.revenue?.USDT || 0, 'USDT')}
                 </p>
-                <p className="text-[11px] text-dark-muted mt-2">
-                  Payout volume: <strong className="text-slate-200">{formatCurrency(reportData?.payouts?.USDT || 0, 'USDT')}</strong>
+                <p className="text-[11px] text-gray-500 dark:text-dark-muted mt-2">
+                  Payout volume: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(reportData?.payouts?.USDT || 0, 'USDT')}</strong>
                 </p>
               </div>
 
               {/* Campaigns & Conversion */}
-              <div className="bg-dark-card border border-dark-border rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden group">
+              <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-brand-500/5 blur-2xl pointer-events-none" />
-                <p className="text-[11px] uppercase tracking-wider text-dark-muted font-bold mb-1">
+                <p className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted font-bold mb-1">
                   Campaigns &amp; Claims
                 </p>
                 <div className="flex items-baseline gap-2">
-                  <p className="text-2xl sm:text-3xl font-black text-white">
+                  <p className="text-2xl sm:text-3xl font-black text-gray-950 dark:text-white">
                     {reportData?.giveaways?.total || 0}
                   </p>
-                  <span className="text-xs font-bold text-brand-400">
+                  <span className="text-xs font-bold text-brand-600 dark:text-brand-400">
                     ({reportData?.giveaways?.active || 0} active)
                   </span>
                 </div>
-                <p className="text-[11px] text-dark-muted mt-2">
-                  Slots: <strong className="text-slate-200">{reportData?.giveaways?.totalSlotsClaimed || 0} / {reportData?.giveaways?.totalSlots || 0}</strong> ({reportData?.giveaways?.claimRate || 0}% conversion)
+                <p className="text-[11px] text-gray-500 dark:text-dark-muted mt-2">
+                  Slots: <strong className="text-gray-900 dark:text-slate-200">{reportData?.giveaways?.totalSlotsClaimed || 0} / {reportData?.giveaways?.totalSlots || 0}</strong> ({reportData?.giveaways?.claimRate || 0}% conversion)
                 </p>
               </div>
 
               {/* Users & Live Support Desk */}
-              <div className="bg-dark-card border border-dark-border rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden group">
+              <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-purple-500/5 blur-2xl pointer-events-none" />
-                <p className="text-[11px] uppercase tracking-wider text-dark-muted font-bold mb-1">
+                <p className="text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted font-bold mb-1">
                   Registered Users &amp; Queue
                 </p>
                 <div className="flex items-baseline gap-2">
-                  <p className="text-2xl sm:text-3xl font-black text-white">
+                  <p className="text-2xl sm:text-3xl font-black text-gray-950 dark:text-white">
                     {reportData?.users?.total || 0}
                   </p>
-                  <span className="text-xs text-dark-muted">
+                  <span className="text-xs text-gray-500 dark:text-dark-muted">
                     ({reportData?.users?.verified || 0} verified)
                   </span>
                 </div>
-                <p className="text-[11px] text-brand-400 mt-2 font-bold">
+                <p className="text-[11px] text-brand-600 dark:text-brand-400 mt-2 font-bold">
                   {reportData?.support?.active || 0} active support chat(s)
                 </p>
               </div>
             </section>
 
             {/* Flagged High-Volume Host Accounts */}
-            <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 space-y-4">
+            <section className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 space-y-4 shadow-sm dark:shadow-none">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
-                  <h2 className="text-lg font-bold text-white">
+                  <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+                  <h2 className="text-lg font-bold text-gray-950 dark:text-white">
                     Flagged High-Volume Host Accounts (AML Review)
                   </h2>
                 </div>
-                <span className="text-xs text-dark-muted">
+                <span className="text-xs text-gray-500 dark:text-dark-muted">
                   Threshold: ₦500,000 / $1,000 USDT
                 </span>
               </div>
@@ -635,7 +666,7 @@ export default function AdminDashboardPage() {
                   <div className="hidden sm:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                        <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                           <th className="py-2.5 px-3">Host Name</th>
                           <th className="py-2.5 px-3">Email</th>
                           <th className="py-2.5 px-3">NGN Paid Out</th>
@@ -652,23 +683,23 @@ export default function AdminDashboardPage() {
                   {/* Mobile Cards */}
                   <div className="sm:hidden space-y-3">
                     {flagData.map((f) => (
-                      <div key={f.user._id} className="bg-dark-bg rounded-xl border border-dark-border p-3.5 space-y-2">
+                      <div key={f.user._id} className="bg-gray-50 dark:bg-dark-bg rounded-xl border border-gray-200 dark:border-dark-border p-3.5 space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-sm text-white">{f.user.fullName}</span>
+                          <span className="font-bold text-sm text-gray-950 dark:text-white">{f.user.fullName}</span>
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                               f.isFlagged
-                                ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                             }`}
                           >
                             {f.isFlagged ? 'FLAGGED' : 'NORMAL'}
                           </span>
                         </div>
-                        <p className="text-xs text-dark-muted">{f.user.email}</p>
+                        <p className="text-xs text-gray-500 dark:text-dark-muted">{f.user.email}</p>
                         <div className="flex gap-4 text-xs font-mono">
-                          <span>NGN: <strong className="text-slate-200">₦{(f.stats.totalNgnPaid / 100).toLocaleString()}</strong></span>
-                          <span>USDT: <strong className="text-slate-200">{(f.stats.totalUsdtPaid / 1000000).toLocaleString()}</strong></span>
+                          <span>NGN: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(f.stats.totalNgnPaid, 'NGN')}</strong></span>
+                          <span>USDT: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(f.stats.totalUsdtPaid, 'USDT')}</strong></span>
                         </div>
                       </div>
                     ))}
@@ -678,7 +709,7 @@ export default function AdminDashboardPage() {
                   <div className="hidden sm:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                        <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                           <th className="py-2.5 px-3">Host Name</th>
                           <th className="py-2.5 px-3">Email</th>
                           <th className="py-2.5 px-3">NGN Paid Out</th>
@@ -686,23 +717,23 @@ export default function AdminDashboardPage() {
                           <th className="py-2.5 px-3 text-right">Payment Threshold Audit</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-dark-border text-xs">
+                      <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
                         {flagData.map((f) => (
-                          <tr key={f.user._id} className="hover:bg-slate-800/30">
-                            <td className="py-3 px-3 font-semibold text-white">{f.user.fullName}</td>
-                            <td className="py-3 px-3 text-dark-muted">{f.user.email}</td>
-                            <td className="py-3 px-3 font-mono font-bold text-slate-200">
-                              ₦{(f.stats.totalNgnPaid / 100).toLocaleString()}
+                          <tr key={f.user._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
+                            <td className="py-3 px-3 font-semibold text-gray-950 dark:text-white">{f.user.fullName}</td>
+                            <td className="py-3 px-3 text-gray-500 dark:text-dark-muted">{f.user.email}</td>
+                            <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
+                              {formatCurrency(f.stats.totalNgnPaid, 'NGN')}
                             </td>
-                            <td className="py-3 px-3 font-mono font-bold text-slate-200">
-                              {(f.stats.totalUsdtPaid / 1000000).toLocaleString()} USDT
+                            <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
+                              {formatCurrency(f.stats.totalUsdtPaid, 'USDT')}
                             </td>
                             <td className="py-3 px-3 text-right">
                               <span
                                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
                                   f.isFlagged
-                                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                    : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                                 }`}
                               >
                                 {f.isFlagged ? 'REVIEW REQUIRED' : 'NORMAL VOLUME'}
@@ -715,7 +746,7 @@ export default function AdminDashboardPage() {
                   </div>
                 </>
               ) : (
-                <p className="text-xs text-dark-muted py-4 text-center">No host accounts currently flagged.</p>
+                <p className="text-xs text-gray-500 dark:text-dark-muted py-4 text-center">No host accounts currently flagged.</p>
               )}
             </section>
           </div>
@@ -725,20 +756,20 @@ export default function AdminDashboardPage() {
             TAB 2: LIVE SUPPORT CHAT DESK
         ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'support' && (
-          <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden shadow-2xl animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl overflow-hidden shadow-sm dark:shadow-2xl animate-in fade-in duration-150">
             <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
               {/* Left Column: Sessions List (4 cols) */}
-              <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-dark-border flex flex-col bg-slate-900/40">
+              <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-dark-border flex flex-col bg-gray-50/70 dark:bg-slate-900/40">
                 {/* Search & Filter Header */}
-                <div className="p-3.5 border-b border-dark-border space-y-2.5">
+                <div className="p-3.5 border-b border-gray-200 dark:border-dark-border space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-extrabold text-white flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4 text-brand-400" />
+                    <h2 className="text-sm font-extrabold text-gray-950 dark:text-white flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-brand-600 dark:text-brand-400" />
                       <span>Chat Sessions Queue</span>
                     </h2>
                     <button
                       onClick={() => refetchSupportSessions()}
-                      className="p-1 text-slate-400 hover:text-white"
+                      className="p-1 text-gray-500 dark:text-slate-400 hover:text-gray-950 dark:hover:text-white"
                       title="Refresh queue"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
@@ -762,7 +793,7 @@ export default function AdminDashboardPage() {
                         className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-colors ${
                           supportStatusFilter === f.id
                             ? 'bg-brand-500 text-slate-950'
-                            : 'bg-dark-bg text-slate-400 hover:text-white border border-dark-border'
+                            : 'bg-white dark:bg-dark-bg text-gray-600 dark:text-slate-400 hover:text-gray-950 dark:hover:text-white border border-gray-200 dark:border-dark-border'
                         }`}
                       >
                         {f.label}
@@ -772,7 +803,7 @@ export default function AdminDashboardPage() {
 
                   {/* Search Input */}
                   <div className="relative">
-                    <Search className="w-3.5 h-3.5 text-dark-muted absolute left-3 top-2.5" />
+                    <Search className="w-3.5 h-3.5 text-gray-400 dark:text-dark-muted absolute left-3 top-2.5" />
                     <input
                       type="text"
                       placeholder="Search name, email, session..."
@@ -781,13 +812,13 @@ export default function AdminDashboardPage() {
                         setSupportSearch(e.target.value);
                         setSupportPage(1);
                       }}
-                      className="w-full bg-dark-bg border border-dark-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
+                      className="w-full bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
                     />
                   </div>
                 </div>
 
                 {/* Sessions Scroll List */}
-                <div className="flex-1 overflow-y-auto divide-y divide-dark-border/50 max-h-[480px]">
+                <div className="flex-1 overflow-y-auto divide-y divide-gray-200 dark:divide-dark-border/50 max-h-[480px]">
                   {supportSessionsData?.sessions?.length > 0 ? (
                     supportSessionsData.sessions.map((sess) => {
                       const isSelected = sess.sessionId === selectedSessionId;
@@ -797,17 +828,17 @@ export default function AdminDashboardPage() {
                           onClick={() => setSelectedSessionId(sess.sessionId)}
                           className={`w-full text-left p-3.5 transition-all flex flex-col gap-1.5 ${
                             isSelected
-                              ? 'bg-brand-500/10 border-l-4 border-l-brand-500 text-white'
-                              : 'hover:bg-slate-800/40 text-slate-300'
+                              ? 'bg-brand-500/10 border-l-4 border-l-brand-500 text-gray-950 dark:text-white'
+                              : 'hover:bg-gray-100/80 dark:hover:bg-slate-800/40 text-gray-700 dark:text-slate-300'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-1">
                             <div className="flex items-center gap-1.5 min-w-0">
-                              <span className="font-extrabold text-xs truncate text-white">
+                              <span className="font-extrabold text-xs truncate text-gray-950 dark:text-white">
                                 {sess.name || 'Guest User'}
                               </span>
                               {sess.isAgentRequested && (
-                                <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                                <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                                   Agent
                                 </span>
                               )}
@@ -815,23 +846,23 @@ export default function AdminDashboardPage() {
                             <span
                               className={`text-[9px] font-bold px-1.5 py-0.2 rounded uppercase ${
                                 sess.status === 'active'
-                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                  : 'bg-slate-800 text-slate-400 border border-dark-border'
+                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                  : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-dark-border'
                               }`}
                             >
                               {sess.status}
                             </span>
                           </div>
 
-                          <p className="text-[11px] text-dark-muted font-mono truncate">{sess.email}</p>
+                          <p className="text-[11px] text-gray-500 dark:text-dark-muted font-mono truncate">{sess.email}</p>
 
                           {sess.lastMessageText && (
-                            <p className="text-xs text-slate-300 line-clamp-1 italic">
+                            <p className="text-xs text-gray-700 dark:text-slate-300 line-clamp-1 italic">
                               "{sess.lastMessageText}"
                             </p>
                           )}
 
-                          <div className="flex items-center justify-between text-[10px] text-dark-muted mt-1">
+                          <div className="flex items-center justify-between text-[10px] text-gray-500 dark:text-dark-muted mt-1">
                             <span>
                               {sess.lastMessageAt
                                 ? new Date(sess.lastMessageAt).toLocaleTimeString([], {
@@ -850,7 +881,7 @@ export default function AdminDashboardPage() {
                       );
                     })
                   ) : (
-                    <div className="p-8 text-center text-xs text-dark-muted">
+                    <div className="p-8 text-center text-xs text-gray-500 dark:text-dark-muted">
                       No support chat sessions found.
                     </div>
                   )}
@@ -858,7 +889,7 @@ export default function AdminDashboardPage() {
 
                 {/* Sessions Pagination */}
                 {supportSessionsData?.pagination?.totalPages > 1 && (
-                  <div className="p-2.5 border-t border-dark-border flex items-center justify-between text-xs text-dark-muted">
+                  <div className="p-2.5 border-t border-gray-200 dark:border-dark-border flex items-center justify-between text-xs text-gray-500 dark:text-dark-muted">
                     <span>
                       Page {supportPage} of {supportSessionsData.pagination.totalPages}
                     </span>
@@ -866,7 +897,7 @@ export default function AdminDashboardPage() {
                       <button
                         onClick={() => setSupportPage((p) => Math.max(1, p - 1))}
                         disabled={supportPage === 1}
-                        className="p-1 rounded bg-dark-bg border border-dark-border disabled:opacity-40"
+                        className="p-1 rounded bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronLeft className="w-3.5 h-3.5" />
                       </button>
@@ -877,7 +908,7 @@ export default function AdminDashboardPage() {
                           )
                         }
                         disabled={supportPage === supportSessionsData.pagination.totalPages}
-                        className="p-1 rounded bg-dark-bg border border-dark-border disabled:opacity-40"
+                        className="p-1 rounded bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
@@ -891,26 +922,26 @@ export default function AdminDashboardPage() {
                 {selectedSessionData?.session ? (
                   <>
                     {/* Active Conversation Header */}
-                    <div className="p-4 border-b border-dark-border bg-slate-900/80 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                    <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-slate-900/80 flex flex-wrap items-center justify-between gap-3 shrink-0">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-black text-sm text-white">
+                          <h3 className="font-black text-sm text-gray-950 dark:text-white">
                             {selectedSessionData.session.name}
                           </h3>
-                          <span className="text-xs text-dark-muted">
+                          <span className="text-xs text-gray-500 dark:text-dark-muted">
                             ({selectedSessionData.session.email})
                           </span>
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border ${
                               selectedSessionData.session.status === 'active'
-                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                                : 'bg-slate-800 text-slate-400 border-dark-border'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                                : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-dark-border'
                             }`}
                           >
                             {selectedSessionData.session.status}
                           </span>
                         </div>
-                        <p className="text-[11px] text-dark-muted font-mono mt-0.5">
+                        <p className="text-[11px] text-gray-500 dark:text-dark-muted font-mono mt-0.5">
                           Session ID: {selectedSessionData.session.sessionId}
                         </p>
                       </div>
@@ -920,7 +951,7 @@ export default function AdminDashboardPage() {
                           <button
                             onClick={handleCloseSupportSession}
                             disabled={isClosingSession}
-                            className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+                            className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             <span>Close &amp; Purge Files</span>
@@ -942,14 +973,14 @@ export default function AdminDashboardPage() {
                             className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}
                           >
                             <div className="flex items-center gap-1.5 mb-1 px-1">
-                              <span className="text-[10px] font-extrabold text-dark-muted">
+                              <span className="text-[10px] font-extrabold text-gray-500 dark:text-dark-muted">
                                 {isAdmin
                                   ? `You (Admin: ${msg.senderName})`
                                   : isUser
                                   ? msg.senderName || 'User'
                                   : 'Sprinkl Bot'}
                               </span>
-                              <span className="text-[9px] text-dark-muted font-mono">
+                              <span className="text-[9px] text-gray-500 dark:text-dark-muted font-mono">
                                 {msg.createdAt
                                   ? new Date(msg.createdAt).toLocaleTimeString([], {
                                       hour: '2-digit',
@@ -964,8 +995,8 @@ export default function AdminDashboardPage() {
                                 isAdmin
                                   ? 'bg-emerald-500 text-slate-950 font-bold rounded-tr-none'
                                   : isUser
-                                  ? 'bg-slate-800 border border-dark-border text-white rounded-tl-none'
-                                  : 'bg-slate-900 border border-dark-border/80 text-slate-300 rounded-tl-none'
+                                  ? 'bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-dark-border text-gray-900 dark:text-white rounded-tl-none'
+                                  : 'bg-gray-200/80 dark:bg-slate-900 border border-gray-300/80 dark:border-dark-border/80 text-gray-800 dark:text-slate-300 rounded-tl-none'
                               }`}
                             >
                               <p className="whitespace-pre-wrap text-[13px]">{msg.text}</p>
@@ -991,7 +1022,7 @@ export default function AdminDashboardPage() {
                                             <img
                                               src={downloadUrl}
                                               alt={att.filename}
-                                              className="max-h-36 rounded-lg object-cover border border-white/20"
+                                              className="max-h-36 rounded-lg object-cover border border-gray-200 dark:border-white/20"
                                             />
                                           </a>
                                         ) : (
@@ -999,7 +1030,7 @@ export default function AdminDashboardPage() {
                                             href={downloadUrl || '#'}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-center gap-2 p-2 rounded bg-black/20 text-[11px] font-mono"
+                                            className="flex items-center gap-2 p-2 rounded bg-black/5 dark:bg-black/20 text-[11px] font-mono text-gray-800 dark:text-slate-200"
                                           >
                                             <FileText className="w-4 h-4" />
                                             <span className="truncate">{att.filename}</span>
@@ -1018,14 +1049,14 @@ export default function AdminDashboardPage() {
                     </div>
 
                     {/* Admin Reply Composer */}
-                    <div className="p-3.5 border-t border-dark-border bg-slate-900/90 shrink-0">
+                    <div className="p-3.5 border-t border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-slate-900/90 shrink-0">
                       <form onSubmit={handleSendAdminReply} className="flex items-center gap-2">
                         <input
                           type="text"
                           placeholder="Type your official response to the user..."
                           value={adminReplyText}
                           onChange={(e) => setAdminReplyText(e.target.value)}
-                          className="flex-1 bg-dark-bg border border-dark-border rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
+                          className="flex-1 bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-4 py-2.5 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
                         />
                         <button
                           type="submit"
@@ -1036,16 +1067,16 @@ export default function AdminDashboardPage() {
                           <span>{isSendingReply ? 'Sending…' : 'Send Reply'}</span>
                         </button>
                       </form>
-                      <p className="text-[10px] text-dark-muted mt-1.5">
+                      <p className="text-[10px] text-gray-500 dark:text-dark-muted mt-1.5">
                         💡 Sending a response appears instantly in the user's widget and dispatches an email notification.
                       </p>
                     </div>
                   </>
                 ) : (
-                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-dark-muted space-y-2">
+                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-500 dark:text-dark-muted space-y-2">
                     <MessageSquare className="w-10 h-10 opacity-40" />
-                    <p className="text-sm font-bold text-slate-300">Select a support conversation</p>
-                    <p className="text-xs max-w-sm">
+                    <p className="text-sm font-bold text-gray-800 dark:text-slate-300">Select a support conversation</p>
+                    <p className="text-xs max-w-sm text-gray-500 dark:text-dark-muted">
                       Choose any session on the left queue to view the full dialogue, attachments, and reply directly as a live agent.
                     </p>
                   </div>
@@ -1059,13 +1090,13 @@ export default function AdminDashboardPage() {
             TAB 3: GIVEAWAYS MONITOR (Paginated)
         ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'giveaways' && (
-          <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150">
+          <section className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150 shadow-sm dark:shadow-none">
             {/* Filter & Search Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold text-white">Platform Giveaways Monitor</h2>
-                <p className="text-xs text-dark-muted">
-                  Inspect all dual-currency campaigns created across the platform
+                <h2 className="text-lg font-bold text-gray-950 dark:text-white">Platform Giveaways Monitor</h2>
+                <p className="text-xs text-gray-500 dark:text-dark-muted">
+                  Inspect all dual-currency &amp; VTU airtime campaigns created across the platform
                 </p>
               </div>
 
@@ -1078,7 +1109,7 @@ export default function AdminDashboardPage() {
                     setGiveawaySearch(e.target.value);
                     setGiveawayPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
                 />
 
                 <select
@@ -1087,7 +1118,7 @@ export default function AdminDashboardPage() {
                     setGiveawayStatusFilter(e.target.value);
                     setGiveawayPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none"
                 >
                   <option value="all">All Statuses</option>
                   <option value="active">Active</option>
@@ -1101,10 +1132,11 @@ export default function AdminDashboardPage() {
                     setGiveawayCurrencyFilter(e.target.value);
                     setGiveawayPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none"
                 >
                   <option value="all">All Currencies</option>
                   <option value="NGN">NGN (Naira)</option>
+                  <option value="AIRTIME">Airtime (VTU)</option>
                   <option value="USDT">USDT (Crypto)</option>
                 </select>
               </div>
@@ -1118,7 +1150,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">Title &amp; Slug</th>
                         <th className="py-3 px-3">Host</th>
                         <th className="py-3 px-3">Currency</th>
@@ -1137,20 +1169,20 @@ export default function AdminDashboardPage() {
                 {/* Mobile Cards */}
                 <div className="sm:hidden space-y-3">
                   {giveawaysData.giveaways.map((g) => (
-                    <div key={g._id} className="bg-dark-bg rounded-xl border border-dark-border p-3.5 space-y-2">
+                    <div key={g._id} className="bg-gray-50 dark:bg-dark-bg rounded-xl border border-gray-200 dark:border-dark-border p-3.5 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-sm text-white line-clamp-1">{g.title}</span>
+                        <span className="font-bold text-sm text-gray-950 dark:text-white line-clamp-1">{g.title}</span>
                         <StatusBadge status={g.status} />
                       </div>
-                      <p className="text-xs text-dark-muted">
-                        Host: <strong className="text-slate-200">{g.host?.fullName || 'Anonymous'}</strong> ({g.host?.email})
+                      <p className="text-xs text-gray-500 dark:text-dark-muted">
+                        Host: <strong className="text-gray-900 dark:text-slate-200">{g.host?.fullName || 'Anonymous'}</strong> ({g.host?.email})
                       </p>
                       <div className="flex items-center justify-between text-xs">
                         <span>
-                          Prize: <strong>{formatCurrency(g.amountPerRecipient, g.currency)}</strong> / person
+                          Prize: <strong className="text-gray-900 dark:text-slate-100">{formatCurrency(g.amountPerRecipient, g.currency)}</strong> / person
                         </span>
                         <span>
-                          Slots: <strong className="text-brand-400">{g.slotsClaimed} / {g.totalSlots}</strong>
+                          Slots: <strong className="text-brand-600 dark:text-brand-400">{g.slotsClaimed} / {g.totalSlots}</strong>
                         </span>
                       </div>
                     </div>
@@ -1161,7 +1193,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">Title &amp; Slug</th>
                         <th className="py-3 px-3">Host</th>
                         <th className="py-3 px-3">Currency</th>
@@ -1171,29 +1203,29 @@ export default function AdminDashboardPage() {
                         <th className="py-3 px-3 text-right">Created</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-dark-border text-xs">
+                    <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
                       {giveawaysData.giveaways.map((g) => (
-                        <tr key={g._id} className="hover:bg-slate-800/30">
+                        <tr key={g._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
                           <td className="py-3.5 px-3">
-                            <p className="font-bold text-white line-clamp-1">{g.title}</p>
-                            <p className="text-[10px] font-mono text-dark-muted">/g/{g.slug}</p>
+                            <p className="font-bold text-gray-950 dark:text-white line-clamp-1">{g.title}</p>
+                            <p className="text-[10px] font-mono text-gray-500 dark:text-dark-muted">/g/{g.slug}</p>
                           </td>
                           <td className="py-3.5 px-3">
-                            <p className="font-semibold text-slate-200">{g.host?.fullName || 'N/A'}</p>
-                            <p className="text-[10px] text-dark-muted">{g.host?.email}</p>
+                            <p className="font-semibold text-gray-900 dark:text-slate-200">{g.host?.fullName || 'N/A'}</p>
+                            <p className="text-[10px] text-gray-500 dark:text-dark-muted">{g.host?.email}</p>
                           </td>
-                          <td className="py-3.5 px-3 font-bold">{g.currency}</td>
-                          <td className="py-3.5 px-3 font-mono font-bold text-slate-200">
+                          <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">{g.currency}</td>
+                          <td className="py-3.5 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
                             {formatCurrency(g.amountPerRecipient, g.currency)}
                           </td>
                           <td className="py-3.5 px-3 font-mono">
-                            <span className="text-brand-400 font-bold">{g.slotsClaimed}</span>
-                            <span className="text-dark-muted"> / {g.totalSlots}</span>
+                            <span className="text-brand-600 dark:text-brand-400 font-bold">{g.slotsClaimed}</span>
+                            <span className="text-gray-500 dark:text-dark-muted"> / {g.totalSlots}</span>
                           </td>
                           <td className="py-3.5 px-3">
                             <StatusBadge status={g.status} />
                           </td>
-                          <td className="py-3.5 px-3 text-right text-dark-muted whitespace-nowrap">
+                          <td className="py-3.5 px-3 text-right text-gray-500 dark:text-dark-muted whitespace-nowrap">
                             {new Date(g.createdAt).toLocaleDateString()}
                           </td>
                         </tr>
@@ -1204,27 +1236,27 @@ export default function AdminDashboardPage() {
 
                 {/* Pagination Controls */}
                 {giveawaysData.pagination?.totalPages > 1 && (
-                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-dark-muted border-t border-dark-border/70">
+                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 dark:text-dark-muted border-t border-gray-200 dark:border-dark-border/70">
                     <p>
                       Showing{' '}
-                      <span className="font-semibold text-slate-200">
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
                         {(giveawayPage - 1) * giveawaysData.pagination.limit + 1}
                       </span>{' '}
                       to{' '}
-                      <span className="font-semibold text-slate-200">
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
                         {Math.min(
                           giveawayPage * giveawaysData.pagination.limit,
                           giveawaysData.pagination.total
                         )}
                       </span>{' '}
-                      of <span className="font-semibold text-slate-200">{giveawaysData.pagination.total}</span> giveaways
+                      of <span className="font-semibold text-gray-900 dark:text-slate-200">{giveawaysData.pagination.total}</span> giveaways
                     </p>
 
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setGiveawayPage((p) => Math.max(1, p - 1))}
                         disabled={giveawayPage === 1}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
@@ -1236,7 +1268,7 @@ export default function AdminDashboardPage() {
                           className={`w-7 h-7 rounded-lg text-xs font-bold ${
                             giveawayPage === n
                               ? 'bg-brand-500 text-slate-950'
-                              : 'bg-dark-bg border border-dark-border text-slate-300 hover:bg-slate-800'
+                              : 'bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                           }`}
                         >
                           {n}
@@ -1248,7 +1280,7 @@ export default function AdminDashboardPage() {
                           setGiveawayPage((p) => Math.min(giveawaysData.pagination.totalPages, p + 1))
                         }
                         disabled={giveawayPage === giveawaysData.pagination.totalPages}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -1257,7 +1289,7 @@ export default function AdminDashboardPage() {
                 )}
               </div>
             ) : (
-              <p className="text-xs text-dark-muted py-8 text-center">No giveaways matching the filter criteria.</p>
+              <p className="text-xs text-gray-500 dark:text-dark-muted py-8 text-center">No giveaways matching the filter criteria.</p>
             )}
           </section>
         )}
@@ -1266,11 +1298,11 @@ export default function AdminDashboardPage() {
             TAB 4: EXTERNAL PROVIDER TRANSACTIONS (Paginated)
         ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'transactions' && (
-          <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150">
+          <section className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150 shadow-sm dark:shadow-none">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold text-white">External Provider Audit Log</h2>
-                <p className="text-xs text-dark-muted">
+                <h2 className="text-lg font-bold text-gray-950 dark:text-white">External Provider Audit Log</h2>
+                <p className="text-xs text-gray-500 dark:text-dark-muted">
                   Webhook confirmations from Flutterwave, Paystack, TRON, and BSC networks
                 </p>
               </div>
@@ -1284,7 +1316,7 @@ export default function AdminDashboardPage() {
                     setTxSearch(e.target.value);
                     setTxPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
                 />
 
                 <select
@@ -1293,7 +1325,7 @@ export default function AdminDashboardPage() {
                     setTxProviderFilter(e.target.value);
                     setTxPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none"
                 >
                   <option value="all">All Providers</option>
                   <option value="flutterwave">Flutterwave</option>
@@ -1312,7 +1344,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">Provider</th>
                         <th className="py-3 px-3">Reference</th>
                         <th className="py-3 px-3">Direction</th>
@@ -1330,26 +1362,26 @@ export default function AdminDashboardPage() {
                 {/* Mobile Cards */}
                 <div className="sm:hidden space-y-3">
                   {txData.transactions.map((t) => (
-                    <div key={t._id} className="bg-dark-bg rounded-xl border border-dark-border p-3.5 space-y-2">
+                    <div key={t._id} className="bg-gray-50 dark:bg-dark-bg rounded-xl border border-gray-200 dark:border-dark-border p-3.5 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-brand-400 uppercase">{t.provider}</span>
-                        <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold">
+                        <span className="text-xs font-black text-brand-600 dark:text-brand-400 uppercase">{t.provider}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getTxStatusBadge(t.status)}`}>
                           {t.status.toUpperCase()}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span
                           className={`text-xs font-semibold capitalize ${
-                            t.direction === 'inbound' ? 'text-emerald-400' : 'text-rose-400'
+                            t.direction === 'inbound' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                           }`}
                         >
                           {t.direction}
                         </span>
-                        <span className="text-xs font-mono font-bold text-white">
-                          {formatCurrency(t.amount, t.currency)}
+                        <span className="text-xs font-mono font-bold text-gray-900 dark:text-white">
+                          {formatCurrency(t.amount, t.currency, t.provider)}
                         </span>
                       </div>
-                      <p className="text-[11px] text-dark-muted font-mono truncate">{t.providerReference}</p>
+                      <p className="text-[11px] text-gray-500 dark:text-dark-muted font-mono truncate">{t.providerReference}</p>
                     </div>
                   ))}
                 </div>
@@ -1358,7 +1390,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">Provider</th>
                         <th className="py-3 px-3">Reference</th>
                         <th className="py-3 px-3">Direction</th>
@@ -1367,25 +1399,25 @@ export default function AdminDashboardPage() {
                         <th className="py-3 px-3 text-right">Timestamp</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-dark-border text-xs">
+                    <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
                       {txData.transactions.map((t) => (
-                        <tr key={t._id} className="hover:bg-slate-800/30">
-                          <td className="py-3 px-3 uppercase font-bold text-brand-400">{t.provider}</td>
-                          <td className="py-3 px-3 font-mono text-xs text-slate-300">{t.providerReference}</td>
+                        <tr key={t._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
+                          <td className="py-3 px-3 uppercase font-bold text-brand-600 dark:text-brand-400">{t.provider}</td>
+                          <td className="py-3 px-3 font-mono text-xs text-gray-700 dark:text-slate-300">{t.providerReference}</td>
                           <td className="py-3 px-3 capitalize font-semibold">
-                            <span className={t.direction === 'inbound' ? 'text-emerald-400' : 'text-rose-400'}>
+                            <span className={t.direction === 'inbound' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                               {t.direction}
                             </span>
                           </td>
-                          <td className="py-3 px-3 font-mono font-bold">
-                            {formatCurrency(t.amount, t.currency)}
+                          <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-100">
+                            {formatCurrency(t.amount, t.currency, t.provider)}
                           </td>
                           <td className="py-3 px-3">
-                            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getTxStatusBadge(t.status)}`}>
                               {t.status.toUpperCase()}
                             </span>
                           </td>
-                          <td className="py-3 px-3 text-right text-dark-muted font-mono whitespace-nowrap">
+                          <td className="py-3 px-3 text-right text-gray-500 dark:text-dark-muted font-mono whitespace-nowrap">
                             {new Date(t.createdAt).toLocaleString()}
                           </td>
                         </tr>
@@ -1396,18 +1428,25 @@ export default function AdminDashboardPage() {
 
                 {/* Pagination */}
                 {txData.pagination?.totalPages > 1 && (
-                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-dark-muted border-t border-dark-border/70">
+                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 dark:text-dark-muted border-t border-gray-200 dark:border-dark-border/70">
                     <p>
-                      Showing {(txPage - 1) * txData.pagination.limit + 1} to{' '}
-                      {Math.min(txPage * txData.pagination.limit, txData.pagination.total)} of{' '}
-                      {txData.pagination.total} provider transactions
+                      Showing{' '}
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
+                        {(txPage - 1) * txData.pagination.limit + 1}
+                      </span>{' '}
+                      to{' '}
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
+                        {Math.min(txPage * txData.pagination.limit, txData.pagination.total)}
+                      </span>{' '}
+                      of{' '}
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">{txData.pagination.total}</span> provider transactions
                     </p>
 
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setTxPage((p) => Math.max(1, p - 1))}
                         disabled={txPage === 1}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
@@ -1419,7 +1458,7 @@ export default function AdminDashboardPage() {
                           className={`w-7 h-7 rounded-lg text-xs font-bold ${
                             txPage === n
                               ? 'bg-brand-500 text-slate-950'
-                              : 'bg-dark-bg border border-dark-border text-slate-300 hover:bg-slate-800'
+                              : 'bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                           }`}
                         >
                           {n}
@@ -1429,7 +1468,7 @@ export default function AdminDashboardPage() {
                       <button
                         onClick={() => setTxPage((p) => Math.min(txData.pagination.totalPages, p + 1))}
                         disabled={txPage === txData.pagination.totalPages}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -1438,7 +1477,7 @@ export default function AdminDashboardPage() {
                 )}
               </div>
             ) : (
-              <p className="text-xs text-dark-muted py-8 text-center">No provider transactions logged yet.</p>
+              <p className="text-xs text-gray-500 dark:text-dark-muted py-8 text-center">No provider transactions logged yet.</p>
             )}
           </section>
         )}
@@ -1447,12 +1486,12 @@ export default function AdminDashboardPage() {
             TAB 5: CLAIMS & WINNERS LEDGER (Paginated)
         ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'claims' && (
-          <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150">
+          <section className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150 shadow-sm dark:shadow-none">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold text-white">Claims &amp; Winners Audit</h2>
-                <p className="text-xs text-dark-muted">
-                  Recipient destination accounts, claim amounts, and idempotent transfer results
+                <h2 className="text-lg font-bold text-gray-950 dark:text-white">Claims &amp; Winners Audit</h2>
+                <p className="text-xs text-gray-500 dark:text-dark-muted">
+                  Recipient destination accounts, claim amounts, and automated settlement results
                 </p>
               </div>
 
@@ -1465,7 +1504,7 @@ export default function AdminDashboardPage() {
                     setClaimSearch(e.target.value);
                     setClaimPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
                 />
 
                 <select
@@ -1474,12 +1513,26 @@ export default function AdminDashboardPage() {
                     setClaimStatusFilter(e.target.value);
                     setClaimPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none"
                 >
                   <option value="all">All Statuses</option>
                   <option value="paid">Paid (Disbursed)</option>
                   <option value="failed">Failed</option>
                   <option value="pending">Pending</option>
+                </select>
+
+                <select
+                  value={claimCurrencyFilter}
+                  onChange={(e) => {
+                    setClaimCurrencyFilter(e.target.value);
+                    setClaimPage(1);
+                  }}
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none"
+                >
+                  <option value="all">All Currencies</option>
+                  <option value="NGN">NGN (Naira)</option>
+                  <option value="AIRTIME">Airtime (VTU)</option>
+                  <option value="USDT">USDT (Crypto)</option>
                 </select>
               </div>
             </div>
@@ -1492,7 +1545,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">Giveaway Title</th>
                         <th className="py-3 px-3">Beneficiary Destination</th>
                         <th className="py-3 px-3">Amount</th>
@@ -1511,27 +1564,27 @@ export default function AdminDashboardPage() {
                 {/* Mobile Cards */}
                 <div className="sm:hidden space-y-3">
                   {claimsData.claims.map((c) => (
-                    <div key={c._id} className="bg-dark-bg rounded-xl border border-dark-border p-3.5 space-y-2">
+                    <div key={c._id} className="bg-gray-50 dark:bg-dark-bg rounded-xl border border-gray-200 dark:border-dark-border p-3.5 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-xs text-white truncate max-w-[200px]">
+                        <span className="font-bold text-xs text-gray-950 dark:text-white truncate max-w-[200px]">
                           {c.giveaway?.title || 'Giveaway'}
                         </span>
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                             c.status === 'paid'
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                              : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
                           }`}
                         >
                           {c.status.toUpperCase()}
                         </span>
                       </div>
-                      <p className="text-xs font-mono text-dark-muted truncate">
+                      <p className="text-xs font-mono text-gray-500 dark:text-dark-muted truncate">
                         {c.destination?.details?.accountName || c.destination?.details?.address || c.destination?.normalized}
                       </p>
                       <div className="flex items-center justify-between text-xs font-mono font-bold">
-                        <span className="text-brand-400">{formatCurrency(c.amount, c.currency)}</span>
-                        <span className="text-dark-muted">{new Date(c.createdAt).toLocaleDateString()}</span>
+                        <span className="text-brand-600 dark:text-brand-400">{formatCurrency(c.amount, c.currency || c.giveaway?.currency || 'NGN')}</span>
+                        <span className="text-gray-500 dark:text-dark-muted">{new Date(c.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
                   ))}
@@ -1541,7 +1594,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">Giveaway Title</th>
                         <th className="py-3 px-3">Beneficiary Destination</th>
                         <th className="py-3 px-3">Amount</th>
@@ -1550,36 +1603,36 @@ export default function AdminDashboardPage() {
                         <th className="py-3 px-3 text-right">Claimed At</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-dark-border text-xs">
+                    <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
                       {claimsData.claims.map((c) => (
-                        <tr key={c._id} className="hover:bg-slate-800/30">
-                          <td className="py-3 px-3 font-semibold text-white max-w-[220px] truncate">
+                        <tr key={c._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
+                          <td className="py-3 px-3 font-semibold text-gray-950 dark:text-white max-w-[220px] truncate">
                             {c.giveaway?.title || 'Giveaway'}
                           </td>
                           <td className="py-3 px-3 font-mono text-xs">
-                            <p className="font-bold text-slate-200">
+                            <p className="font-bold text-gray-900 dark:text-slate-200">
                               {c.destination?.details?.accountName || c.destination?.details?.bankName || 'Direct Destination'}
                             </p>
-                            <p className="text-[10px] text-dark-muted truncate max-w-[280px]">
+                            <p className="text-[10px] text-gray-500 dark:text-dark-muted truncate max-w-[280px]">
                               {c.destination?.details?.accountNumber || c.destination?.details?.address || c.destination?.normalized}
                             </p>
                           </td>
-                          <td className="py-3 px-3 font-mono font-bold text-emerald-400">
-                            {formatCurrency(c.amount, c.currency)}
+                          <td className="py-3 px-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            {formatCurrency(c.amount, c.currency || c.giveaway?.currency || 'NGN')}
                           </td>
-                          <td className="py-3 px-3 font-bold">{c.currency}</td>
+                          <td className="py-3 px-3 font-bold text-gray-900 dark:text-white">{c.currency || c.giveaway?.currency || 'NGN'}</td>
                           <td className="py-3 px-3">
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                                 c.status === 'paid'
-                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                                  : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
                               }`}
                             >
                               {c.status.toUpperCase()}
                             </span>
                           </td>
-                          <td className="py-3 px-3 text-right text-dark-muted font-mono whitespace-nowrap">
+                          <td className="py-3 px-3 text-right text-gray-500 dark:text-dark-muted font-mono whitespace-nowrap">
                             {new Date(c.createdAt).toLocaleString()}
                           </td>
                         </tr>
@@ -1590,18 +1643,24 @@ export default function AdminDashboardPage() {
 
                 {/* Pagination */}
                 {claimsData.pagination?.totalPages > 1 && (
-                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-dark-muted border-t border-dark-border/70">
+                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 dark:text-dark-muted border-t border-gray-200 dark:border-dark-border/70">
                     <p>
-                      Showing {(claimPage - 1) * claimsData.pagination.limit + 1} to{' '}
-                      {Math.min(claimPage * claimsData.pagination.limit, claimsData.pagination.total)} of{' '}
-                      {claimsData.pagination.total} claims
+                      Showing{' '}
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
+                        {(claimPage - 1) * claimsData.pagination.limit + 1}
+                      </span>{' '}
+                      to{' '}
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
+                        {Math.min(claimPage * claimsData.pagination.limit, claimsData.pagination.total)}
+                      </span>{' '}
+                      of <span className="font-semibold text-gray-900 dark:text-slate-200">{claimsData.pagination.total}</span> claims
                     </p>
 
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setClaimPage((p) => Math.max(1, p - 1))}
                         disabled={claimPage === 1}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
@@ -1613,7 +1672,7 @@ export default function AdminDashboardPage() {
                           className={`w-7 h-7 rounded-lg text-xs font-bold ${
                             claimPage === n
                               ? 'bg-brand-500 text-slate-950'
-                              : 'bg-dark-bg border border-dark-border text-slate-300 hover:bg-slate-800'
+                              : 'bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                           }`}
                         >
                           {n}
@@ -1623,7 +1682,7 @@ export default function AdminDashboardPage() {
                       <button
                         onClick={() => setClaimPage((p) => Math.min(claimsData.pagination.totalPages, p + 1))}
                         disabled={claimPage === claimsData.pagination.totalPages}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -1632,7 +1691,7 @@ export default function AdminDashboardPage() {
                 )}
               </div>
             ) : (
-              <p className="text-xs text-dark-muted py-8 text-center">No claims found.</p>
+              <p className="text-xs text-gray-500 dark:text-dark-muted py-8 text-center">No claims found.</p>
             )}
           </section>
         )}
@@ -1641,12 +1700,12 @@ export default function AdminDashboardPage() {
             TAB 6: USERS & KYC DIRECTORY (Paginated)
         ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'users' && (
-          <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150">
+          <section className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150 shadow-sm dark:shadow-none">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold text-white">Users &amp; Roles Management</h2>
-                <p className="text-xs text-dark-muted">
-                  Directory of registered hosts and platform administrators
+                <h2 className="text-lg font-bold text-gray-950 dark:text-white">Users &amp; Roles Management</h2>
+                <p className="text-xs text-gray-500 dark:text-dark-muted">
+                  Directory of registered hosts, platform administrators, and live ledger balances
                 </p>
               </div>
 
@@ -1659,7 +1718,7 @@ export default function AdminDashboardPage() {
                     setUserSearch(e.target.value);
                     setUserPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-dark-muted focus:outline-none focus:border-brand-500"
                 />
 
                 <select
@@ -1668,7 +1727,7 @@ export default function AdminDashboardPage() {
                     setUserRoleFilter(e.target.value);
                     setUserPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none"
                 >
                   <option value="all">All Roles</option>
                   <option value="host">Hosts</option>
@@ -1685,7 +1744,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">User</th>
                         <th className="py-3 px-3">Role</th>
                         <th className="py-3 px-3">Email Verified</th>
@@ -1704,28 +1763,28 @@ export default function AdminDashboardPage() {
                 {/* Mobile Cards */}
                 <div className="sm:hidden space-y-3">
                   {usersData.users.map((u) => (
-                    <div key={u._id} className="bg-dark-bg rounded-xl border border-dark-border p-3.5 space-y-2.5">
+                    <div key={u._id} className="bg-gray-50 dark:bg-dark-bg rounded-xl border border-gray-200 dark:border-dark-border p-3.5 space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-sm text-white">{u.fullName}</span>
+                        <span className="font-bold text-sm text-gray-950 dark:text-white">{u.fullName}</span>
                         <span
                           className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
                             u.role === 'admin'
-                              ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                              : 'bg-brand-500/10 text-brand-400 border-brand-500/20'
+                              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                              : 'bg-brand-500/10 text-brand-600 dark:text-brand-400 border-brand-500/20'
                           }`}
                         >
                           {u.role}
                         </span>
                       </div>
-                      <p className="text-xs text-dark-muted">{u.email}</p>
+                      <p className="text-xs text-gray-500 dark:text-dark-muted">{u.email}</p>
                       <div className="flex items-center justify-between text-xs font-mono">
-                        <span>NGN: {formatCurrency(u.balances?.NGN?.available || 0, 'NGN')}</span>
-                        <span>USDT: {formatCurrency(u.balances?.USDT?.available || 0, 'USDT')}</span>
+                        <span>NGN: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(u.balances?.NGN?.available || 0, 'NGN')}</strong></span>
+                        <span>USDT: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(u.balances?.USDT?.available || 0, 'USDT')}</strong></span>
                       </div>
-                      <div className="pt-2 border-t border-dark-border/60 flex items-center justify-end">
+                      <div className="pt-2 border-t border-gray-200 dark:border-dark-border/60 flex items-center justify-end">
                         <button
                           onClick={() => handleToggleUserRole(u)}
-                          className="text-xs font-bold text-brand-400 hover:underline"
+                          className="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline"
                         >
                           Change Role →
                         </button>
@@ -1738,7 +1797,7 @@ export default function AdminDashboardPage() {
                 <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">User</th>
                         <th className="py-3 px-3">Role</th>
                         <th className="py-3 px-3">Email Verified</th>
@@ -1748,19 +1807,19 @@ export default function AdminDashboardPage() {
                         <th className="py-3 px-3 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-dark-border text-xs">
+                    <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
                       {usersData.users.map((u) => (
-                        <tr key={u._id} className="hover:bg-slate-800/30">
+                        <tr key={u._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
                           <td className="py-3 px-3">
-                            <p className="font-bold text-white">{u.fullName}</p>
-                            <p className="text-[10px] text-dark-muted">{u.email}</p>
+                            <p className="font-bold text-gray-950 dark:text-white">{u.fullName}</p>
+                            <p className="text-[10px] text-gray-500 dark:text-dark-muted">{u.email}</p>
                           </td>
                           <td className="py-3 px-3">
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase border ${
                                 u.role === 'admin'
-                                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                                  : 'bg-brand-500/10 text-brand-400 border-brand-500/20'
+                                  ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                                  : 'bg-brand-500/10 text-brand-600 dark:text-brand-400 border-brand-500/20'
                               }`}
                             >
                               {u.role}
@@ -1769,7 +1828,7 @@ export default function AdminDashboardPage() {
                           <td className="py-3 px-3">
                             <span
                               className={`text-[10px] font-bold ${
-                                u.emailVerified ? 'text-emerald-400' : 'text-amber-400'
+                                u.emailVerified ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
                               }`}
                             >
                               {u.emailVerified ? 'VERIFIED' : 'PENDING'}
@@ -1783,7 +1842,7 @@ export default function AdminDashboardPage() {
                                   placeholder="₦ in Naira"
                                   value={editingThresholdValue}
                                   onChange={(e) => setEditingThresholdValue(e.target.value)}
-                                  className="w-24 bg-dark-bg border border-brand-500 rounded px-1.5 py-0.5 text-xs text-white font-mono"
+                                  className="w-24 bg-white dark:bg-dark-bg border border-brand-500 rounded px-1.5 py-0.5 text-xs text-gray-900 dark:text-white font-mono"
                                   autoFocus
                                 />
                                 <button
@@ -1794,7 +1853,7 @@ export default function AdminDashboardPage() {
                                 </button>
                                 <button
                                   onClick={() => setEditingThresholdUserId(null)}
-                                  className="text-[10px] text-slate-400 hover:text-white px-1"
+                                  className="text-[10px] text-gray-400 hover:text-gray-900 dark:hover:text-white px-1"
                                 >
                                   ✕
                                 </button>
@@ -1806,23 +1865,23 @@ export default function AdminDashboardPage() {
                                   setEditingThresholdValue(String(((u.kyc?.payoutReviewThreshold || 50000000) / 100)));
                                 }}
                                 title="Click to edit payment threshold"
-                                className="font-mono font-bold text-amber-400 hover:underline flex items-center gap-1"
+                                className="font-mono font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
                               >
                                 <span>₦{((u.kyc?.payoutReviewThreshold || 50000000) / 100).toLocaleString()}</span>
-                                <span className="text-[10px] text-dark-muted">✎</span>
+                                <span className="text-[10px] text-gray-400 dark:text-dark-muted">✎</span>
                               </button>
                             )}
                           </td>
-                          <td className="py-3 px-3 font-mono font-bold text-slate-200">
+                          <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
                             {formatCurrency(u.balances?.NGN?.available || 0, 'NGN')}
                           </td>
-                          <td className="py-3 px-3 font-mono font-bold text-slate-200">
+                          <td className="py-3 px-3 font-mono font-bold text-gray-900 dark:text-slate-200">
                             {formatCurrency(u.balances?.USDT?.available || 0, 'USDT')}
                           </td>
                           <td className="py-3 px-3 text-right">
                             <button
                               onClick={() => handleToggleUserRole(u)}
-                              className="px-2.5 py-1 rounded-lg border border-dark-border hover:bg-slate-800 text-[11px] font-bold text-slate-300 hover:text-white transition-all"
+                              className="px-2.5 py-1 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:bg-gray-100 dark:hover:bg-slate-800 text-[11px] font-bold text-gray-700 dark:text-slate-300 hover:text-gray-950 dark:hover:text-white transition-all"
                             >
                               {u.role === 'admin' ? 'Demote to Host' : 'Promote to Admin'}
                             </button>
@@ -1835,18 +1894,24 @@ export default function AdminDashboardPage() {
 
                 {/* Pagination */}
                 {usersData.pagination?.totalPages > 1 && (
-                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-dark-muted border-t border-dark-border/70">
+                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 dark:text-dark-muted border-t border-gray-200 dark:border-dark-border/70">
                     <p>
-                      Showing {(userPage - 1) * usersData.pagination.limit + 1} to{' '}
-                      {Math.min(userPage * usersData.pagination.limit, usersData.pagination.total)} of{' '}
-                      {usersData.pagination.total} users
+                      Showing{' '}
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
+                        {(userPage - 1) * usersData.pagination.limit + 1}
+                      </span>{' '}
+                      to{' '}
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
+                        {Math.min(userPage * usersData.pagination.limit, usersData.pagination.total)}
+                      </span>{' '}
+                      of <span className="font-semibold text-gray-900 dark:text-slate-200">{usersData.pagination.total}</span> users
                     </p>
 
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setUserPage((p) => Math.max(1, p - 1))}
                         disabled={userPage === 1}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
@@ -1858,7 +1923,7 @@ export default function AdminDashboardPage() {
                           className={`w-7 h-7 rounded-lg text-xs font-bold ${
                             userPage === n
                               ? 'bg-brand-500 text-slate-950'
-                              : 'bg-dark-bg border border-dark-border text-slate-300 hover:bg-slate-800'
+                              : 'bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                           }`}
                         >
                           {n}
@@ -1868,7 +1933,7 @@ export default function AdminDashboardPage() {
                       <button
                         onClick={() => setUserPage((p) => Math.min(usersData.pagination.totalPages, p + 1))}
                         disabled={userPage === usersData.pagination.totalPages}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -1877,7 +1942,7 @@ export default function AdminDashboardPage() {
                 )}
               </div>
             ) : (
-              <p className="text-xs text-dark-muted py-8 text-center">No users matching search.</p>
+              <p className="text-xs text-gray-500 dark:text-dark-muted py-8 text-center">No users matching search.</p>
             )}
           </section>
         )}
@@ -1886,11 +1951,11 @@ export default function AdminDashboardPage() {
             TAB 7: PAYMENT THRESHOLD REQUESTS (Paginated)
         ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'kyc' && (
-          <section className="bg-dark-card border border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150">
+          <section className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 space-y-5 animate-in fade-in duration-150 shadow-sm dark:shadow-none">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold text-white">Payment Threshold Upgrade Requests</h2>
-                <p className="text-xs text-dark-muted">
+                <h2 className="text-lg font-bold text-gray-950 dark:text-white">Payment Threshold Upgrade Requests</h2>
+                <p className="text-xs text-gray-500 dark:text-dark-muted">
                   Review and approve host requests to raise single-giveaway payout limits above ₦500,000
                 </p>
               </div>
@@ -1902,7 +1967,7 @@ export default function AdminDashboardPage() {
                     setKycStatusFilter(e.target.value);
                     setKycPage(1);
                   }}
-                  className="bg-dark-bg border border-dark-border rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                  className="bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none"
                 >
                   <option value="pending">Pending Review</option>
                   <option value="approved">Approved</option>
@@ -1911,7 +1976,7 @@ export default function AdminDashboardPage() {
                 </select>
                 <button
                   onClick={() => refetchKycRequests()}
-                  className="p-1.5 rounded-lg border border-dark-border hover:bg-slate-800 text-slate-300 hover:text-white"
+                  className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 hover:text-gray-950 dark:hover:text-white transition-all shadow-sm"
                   title="Refresh requests"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -1924,7 +1989,7 @@ export default function AdminDashboardPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">User</th>
                         <th className="py-3 px-3">Current Limit</th>
                         <th className="py-3 px-3">Requested Limit</th>
@@ -1943,7 +2008,7 @@ export default function AdminDashboardPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-dark-border text-[11px] uppercase tracking-wider text-dark-muted">
+                      <tr className="border-b border-gray-200 dark:border-dark-border text-[11px] uppercase tracking-wider text-gray-500 dark:text-dark-muted bg-gray-50/50 dark:bg-transparent">
                         <th className="py-3 px-3">User</th>
                         <th className="py-3 px-3">Current Limit</th>
                         <th className="py-3 px-3">Requested Limit</th>
@@ -1953,26 +2018,26 @@ export default function AdminDashboardPage() {
                         <th className="py-3 px-3 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-dark-border text-xs">
+                    <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
                       {kycRequestsData.requests.map((r) => {
                         const status = r.kyc?.requestStatus || 'none';
                         const currentNaira = ((r.kyc?.payoutReviewThreshold || 50000000) / 100).toLocaleString();
                         const requestedNaira = ((r.kyc?.requestedThreshold || 0) / 100).toLocaleString();
 
                         return (
-                          <tr key={r._id} className="hover:bg-slate-800/30">
+                          <tr key={r._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
                             <td className="py-3 px-3">
-                              <p className="font-bold text-white">{r.fullName}</p>
-                              <p className="text-[10px] text-dark-muted">{r.email}</p>
+                              <p className="font-bold text-gray-950 dark:text-white">{r.fullName}</p>
+                              <p className="text-[10px] text-gray-500 dark:text-dark-muted">{r.email}</p>
                             </td>
-                            <td className="py-3 px-3 font-mono text-slate-300">
+                            <td className="py-3 px-3 font-mono text-gray-700 dark:text-slate-300">
                               ₦{currentNaira}
                             </td>
-                            <td className="py-3 px-3 font-mono font-bold text-amber-400">
+                            <td className="py-3 px-3 font-mono font-bold text-amber-600 dark:text-amber-400">
                               ₦{requestedNaira}
                             </td>
                             <td className="py-3 px-3 max-w-xs">
-                              <p className="text-xs text-slate-300 truncate" title={r.kyc?.requestReason}>
+                              <p className="text-xs text-gray-700 dark:text-slate-300 truncate" title={r.kyc?.requestReason}>
                                 {r.kyc?.requestReason || '—'}
                               </p>
                             </td>
@@ -1980,16 +2045,16 @@ export default function AdminDashboardPage() {
                               <span
                                 className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
                                   status === 'approved'
-                                    ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                                    ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
                                     : status === 'rejected'
-                                    ? 'bg-rose-500/15 text-rose-400 border-rose-500/30'
-                                    : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                                    ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                                    : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30'
                                 }`}
                               >
                                 {status}
                               </span>
                             </td>
-                            <td className="py-3 px-3 text-[11px] text-dark-muted whitespace-nowrap">
+                            <td className="py-3 px-3 text-[11px] text-gray-500 dark:text-dark-muted whitespace-nowrap">
                               {r.kyc?.requestedAt
                                 ? new Date(r.kyc.requestedAt).toLocaleDateString()
                                 : '—'}
@@ -1999,19 +2064,19 @@ export default function AdminDashboardPage() {
                                 <div className="flex items-center justify-end gap-1.5">
                                   <button
                                     onClick={() => handleKycReview(r._id, 'approve', r.kyc.requestedThreshold)}
-                                    className="px-2.5 py-1 rounded-lg bg-brand-500 hover:bg-brand-600 text-slate-950 text-[11px] font-bold transition-all"
+                                    className="px-2.5 py-1 rounded-lg bg-brand-500 hover:bg-brand-600 text-slate-950 text-[11px] font-bold transition-all shadow-sm"
                                   >
                                     Approve
                                   </button>
                                   <button
                                     onClick={() => handleKycReview(r._id, 'reject')}
-                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] font-bold transition-all"
+                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-[11px] font-bold transition-all"
                                   >
                                     Reject
                                   </button>
                                 </div>
                               ) : (
-                                <span className="text-[10px] text-dark-muted uppercase font-bold">
+                                <span className="text-[10px] text-gray-500 dark:text-dark-muted uppercase font-bold">
                                   {r.kyc?.reviewedAt
                                     ? `Reviewed ${new Date(r.kyc.reviewedAt).toLocaleDateString()}`
                                     : 'Reviewed'}
@@ -2027,18 +2092,24 @@ export default function AdminDashboardPage() {
 
                 {/* Pagination */}
                 {kycRequestsData.pagination?.totalPages > 1 && (
-                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-dark-muted border-t border-dark-border/70">
+                  <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 dark:text-dark-muted border-t border-gray-200 dark:border-dark-border/70">
                     <p>
-                      Showing {(kycPage - 1) * kycRequestsData.pagination.limit + 1} to{' '}
-                      {Math.min(kycPage * kycRequestsData.pagination.limit, kycRequestsData.pagination.total)} of{' '}
-                      {kycRequestsData.pagination.total} requests
+                      Showing{' '}
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
+                        {(kycPage - 1) * kycRequestsData.pagination.limit + 1}
+                      </span>{' '}
+                      to{' '}
+                      <span className="font-semibold text-gray-900 dark:text-slate-200">
+                        {Math.min(kycPage * kycRequestsData.pagination.limit, kycRequestsData.pagination.total)}
+                      </span>{' '}
+                      of <span className="font-semibold text-gray-900 dark:text-slate-200">{kycRequestsData.pagination.total}</span> requests
                     </p>
 
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setKycPage((p) => Math.max(1, p - 1))}
                         disabled={kycPage === 1}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
@@ -2050,7 +2121,7 @@ export default function AdminDashboardPage() {
                           className={`w-7 h-7 rounded-lg text-xs font-bold ${
                             kycPage === n
                               ? 'bg-brand-500 text-slate-950'
-                              : 'bg-dark-bg border border-dark-border text-slate-300 hover:bg-slate-800'
+                              : 'bg-white dark:bg-dark-bg border border-gray-200 dark:border-dark-border text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                           }`}
                         >
                           {n}
@@ -2060,7 +2131,7 @@ export default function AdminDashboardPage() {
                       <button
                         onClick={() => setKycPage((p) => Math.min(kycRequestsData.pagination.totalPages, p + 1))}
                         disabled={kycPage === kycRequestsData.pagination.totalPages}
-                        className="p-1.5 rounded-lg border border-dark-border bg-dark-bg hover:bg-slate-800 disabled:opacity-40"
+                        className="p-1.5 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -2069,7 +2140,7 @@ export default function AdminDashboardPage() {
                 )}
               </div>
             ) : (
-              <p className="text-xs text-dark-muted py-8 text-center">
+              <p className="text-xs text-gray-500 dark:text-dark-muted py-8 text-center">
                 No payment threshold requests in this category.
               </p>
             )}
