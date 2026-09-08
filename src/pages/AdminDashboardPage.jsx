@@ -1781,14 +1781,7 @@ export default function AdminDashboardPage() {
                         <span>NGN: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(u.balances?.NGN?.available || 0, 'NGN')}</strong></span>
                         <span>USDT: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(u.balances?.USDT?.available || 0, 'USDT')}</strong></span>
                       </div>
-                      <div className="pt-2 border-t border-gray-200 dark:border-dark-border/60 flex items-center justify-end">
-                        <button
-                          onClick={() => handleToggleUserRole(u)}
-                          className="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline"
-                        >
-                          Change Role →
-                        </button>
-                      </div>
+
                     </div>
                   ))}
                 </div>
@@ -1804,7 +1797,7 @@ export default function AdminDashboardPage() {
                         <th className="py-3 px-3">Payment Limit</th>
                         <th className="py-3 px-3">NGN Balance</th>
                         <th className="py-3 px-3">USDT Balance</th>
-                        <th className="py-3 px-3 text-right">Actions</th>
+
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
@@ -1878,14 +1871,7 @@ export default function AdminDashboardPage() {
                           <td className="py-3 px-3 font-mono font-bold text-gray-950 dark:text-white">
                             {formatCurrency(u.balances?.USDT?.available || 0, 'USDT')}
                           </td>
-                          <td className="py-3 px-3 text-right">
-                            <button
-                              onClick={() => handleToggleUserRole(u)}
-                              className="px-2.5 py-1 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:bg-gray-100 dark:hover:bg-slate-800 text-[11px] font-bold text-gray-700 dark:text-slate-300 hover:text-gray-950 dark:hover:text-white transition-all"
-                            >
-                              {u.role === 'admin' ? 'Demote to Host' : 'Promote to Admin'}
-                            </button>
-                          </td>
+
                         </tr>
                       ))}
                     </tbody>
