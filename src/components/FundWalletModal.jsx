@@ -27,9 +27,68 @@ export default function FundWalletModal({
   const [copied, setCopied] = useState(null); // which text was copied
   const [loading, setLoading] = useState(false);
   const [setupLoading, setSetupLoading] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(false);
   const [msg, setMsg] = useState(null);
   const [localDva, setLocalDva] = useState(dva);
   const [oxapayInvoice, setOxapayInvoice] = useState(null);
+
+  // Auto-poll OxaPay status while invoice is open
+  useEffect(() => {
+    if (!oxapayInvoice?.trackId || !isOpen) return;
+
+    let isMounted = true;
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.post('/wallet/fund/oxapay-check-status', {
+          trackId: oxapayInvoice.trackId,
+        });
+        if (isMounted && res.data?.credited) {
+          setMsg({
+            type: 'success',
+            text: res.data.message || `Deposit confirmed! $${res.data.amount} USDT has been credited to your wallet.`,
+          });
+          onFunded();
+        }
+      } catch (e) {
+        // silent background check
+      }
+    }, 5000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [oxapayInvoice?.trackId, isOpen]);
+
+  const handleManualCheckStatus = async () => {
+    if (!oxapayInvoice?.trackId) return;
+    try {
+      setCheckingStatus(true);
+      setMsg(null);
+      const res = await api.post('/wallet/fund/oxapay-check-status', {
+        trackId: oxapayInvoice.trackId,
+      });
+      if (res.data?.credited) {
+        setMsg({
+          type: 'success',
+          text: res.data.message || `Deposit confirmed! $${res.data.amount} USDT has been credited to your wallet.`,
+        });
+        onFunded();
+      } else {
+        setMsg({
+          type: 'error',
+          text: res.data.message || 'Payment is still awaiting confirmation on the blockchain. Please try again in 1-2 minutes.',
+        });
+      }
+    } catch (err) {
+      setMsg({
+        type: 'error',
+        text: err.response?.data?.error || 'Could not verify payment status with OxaPay.',
+      });
+    } finally {
+      setCheckingStatus(false);
+    }
+  };
 
   // Sync state when modal is opened or props change
   useEffect(() => {
@@ -525,9 +584,29 @@ export default function FundWalletModal({
                   <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-[11px] leading-relaxed flex items-start gap-2 text-left">
                     <Clock className="w-4 h-4 shrink-0 mt-0.5 text-amber-500 dark:text-amber-400" />
                     <span>
-                      Only send <strong>USDT</strong> via <strong>{oxapayInvoice.network || selectedChain}</strong>. Sending any other asset or wrong network will result in permanent loss of funds.
+                      Only send <strong>USDT</strong> via <strong>{oxapayInvoice.network || selectedChain}</strong>. Your balance updates automatically upon blockchain confirmation.
                     </span>
                   </div>
+
+                  {/* Manual Check Status Button */}
+                  <button
+                    type="button"
+                    onClick={handleManualCheckStatus}
+                    disabled={checkingStatus}
+                    className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-brand-500/20 disabled:opacity-50 mt-2"
+                  >
+                    {checkingStatus ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Verifying with OxaPay Gateway...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>I Have Sent USDT — Check Status Now</span>
+                      </>
+                    )}
+                  </button>
                 </div>
 
                 <div className="flex items-center justify-between pt-1">

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Wallet,
@@ -12,6 +12,8 @@ import {
   Share2,
   Eye,
   RotateCcw,
+  RefreshCw,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -30,7 +32,9 @@ export default function DashboardPage() {
   const [shareData, setShareData] = useState(null);
   const [releasingCurrency, setReleasingCurrency] = useState(null);
   const [releaseNotice, setReleaseNotice] = useState(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuthStore();
 
   // Pagination states
@@ -53,6 +57,47 @@ export default function DashboardPage() {
       return res.data;
     },
   });
+
+  // Auto-verify payment on redirect from Flutterwave / payment gateways
+  useEffect(() => {
+    const status = searchParams.get('status');
+    const txRef = searchParams.get('tx_ref');
+    const transactionId = searchParams.get('transaction_id');
+    const isFunded = searchParams.get('funded');
+
+    if (transactionId || txRef || (status === 'successful' && isFunded)) {
+      const verifyDeposit = async () => {
+        try {
+          const res = await api.post('/wallet/verify-flw-payment', {
+            transactionId: transactionId || undefined,
+            txRef: txRef || undefined,
+          });
+          toast.success(res.data.message || 'Deposit confirmed and wallet balance updated!', 'Wallet Funded');
+          queryClient.invalidateQueries({ queryKey: ['wallet'] });
+        } catch (err) {
+          // If already processed or error, refresh anyway
+          queryClient.invalidateQueries({ queryKey: ['wallet'] });
+        } finally {
+          setSearchParams({}, { replace: true });
+        }
+      };
+
+      verifyDeposit();
+    }
+  }, [searchParams]);
+
+  const handleManualSync = async () => {
+    try {
+      setIsSyncing(true);
+      await refetchWallet();
+      await queryClient.invalidateQueries({ queryKey: ['giveaways'] });
+      toast.success('Wallet balances and transaction records refreshed!', 'Synced');
+    } catch (err) {
+      toast.error('Could not refresh wallet balances.', 'Sync Error');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const {
     data: giveawaysData,
@@ -150,7 +195,16 @@ export default function DashboardPage() {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Host Dashboard</h1>
             <p className="text-xs text-slate-500 dark:text-dark-muted">Overview of your dual-currency wallet and giveaway campaigns</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={handleManualSync}
+              disabled={isSyncing}
+              title="Refresh and sync wallet balances from blockchain & payment gateways"
+              className="px-3.5 py-2.5 bg-white dark:bg-dark-card hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-dark-border text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-brand-500 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>{isSyncing ? 'Syncing...' : 'Sync Balances'}</span>
+            </button>
             <button
               onClick={() => setIsFundModalOpen(true)}
               className="px-4 py-2.5 bg-white dark:bg-dark-card hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-dark-border text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl flex items-center gap-2 transition-colors shadow-sm"
