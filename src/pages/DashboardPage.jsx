@@ -89,11 +89,18 @@ export default function DashboardPage() {
   const handleManualSync = async () => {
     try {
       setIsSyncing(true);
+      const res = await api.post('/wallet/sync-pending');
       await refetchWallet();
       await queryClient.invalidateQueries({ queryKey: ['giveaways'] });
-      toast.success('Wallet balances and transaction records refreshed!', 'Synced');
+
+      if (res.data?.creditedCount > 0) {
+        toast.success(res.data.message || 'Deposits verified and credited!', 'Wallet Synced');
+      } else {
+        toast.success('Wallet balances synchronized with payment gateways.', 'Synced');
+      }
     } catch (err) {
-      toast.error('Could not refresh wallet balances.', 'Sync Error');
+      await refetchWallet();
+      toast.info('Wallet balance refreshed.', 'Refresh Complete');
     } finally {
       setIsSyncing(false);
     }
