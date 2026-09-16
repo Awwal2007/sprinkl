@@ -314,7 +314,7 @@ export default function SupportChatWidget() {
 
   const quickPrompts = [
     'How do I fund my wallet with NGN?',
-    'When will USDT crypto deposits be live?',
+    'How do I fund my wallet with USDT crypto?',
     'How do I cancel a giveaway and get a refund?',
     'Why does a claim show as failed?',
     '🙋 Speak with a Human Agent',

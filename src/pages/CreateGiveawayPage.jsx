@@ -224,18 +224,26 @@ export default function CreateGiveawayPage() {
                   <div className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Low floor: Min ₦50 / person</div>
                 </button>
 
-                <div className="relative p-4 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50 dark:bg-dark-bg text-left opacity-60 cursor-not-allowed select-none">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="font-bold text-sm mb-1 text-slate-500 dark:text-slate-400">💎 USDT (Crypto)</div>
-                      <div className="text-xs text-slate-400 dark:text-dark-muted leading-relaxed">TRC-20 / BEP-20 Hot Wallet transfers</div>
-                    </div>
-                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0 mt-0.5">
-                      Upcoming
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrency('USDT');
+                  }}
+                  className={`p-4 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
+                    currency === 'USDT'
+                      ? 'bg-brand-500/10 border-brand-500 text-slate-900 dark:text-white shadow-md ring-1 ring-brand-500'
+                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-bold text-sm text-slate-900 dark:text-white">💎 USDT (Crypto)</div>
+                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/30">
+                      Active
                     </span>
                   </div>
-                  <div className="mt-2 text-[10px] font-bold text-slate-400">Min $0.20 USDT</div>
-                </div>
+                  <div className="text-xs text-slate-500 dark:text-dark-muted leading-relaxed">TRC-20 &amp; BEP-20 stablecoin drops</div>
+                  <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ${isAdmin ? '0.10' : '0.20'} / person</div>
+                </button>
               </div>
 
               {currency === 'AIRTIME' && (
@@ -245,6 +253,18 @@ export default function CreateGiveawayPage() {
                     <p className="font-bold text-slate-900 dark:text-white">VTU Mobile Recharge Card</p>
                     <p className="text-slate-600 dark:text-dark-muted text-[11px] leading-relaxed">
                       Claimants enter their phone number and network. Airtime is dispatched immediately and funded directly from your existing <strong>NGN wallet balance</strong>.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {currency === 'USDT' && (
+                <div className="mt-3 p-3.5 rounded-xl bg-brand-500/10 border border-brand-500/20 text-xs flex items-start gap-2.5">
+                  <Sparkles className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <p className="font-bold text-slate-900 dark:text-white">USDT Crypto Giveaway</p>
+                    <p className="text-slate-600 dark:text-dark-muted text-[11px] leading-relaxed">
+                      Claimants enter their TRC-20 or BEP-20 wallet address. Payouts are dispatched directly on-chain and funded from your <strong>USDT wallet balance</strong>.
                     </p>
                   </div>
                 </div>

@@ -235,8 +235,8 @@ export default function DashboardPage() {
                   <p className="text-[10px] text-slate-500 dark:text-dark-muted">TRC-20 & BEP-20 Chains</p>
                 </div>
               </div>
-              <span className="text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-bold">
-                UPCOMING
+              <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">
+                ACTIVE
               </span>
             </div>
 
@@ -268,9 +268,9 @@ export default function DashboardPage() {
                 )}
               </div>
               <div className="flex items-center justify-between pt-1">
-                <span className="text-slate-500 dark:text-dark-muted">Top Up:</span>
-                <span className="text-amber-600 dark:text-amber-400/80 text-xs font-semibold">
-                  Upcoming
+                <span className="text-slate-500 dark:text-dark-muted">Deposit Rail:</span>
+                <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+                  TRC-20 &amp; BEP-20
                 </span>
               </div>
             </div>

@@ -183,16 +183,18 @@ export default function FundWalletModal({
             <Building2 className="w-4 h-4" />
             <span>NGN (Naira)</span>
           </button>
-          <div
-            className="py-2.5 px-3 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed select-none text-slate-400 bg-slate-200/50 dark:bg-dark-bg/50"
-            title="Crypto deposits are currently upcoming"
+          <button
+            type="button"
+            onClick={() => { setCurrency('USDT'); setMsg(null); }}
+            className={`py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+              currency === 'USDT'
+                ? 'bg-brand-500 text-slate-950 shadow-md'
+                : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
+            }`}
           >
             <Coins className="w-4 h-4" />
             <span>USDT (Crypto)</span>
-            <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20">
-              Upcoming
-            </span>
-          </div>
+          </button>
         </div>
 
         {/* Alert Messages */}
