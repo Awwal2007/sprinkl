@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { CheckCircle2, Clock, Share2, Sparkles, ArrowLeft, ExternalLink, Gift, ArrowRight, Copy, Check } from 'lucide-react';
+import { CheckCircle2, Clock, Share2, Sparkles, ArrowLeft, ExternalLink, Gift, ArrowRight, Copy, Check, RotateCcw, AlertTriangle, AlertCircle } from 'lucide-react';
 import api from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import SEO from '../components/SEO';
@@ -10,6 +10,7 @@ import { SocialShareButtons } from '../components/SocialLinks';
 export default function ClaimSuccessPage() {
   const { slug, claimId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [claim, setClaim] = useState(location.state?.claim || null);
   const [copiedRef, setCopiedRef] = useState(false);
@@ -45,10 +46,34 @@ export default function ClaimSuccessPage() {
   const isFailed = claim?.status === 'failed';
   const isPaid = claim?.status === 'paid';
 
+  // Automatically clear browser claim lock if the payout failed so the claimant can retry
+  useEffect(() => {
+    if (isFailed) {
+      try {
+        localStorage.removeItem(`sprinkl_claimed_${slug}`);
+      } catch {}
+    }
+  }, [isFailed, slug]);
+
+  const isAddressError = Boolean(
+    claim?.failureReason &&
+      (claim.failureReason.toLowerCase().includes('contract') ||
+        claim.failureReason.toLowerCase().includes('invalid_address') ||
+        claim.failureReason.toLowerCase().includes('exchange') ||
+        claim.failureReason.toLowerCase().includes('invalid wallet'))
+  );
+
+  const handleRetry = () => {
+    try {
+      localStorage.removeItem(`sprinkl_claimed_${slug}`);
+    } catch {}
+    navigate(`/g/${slug}`);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 flex items-center justify-center p-4">
       <SEO
-        title={isPaid ? 'Claim Paid Successfully — Sprinkl' : 'Giveaway Claim Status — Sprinkl'}
+        title={isPaid ? 'Claim Paid Successfully — Sprinkl' : isFailed ? 'Payout Failed — Sprinkl' : 'Giveaway Claim Status — Sprinkl'}
         description="View the live status of your giveaway prize payout on Sprinkl."
         canonical={`/g/${slug}/claim/${claimId}/success`}
         noIndex={true}
@@ -56,7 +81,6 @@ export default function ClaimSuccessPage() {
       <div className="max-w-md w-full bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 animate-in fade-in zoom-in duration-300 relative overflow-hidden">
         {isFailed ? (
           <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 flex items-center justify-center mx-auto shadow-xl shadow-rose-500/10">
-            <CheckCircle2 className="w-10 h-10 stroke-[2.5] hidden" />
             <span className="text-2xl font-bold">✕</span>
           </div>
         ) : (
@@ -68,25 +92,50 @@ export default function ClaimSuccessPage() {
         <div className="space-y-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             {isFailed
-              ? 'Payout Failed'
+              ? (isAddressError ? 'Wallet Rejected' : 'Payout Failed')
               : isPaid
               ? (claim?.currency === 'AIRTIME' ? 'Airtime Recharged!' : 'Claim Paid!')
               : (claim?.currency === 'AIRTIME' ? 'Recharge Dispatched!' : 'Claim Submitted!')}
           </h1>
           <p className="text-xs text-slate-500 dark:text-dark-muted">
             {isFailed
-              ? 'The payout transfer could not be completed by the provider.'
+              ? (isAddressError
+                  ? 'The wallet address provided cannot receive automated payouts.'
+                  : 'The payout transfer could not be completed by the provider.')
               : claim?.currency === 'AIRTIME'
               ? `Airtime credit has been dispatched to ${claim?.destination?.phoneNumber || 'your phone'} (${claim?.destination?.network || 'VTU'}).`
               : claim?.successMessage || 'Funds transfer initiated directly to your destination.'}
           </p>
         </div>
 
-        {/* Failure Detail Notice */}
-        {isFailed && claim?.failureReason && (
-          <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs text-left space-y-1">
-            <p className="font-bold">Error Reason:</p>
-            <p className="font-mono text-[11px] leading-relaxed break-words">{claim.failureReason}</p>
+        {/* Failure Detail Notice & Retry Action */}
+        {isFailed && (
+          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/25 text-rose-700 dark:text-rose-300 text-xs text-left space-y-3 shadow-sm">
+            <div className="flex items-center gap-2 font-bold text-rose-600 dark:text-rose-400">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{isAddressError ? 'Exchange / Contract Address Rejected' : 'Error Reason'}</span>
+            </div>
+
+            {isAddressError ? (
+              <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
+                Automated payout gateways strictly reject transfers to <strong>exchange deposit addresses</strong> (e.g. Binance, Bybit, OKX) or smart contract wallets. Your slot has been returned to the giveaway!
+              </p>
+            ) : null}
+
+            {claim?.failureReason && (
+              <div className="p-2.5 rounded-xl bg-black/5 dark:bg-black/30 border border-rose-500/15 font-mono text-[11px] leading-relaxed break-words text-rose-700 dark:text-rose-300">
+                {claim.failureReason}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="w-full py-3 px-4 bg-brand-500 hover:bg-brand-400 active:scale-[0.98] text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-md touch-manipulation cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>{isAddressError ? 'Try Again With Personal Wallet' : 'Try Again'}</span>
+            </button>
           </div>
         )}
 

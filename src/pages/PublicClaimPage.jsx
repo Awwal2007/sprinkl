@@ -108,6 +108,29 @@ export default function PublicClaimPage() {
     }
   }, [giveawayData?.id, alreadyClaimed]);
 
+  // Check if saved claim actually failed; if so, unlock the browser so claimant can retry
+  useEffect(() => {
+    if (alreadyClaimed?.claimId) {
+      api
+        .get(`/g/${slug}/claim/${alreadyClaimed.claimId}/status`)
+        .then((res) => {
+          if (res.data?.claim?.status === 'failed') {
+            try {
+              localStorage.removeItem(`sprinkl_claimed_${slug}`);
+              if (giveawayData?.id) {
+                localStorage.removeItem(`sprinkl_claimed_${giveawayData.id}`);
+              }
+            } catch {}
+            setAlreadyClaimed(null);
+            setError(
+              'Your previous payout attempt was rejected (likely an exchange deposit or contract address). Please enter a personal self-custody wallet address below.'
+            );
+          }
+        })
+        .catch(() => {});
+    }
+  }, [alreadyClaimed?.claimId, slug, giveawayData?.id]);
+
   // Real-time phone carrier auto-detection
   useEffect(() => {
     if (giveawayData?.currency === 'AIRTIME' && phoneNumber) {
@@ -709,20 +732,58 @@ export default function PublicClaimPage() {
                   </p>
                 </div>
 
+                {/* Important Personal Wallet Warning Card */}
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-200 text-xs space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold">
+                    <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span>Personal Self-Custody Wallet Required</span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-slate-700 dark:text-amber-200/90">
+                    ⚠️ <strong>Do NOT use exchange deposit addresses</strong> (Binance, Bybit, OKX, Coinbase, KuCoin). Automated payout processors strictly reject exchange and smart contract addresses.
+                  </p>
+                  <p className="text-[11px] leading-relaxed font-semibold text-emerald-700 dark:text-brand-400">
+                    ✅ <strong>Supported wallets:</strong> Trust Wallet, MetaMask, TronLink, Phantom, or Exodus.
+                  </p>
+                </div>
+
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Your {giveawayData.chain || 'TRC20'} USDT Wallet Address
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      Your {giveawayData.chain || 'TRC20'} USDT Wallet Address
+                    </label>
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-dark-muted">
+                      {(giveawayData.chain || 'TRC20') === 'BEP20' ? 'Starts with 0x (42 chars)' : 'Starts with T (34 chars)'}
+                    </span>
+                  </div>
                   <input
                     type="text"
                     required
                     value={walletAddress}
-                    onChange={(e) => setWalletAddress(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-4 py-3 text-base sm:text-xs text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono"
-                    placeholder={(giveawayData.chain || 'TRC20') === 'BEP20' ? '0x... (42 characters)' : 'T... (34 characters)'}
+                    onChange={(e) => {
+                      setWalletAddress(e.target.value.trim());
+                      if (error) setError(null);
+                    }}
+                    className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-4 py-3 text-base sm:text-xs text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono tracking-wider"
+                    placeholder={(giveawayData.chain || 'TRC20') === 'BEP20' ? '0x... (42-character BSC address)' : 'T... (34-character TRON address)'}
                   />
-                  <p className="text-[10px] text-amber-600 dark:text-amber-400/80 mt-1">
-                    Warning: Double check your address. Transfers are irreversible once broadcast on-chain.
+
+                  {/* Real-time mismatch detection */}
+                  {walletAddress && (giveawayData.chain || 'TRC20') === 'TRC20' && walletAddress.startsWith('0x') && (
+                    <div className="mt-1.5 p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-[11px] flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>This giveaway is on TRON (TRC-20). You entered an Ethereum/BSC address starting with 0x. TRON addresses start with &quot;T&quot;.</span>
+                    </div>
+                  )}
+
+                  {walletAddress && (giveawayData.chain || 'TRC20') === 'BEP20' && walletAddress.startsWith('T') && (
+                    <div className="mt-1.5 p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-[11px] flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>This giveaway is on BNB Smart Chain (BEP-20). You entered a TRON address starting with T. BSC addresses start with &quot;0x&quot;.</span>
+                    </div>
+                  )}
+
+                  <p className="text-[10px] text-slate-500 dark:text-dark-muted mt-1.5">
+                    Double-check your address before claiming. Dispatches are irreversible once confirmed.
                   </p>
                 </div>
               </>
