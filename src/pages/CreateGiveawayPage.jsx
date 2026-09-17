@@ -57,7 +57,7 @@ export default function CreateGiveawayPage() {
   const isWhale = ((currency === 'NGN' || currency === 'AIRTIME') && giftPool >= 1000000) || (currency === 'USDT' && giftPool >= 1000);
 
   let feeRate = isWhale ? 0.03 : (isPromo ? 0.025 : 0.05);
-  const minFloor = (currency === 'NGN' || currency === 'AIRTIME') ? (isPromo ? 150 : 300) : (isPromo ? 0.50 : 1.00);
+  const minFloor = (currency === 'NGN' || currency === 'AIRTIME') ? (isPromo ? 150 : 300) : (isPromo ? 0.15 : 0.25);
   const maxCap = isWhale ? ((currency === 'NGN' || currency === 'AIRTIME') ? 35000 : 35) : Infinity;
 
   let calculatedFee = giftPool * feeRate;

@@ -104,7 +104,7 @@ export default function PublicClaimPage() {
         if (saved) {
           setAlreadyClaimed(JSON.parse(saved));
         }
-      } catch {}
+      } catch { }
     }
   }, [giveawayData?.id, alreadyClaimed]);
 
@@ -120,14 +120,14 @@ export default function PublicClaimPage() {
               if (giveawayData?.id) {
                 localStorage.removeItem(`sprinkl_claimed_${giveawayData.id}`);
               }
-            } catch {}
+            } catch { }
             setAlreadyClaimed(null);
             setError(
               'Your previous payout attempt was rejected (likely an exchange deposit or contract address). Please enter a personal self-custody wallet address below.'
             );
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [alreadyClaimed?.claimId, slug, giveawayData?.id]);
 
@@ -283,7 +283,7 @@ export default function PublicClaimPage() {
         if (giveawayData.id) {
           localStorage.setItem(`sprinkl_claimed_${giveawayData.id}`, JSON.stringify(claimRecord));
         }
-      } catch {}
+      } catch { }
 
       navigate(`/g/${slug}/claim/${claimId}/success`, { state: { claim: res.data.claim } });
     } catch (err) {
@@ -669,11 +669,10 @@ export default function PublicClaimPage() {
                               setNetwork(net.id);
                               setUserSelectedNetwork(true);
                             }}
-                            className={`min-h-[38px] py-2 px-1 rounded-xl text-center font-black text-[11px] sm:text-xs transition-all border active:scale-95 touch-manipulation ${
-                              isSelected
+                            className={`min-h-[38px] py-2 px-1 rounded-xl text-center font-black text-[11px] sm:text-xs transition-all border active:scale-95 touch-manipulation ${isSelected
                                 ? `${net.badge} border-white shadow-lg ring-2 ring-brand-400 scale-[1.02]`
                                 : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:border-slate-500'
-                            }`}
+                              }`}
                           >
                             {net.name}
                           </button>
@@ -739,7 +738,7 @@ export default function PublicClaimPage() {
                     <span>Personal Self-Custody Wallet Required</span>
                   </div>
                   <p className="text-[11px] leading-relaxed text-slate-700 dark:text-amber-200/90">
-                    ⚠️ <strong>Do NOT use fintech or exchange deposit addresses</strong> (Spenda, Roqqu, Binance, Bybit, OKX, Coinbase, KuCoin). Automated payout processors strictly reject custodial apps and smart contract forwarding addresses.
+                    ⚠️ <strong>Do NOT use fintech or exchange deposit addresses</strong> (Spenda, Roqqu, Binance, Bybit, OKX, Coinbase, KuCoin).
                   </p>
                   <p className="text-[11px] leading-relaxed font-semibold text-emerald-700 dark:text-brand-400">
                     ✅ <strong>Supported wallets:</strong> Trust Wallet, MetaMask, TronLink, Phantom, or Exodus.
@@ -807,10 +806,10 @@ export default function PublicClaimPage() {
                   {resolving
                     ? 'Verifying Bank Account...'
                     : loading
-                    ? 'Processing Claim...'
-                    : giveawayData.currency === 'AIRTIME'
-                    ? `⚡ Recharge ${formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)} Now`
-                    : `Claim ${formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)} Now`}
+                      ? 'Processing Claim...'
+                      : giveawayData.currency === 'AIRTIME'
+                        ? `⚡ Recharge ${formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)} Now`
+                        : `Claim ${formatCurrency(giveawayData.amountPerRecipient, giveawayData.currency)} Now`}
                 </span>
                 <ArrowRight className="w-4 h-4 stroke-[2.5] shrink-0" />
               </button>
