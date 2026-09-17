@@ -192,13 +192,16 @@ export default function CreateGiveawayPage() {
                 {/* 1. Naira Cash (NGN) */}
                 <button
                   type="button"
-                  onClick={() => setCurrency('NGN')}
-                  className={`p-3.5 rounded-xl border text-left transition-all active:scale-[0.98] touch-manipulation group ${
+                  onClick={() => { setCurrency('NGN'); setChain('TRC20'); }}
+                  className={`p-3.5 rounded-xl border text-left transition-all active:scale-[0.98] touch-manipulation relative ${
                     currency === 'NGN'
                       ? 'bg-brand-500/10 border-brand-500 shadow-sm ring-1 ring-brand-500'
                       : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
+                  {currency === 'NGN' && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-500 absolute top-2.5 right-2.5" />
+                  )}
                   <div className="text-xl mb-2">🏦</div>
                   <div className="font-bold text-xs text-slate-900 dark:text-white leading-tight">Naira Cash</div>
                   <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">NGN · Bank transfer</div>
@@ -208,16 +211,23 @@ export default function CreateGiveawayPage() {
                 {/* 2. VTU Airtime Card */}
                 <button
                   type="button"
-                  onClick={() => setCurrency('AIRTIME')}
+                  onClick={() => { setCurrency('AIRTIME'); setChain('TRC20'); }}
                   className={`p-3.5 rounded-xl border text-left transition-all relative active:scale-[0.98] touch-manipulation ${
                     currency === 'AIRTIME'
                       ? 'bg-brand-500/10 border-brand-500 shadow-sm ring-1 ring-brand-500'
                       : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
+                  {currency === 'AIRTIME' && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-500 absolute top-2.5 right-2.5" />
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <span className="text-xl">📱</span>
-                    <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/30">
+                    <span className={`text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-md border ${
+                      currency === 'AIRTIME'
+                        ? 'bg-brand-500/30 text-brand-600 dark:text-brand-300 border-brand-500/40'
+                        : 'bg-brand-500/20 text-brand-600 dark:text-brand-400 border-brand-500/30'
+                    }`}>
                       Popular
                     </span>
                   </div>
@@ -230,12 +240,15 @@ export default function CreateGiveawayPage() {
                 <button
                   type="button"
                   onClick={() => { setCurrency('USDT'); setChain('TRC20'); }}
-                  className={`p-3.5 rounded-xl border text-left transition-all active:scale-[0.98] touch-manipulation ${
+                  className={`p-3.5 rounded-xl border text-left transition-all active:scale-[0.98] touch-manipulation relative ${
                     currency === 'USDT' && chain === 'TRC20'
                       ? 'bg-brand-500/10 border-brand-500 shadow-sm ring-2 ring-brand-500'
                       : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
+                  {currency === 'USDT' && chain === 'TRC20' && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-500 absolute top-2.5 right-2.5" />
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <span className="text-xl">🔴</span>
                     <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30">
@@ -251,12 +264,15 @@ export default function CreateGiveawayPage() {
                 <button
                   type="button"
                   onClick={() => { setCurrency('USDT'); setChain('BEP20'); }}
-                  className={`p-3.5 rounded-xl border text-left transition-all active:scale-[0.98] touch-manipulation ${
+                  className={`p-3.5 rounded-xl border text-left transition-all active:scale-[0.98] touch-manipulation relative ${
                     currency === 'USDT' && chain === 'BEP20'
                       ? 'bg-brand-500/10 border-brand-500 shadow-sm ring-2 ring-brand-500'
                       : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
+                  {currency === 'USDT' && chain === 'BEP20' && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-500 absolute top-2.5 right-2.5" />
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <span className="text-xl">🟡</span>
                     <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
@@ -267,6 +283,20 @@ export default function CreateGiveawayPage() {
                   <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">0x... addresses</div>
                   <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ${isAdmin ? '0.10' : '0.20'}/pp</div>
                 </button>
+              </div>
+
+              {/* Selection Confirmation Pill */}
+              <div className="mt-2.5 flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-dark-bg border border-slate-200 dark:border-dark-border">
+                <CheckCircle2 className="w-3.5 h-3.5 text-brand-500 shrink-0" />
+                <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                  Selected:
+                </span>
+                <span className="text-[11px] font-bold text-slate-900 dark:text-white">
+                  {currency === 'NGN' && 'Naira Cash (NGN) — Bank Transfer'}
+                  {currency === 'AIRTIME' && 'VTU Airtime — Phone Recharge'}
+                  {currency === 'USDT' && chain === 'TRC20' && 'USDT on TRON Network (TRC-20)'}
+                  {currency === 'USDT' && chain === 'BEP20' && 'USDT on BNB Smart Chain (BEP-20)'}
+                </span>
               </div>
 
               {currency === 'AIRTIME' && (
