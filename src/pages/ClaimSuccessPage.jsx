@@ -118,7 +118,7 @@ export default function ClaimSuccessPage() {
 
             {isAddressError ? (
               <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
-                Automated payout gateways strictly reject transfers to <strong>exchange deposit addresses</strong> (e.g. Binance, Bybit, OKX) or smart contract wallets. Your slot has been returned to the giveaway!
+                Automated payout gateways strictly reject transfers to <strong>fintech &amp; exchange deposit addresses</strong> (e.g. Spenda, Roqqu, Binance, Bybit, OKX) or smart contract wallets. Your slot has been returned to the giveaway!
               </p>
             ) : null}
 

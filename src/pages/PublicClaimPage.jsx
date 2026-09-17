@@ -739,7 +739,7 @@ export default function PublicClaimPage() {
                     <span>Personal Self-Custody Wallet Required</span>
                   </div>
                   <p className="text-[11px] leading-relaxed text-slate-700 dark:text-amber-200/90">
-                    ⚠️ <strong>Do NOT use exchange deposit addresses</strong> (Binance, Bybit, OKX, Coinbase, KuCoin). Automated payout processors strictly reject exchange and smart contract addresses.
+                    ⚠️ <strong>Do NOT use fintech or exchange deposit addresses</strong> (Spenda, Roqqu, Binance, Bybit, OKX, Coinbase, KuCoin). Automated payout processors strictly reject custodial apps and smart contract forwarding addresses.
                   </p>
                   <p className="text-[11px] leading-relaxed font-semibold text-emerald-700 dark:text-brand-400">
                     ✅ <strong>Supported wallets:</strong> Trust Wallet, MetaMask, TronLink, Phantom, or Exodus.
