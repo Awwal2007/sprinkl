@@ -195,25 +195,6 @@ export default function FundWalletModal({
     }
   };
 
-  const handleSimulateUsdtFund = async () => {
-    const amount = parseFloat(usdtAmount);
-    if (!amount || amount < 2) {
-      setMsg({ type: 'error', text: 'Minimum USDT deposit is $2.' });
-      return;
-    }
-    try {
-      setLoading(true);
-      setMsg(null);
-      const res = await api.post('/wallet/fund/usdt', { amountUsdt: amount, chain: selectedChain });
-      setMsg({ type: 'success', text: res.data.message });
-      onFunded();
-    } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data?.error || 'Funding failed' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-t-3xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
