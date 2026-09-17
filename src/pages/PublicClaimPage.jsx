@@ -62,7 +62,6 @@ export default function PublicClaimPage() {
   const [userSelectedNetwork, setUserSelectedNetwork] = useState(false);
 
   // USDT state
-  const [chain, setChain] = useState('TRC20');
   const [walletAddress, setWalletAddress] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -222,10 +221,22 @@ export default function PublicClaimPage() {
           resolvedAccountName: resolvedName,
         };
       } else {
+        const requiredChain = giveawayData.chain || 'TRC20';
+        const cleanWallet = walletAddress.trim();
+        if (requiredChain === 'TRC20' && !/^T[a-zA-Z0-9]{33}$/.test(cleanWallet)) {
+          setError('Please enter a valid 34-character TRON (TRC-20) address starting with "T".');
+          setLoading(false);
+          return;
+        }
+        if (requiredChain === 'BEP20' && !/^0x[a-fA-F0-9]{40}$/.test(cleanWallet)) {
+          setError('Please enter a valid 42-character BNB Smart Chain (BEP-20) address starting with "0x".');
+          setLoading(false);
+          return;
+        }
         payload = {
-          claimantName: `${chain} Winner`,
-          chain,
-          walletAddress,
+          claimantName: `${requiredChain} Winner`,
+          chain: requiredChain,
+          walletAddress: cleanWallet,
         };
       }
 
@@ -681,32 +692,26 @@ export default function PublicClaimPage() {
             {/* USDT Crypto Destination */}
             {giveawayData.currency === 'USDT' && (
               <>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Select USDT Network
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['TRC20', 'BEP20'].map((c) => (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => setChain(c)}
-                        className={`min-h-[40px] py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 touch-manipulation ${
-                          chain === c
-                            ? 'bg-brand-500/10 border-brand-500 text-brand-600 dark:text-brand-400 ring-1 ring-brand-500'
-                            : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
-                        }`}
-                      >
-                        <Coins className="w-3.5 h-3.5" />
-                        <span>{c}</span>
-                      </button>
-                    ))}
+                <div className="p-3.5 rounded-xl bg-brand-500/10 border border-brand-500/20 text-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Coins className="w-4 h-4 text-brand-500 shrink-0" />
+                      <span className="font-bold text-slate-900 dark:text-white">
+                        Network: {giveawayData.chain === 'BEP20' ? 'BNB Smart Chain (BEP-20)' : 'TRON (TRC-20)'}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/30">
+                      {giveawayData.chain || 'TRC20'}
+                    </span>
                   </div>
+                  <p className="text-[11px] text-slate-500 dark:text-dark-muted mt-1.5 leading-relaxed">
+                    This giveaway pays out on <strong>{giveawayData.chain === 'BEP20' ? 'BNB Smart Chain (BEP-20)' : 'TRON (TRC-20)'}</strong>. Enter your personal {giveawayData.chain || 'TRC20'} USDT address below.
+                  </p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    {chain} USDT Wallet Address
+                    Your {giveawayData.chain || 'TRC20'} USDT Wallet Address
                   </label>
                   <input
                     type="text"
@@ -714,7 +719,7 @@ export default function PublicClaimPage() {
                     value={walletAddress}
                     onChange={(e) => setWalletAddress(e.target.value)}
                     className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl px-4 py-3 text-base sm:text-xs text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono"
-                    placeholder={chain === 'TRC20' ? 'T...' : '0x...'}
+                    placeholder={(giveawayData.chain || 'TRC20') === 'BEP20' ? '0x... (42 characters)' : 'T... (34 characters)'}
                   />
                   <p className="text-[10px] text-amber-600 dark:text-amber-400/80 mt-1">
                     Warning: Double check your address. Transfers are irreversible once broadcast on-chain.

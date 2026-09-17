@@ -13,6 +13,7 @@ import SEO from '../components/SEO';
 export default function CreateGiveawayPage() {
   const navigate = useNavigate();
   const [currency, setCurrency] = useState('NGN');
+  const [chain, setChain] = useState('TRC20');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [amountPerRecipient, setAmountPerRecipient] = useState('');
@@ -125,6 +126,7 @@ export default function CreateGiveawayPage() {
         title,
         description,
         currency,
+        chain: currency === 'USDT' ? chain : undefined,
         amountPerRecipient: parseFloat(amountPerRecipient),
         totalSlots: parseInt(totalSlots),
         settings: {
@@ -259,13 +261,48 @@ export default function CreateGiveawayPage() {
               )}
 
               {currency === 'USDT' && (
-                <div className="mt-3 p-3.5 rounded-xl bg-brand-500/10 border border-brand-500/20 text-xs flex items-start gap-2.5">
-                  <Sparkles className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
-                  <div className="space-y-0.5">
-                    <p className="font-bold text-slate-900 dark:text-white">USDT Crypto Giveaway</p>
-                    <p className="text-slate-600 dark:text-dark-muted text-[11px] leading-relaxed">
-                      Claimants enter their TRC-20 or BEP-20 wallet address. Payouts are dispatched directly on-chain and funded from your <strong>USDT wallet balance</strong>.
-                    </p>
+                <div className="mt-3 p-3.5 rounded-xl bg-brand-500/10 border border-brand-500/20 text-xs space-y-3">
+                  <div className="flex items-start gap-2.5">
+                    <Sparkles className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
+                    <div className="space-y-0.5">
+                      <p className="font-bold text-slate-900 dark:text-white">USDT Crypto Giveaway</p>
+                      <p className="text-slate-600 dark:text-dark-muted text-[11px] leading-relaxed">
+                        Choose the network for this drop. Claimants will be locked to this network when claiming. Payouts are funded directly from your <strong>USDT balance</strong>.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                      Payout Blockchain Network
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setChain('TRC20')}
+                        className={`p-3 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
+                          chain === 'TRC20'
+                            ? 'bg-brand-500/20 border-brand-500 ring-1 ring-brand-500 text-slate-900 dark:text-white'
+                            : 'bg-white/5 border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400'
+                        }`}
+                      >
+                        <div className="font-bold text-xs">TRON (TRC-20)</div>
+                        <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">Most common · T... addresses</div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setChain('BEP20')}
+                        className={`p-3 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
+                          chain === 'BEP20'
+                            ? 'bg-brand-500/20 border-brand-500 ring-1 ring-brand-500 text-slate-900 dark:text-white'
+                            : 'bg-white/5 border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400'
+                        }`}
+                      >
+                        <div className="font-bold text-xs">BNB Smart Chain (BEP-20)</div>
+                        <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">Ultra-low gas · 0x... addresses</div>
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
