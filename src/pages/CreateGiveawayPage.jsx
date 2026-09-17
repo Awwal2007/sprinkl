@@ -187,91 +187,85 @@ export default function CreateGiveawayPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Currency Choice */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Choose Giveaway Currency & Payout Method</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Payout Method</label>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
                 {/* 1. Naira Cash (NGN) */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setCurrency('NGN');
-                  }}
-                  className={`p-4 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
+                  onClick={() => setCurrency('NGN')}
+                  className={`p-3.5 rounded-xl border text-left transition-all active:scale-[0.98] touch-manipulation group ${
                     currency === 'NGN'
-                      ? 'bg-brand-500/10 border-brand-500 text-slate-900 dark:text-white shadow-md ring-1 ring-brand-500'
-                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
+                      ? 'bg-brand-500/10 border-brand-500 shadow-sm ring-1 ring-brand-500'
+                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
-                  <div className="font-bold text-sm mb-1 text-slate-900 dark:text-white">🏦 Naira Cash (NGN)</div>
-                  <div className="text-xs text-slate-500 dark:text-dark-muted leading-relaxed">Direct transfer to Nigerian bank accounts</div>
-                  <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ₦{isAdmin ? '100' : '300'} / person</div>
+                  <div className="text-xl mb-2">🏦</div>
+                  <div className="font-bold text-xs text-slate-900 dark:text-white leading-tight">Naira Cash</div>
+                  <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">NGN · Bank transfer</div>
+                  <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ₦{isAdmin ? '100' : '300'}/pp</div>
                 </button>
 
                 {/* 2. VTU Airtime Card */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setCurrency('AIRTIME');
-                  }}
-                  className={`p-4 rounded-xl border text-left transition-all relative overflow-hidden active:scale-[0.99] touch-manipulation ${
+                  onClick={() => setCurrency('AIRTIME')}
+                  className={`p-3.5 rounded-xl border text-left transition-all relative active:scale-[0.98] touch-manipulation ${
                     currency === 'AIRTIME'
-                      ? 'bg-brand-500/10 border-brand-500 text-slate-900 dark:text-white shadow-md ring-1 ring-brand-500'
-                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
+                      ? 'bg-brand-500/10 border-brand-500 shadow-sm ring-1 ring-brand-500'
+                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="font-bold text-sm text-slate-900 dark:text-white">📱 VTU Airtime Card</div>
-                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/30">
+                  <div className="flex items-start justify-between mb-2">
+                    <span className="text-xl">📱</span>
+                    <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/30">
                       Popular
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-dark-muted leading-relaxed">Instant recharge for MTN, Airtel, Glo & 9mobile</div>
-                  <div className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Low floor: Min ₦50 / person</div>
+                  <div className="font-bold text-xs text-slate-900 dark:text-white leading-tight">VTU Airtime</div>
+                  <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">MTN · Airtel · Glo · 9mobile</div>
+                  <div className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Min ₦50/pp</div>
                 </button>
 
                 {/* 3. USDT TRC-20 */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setCurrency('USDT');
-                    setChain('TRC20');
-                  }}
-                  className={`p-4 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
+                  onClick={() => { setCurrency('USDT'); setChain('TRC20'); }}
+                  className={`p-3.5 rounded-xl border text-left transition-all active:scale-[0.98] touch-manipulation ${
                     currency === 'USDT' && chain === 'TRC20'
-                      ? 'bg-brand-500/10 border-brand-500 text-slate-900 dark:text-white shadow-md ring-2 ring-brand-500'
-                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
+                      ? 'bg-brand-500/10 border-brand-500 shadow-sm ring-2 ring-brand-500'
+                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="font-bold text-sm text-slate-900 dark:text-white">🔴 USDT (TRC-20)</div>
-                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30">
+                  <div className="flex items-start justify-between mb-2">
+                    <span className="text-xl">🔴</span>
+                    <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30">
                       TRON
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-dark-muted leading-relaxed">Tron network stablecoin drop · T... addresses</div>
-                  <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ${isAdmin ? '0.10' : '0.20'} / person</div>
+                  <div className="font-bold text-xs text-slate-900 dark:text-white leading-tight">USDT TRC-20</div>
+                  <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">T... addresses</div>
+                  <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ${isAdmin ? '0.10' : '0.20'}/pp</div>
                 </button>
 
                 {/* 4. USDT BEP-20 */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setCurrency('USDT');
-                    setChain('BEP20');
-                  }}
-                  className={`p-4 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
+                  onClick={() => { setCurrency('USDT'); setChain('BEP20'); }}
+                  className={`p-3.5 rounded-xl border text-left transition-all active:scale-[0.98] touch-manipulation ${
                     currency === 'USDT' && chain === 'BEP20'
-                      ? 'bg-brand-500/10 border-brand-500 text-slate-900 dark:text-white shadow-md ring-2 ring-brand-500'
-                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
+                      ? 'bg-brand-500/10 border-brand-500 shadow-sm ring-2 ring-brand-500'
+                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="font-bold text-sm text-slate-900 dark:text-white">🟡 USDT (BEP-20)</div>
-                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                  <div className="flex items-start justify-between mb-2">
+                    <span className="text-xl">🟡</span>
+                    <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                       BSC
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-dark-muted leading-relaxed">BNB Smart Chain · Ultra-low gas · 0x... addresses</div>
-                  <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ${isAdmin ? '0.10' : '0.20'} / person</div>
+                  <div className="font-bold text-xs text-slate-900 dark:text-white leading-tight">USDT BEP-20</div>
+                  <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">0x... addresses</div>
+                  <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ${isAdmin ? '0.10' : '0.20'}/pp</div>
                 </button>
               </div>
 
