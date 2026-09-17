@@ -188,7 +188,8 @@ export default function CreateGiveawayPage() {
             {/* Currency Choice */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Choose Giveaway Currency & Payout Method</label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* 1. Naira Cash (NGN) */}
                 <button
                   type="button"
                   onClick={() => {
@@ -205,6 +206,7 @@ export default function CreateGiveawayPage() {
                   <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ₦{isAdmin ? '100' : '300'} / person</div>
                 </button>
 
+                {/* 2. VTU Airtime Card */}
                 <button
                   type="button"
                   onClick={() => {
@@ -226,24 +228,49 @@ export default function CreateGiveawayPage() {
                   <div className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Low floor: Min ₦50 / person</div>
                 </button>
 
+                {/* 3. USDT TRC-20 */}
                 <button
                   type="button"
                   onClick={() => {
                     setCurrency('USDT');
+                    setChain('TRC20');
                   }}
                   className={`p-4 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
-                    currency === 'USDT'
-                      ? 'bg-brand-500/10 border-brand-500 text-slate-900 dark:text-white shadow-md ring-1 ring-brand-500'
+                    currency === 'USDT' && chain === 'TRC20'
+                      ? 'bg-brand-500/10 border-brand-500 text-slate-900 dark:text-white shadow-md ring-2 ring-brand-500'
                       : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <div className="font-bold text-sm text-slate-900 dark:text-white">💎 USDT (Crypto)</div>
-                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/30">
-                      Active
+                    <div className="font-bold text-sm text-slate-900 dark:text-white">🔴 USDT (TRC-20)</div>
+                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30">
+                      TRON
                     </span>
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-dark-muted leading-relaxed">TRC-20 &amp; BEP-20 stablecoin drops</div>
+                  <div className="text-xs text-slate-500 dark:text-dark-muted leading-relaxed">Tron network stablecoin drop · T... addresses</div>
+                  <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ${isAdmin ? '0.10' : '0.20'} / person</div>
+                </button>
+
+                {/* 4. USDT BEP-20 */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrency('USDT');
+                    setChain('BEP20');
+                  }}
+                  className={`p-4 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
+                    currency === 'USDT' && chain === 'BEP20'
+                      ? 'bg-brand-500/10 border-brand-500 text-slate-900 dark:text-white shadow-md ring-2 ring-brand-500'
+                      : 'bg-slate-50 dark:bg-dark-bg border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-bold text-sm text-slate-900 dark:text-white">🟡 USDT (BEP-20)</div>
+                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                      BSC
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-dark-muted leading-relaxed">BNB Smart Chain · Ultra-low gas · 0x... addresses</div>
                   <div className="mt-2 text-[10px] font-bold text-brand-600 dark:text-brand-400">Min ${isAdmin ? '0.10' : '0.20'} / person</div>
                 </button>
               </div>
@@ -265,44 +292,39 @@ export default function CreateGiveawayPage() {
                   <div className="flex items-start gap-2.5">
                     <Sparkles className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
                     <div className="space-y-0.5">
-                      <p className="font-bold text-slate-900 dark:text-white">USDT Crypto Giveaway</p>
+                      <p className="font-bold text-slate-900 dark:text-white">
+                        USDT Giveaway Network: {chain === 'BEP20' ? 'BNB Smart Chain (BEP-20)' : 'TRON Network (TRC-20)'}
+                      </p>
                       <p className="text-slate-600 dark:text-dark-muted text-[11px] leading-relaxed">
-                        Choose the network for this drop. Claimants will be locked to this network when claiming. Payouts are funded directly from your <strong>USDT balance</strong>.
+                        Claimants will be locked to this network when claiming. Payouts are funded directly from your <strong>USDT balance</strong>.
                       </p>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-                      Payout Blockchain Network
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setChain('TRC20')}
-                        className={`p-3 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
-                          chain === 'TRC20'
-                            ? 'bg-brand-500/20 border-brand-500 ring-1 ring-brand-500 text-slate-900 dark:text-white'
-                            : 'bg-white/5 border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400'
-                        }`}
-                      >
-                        <div className="font-bold text-xs">TRON (TRC-20)</div>
-                        <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">Most common · T... addresses</div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setChain('BEP20')}
-                        className={`p-3 rounded-xl border text-left transition-all active:scale-[0.99] touch-manipulation ${
-                          chain === 'BEP20'
-                            ? 'bg-brand-500/20 border-brand-500 ring-1 ring-brand-500 text-slate-900 dark:text-white'
-                            : 'bg-white/5 border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-400 hover:border-slate-400'
-                        }`}
-                      >
-                        <div className="font-bold text-xs">BNB Smart Chain (BEP-20)</div>
-                        <div className="text-[10px] text-slate-500 dark:text-dark-muted mt-0.5">Ultra-low gas · 0x... addresses</div>
-                      </button>
-                    </div>
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-brand-500/20">
+                    <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">Selected Network:</span>
+                    <button
+                      type="button"
+                      onClick={() => setChain('TRC20')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        chain === 'TRC20'
+                          ? 'bg-brand-500 text-slate-950 shadow-sm'
+                          : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      🔴 TRON (TRC-20)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setChain('BEP20')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        chain === 'BEP20'
+                          ? 'bg-brand-500 text-slate-950 shadow-sm'
+                          : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      🟡 BNB Smart Chain (BEP-20)
+                    </button>
                   </div>
                 </div>
               )}
@@ -521,6 +543,14 @@ export default function CreateGiveawayPage() {
                   {platformFee.toLocaleString()} {currency === 'AIRTIME' ? 'NGN' : currency}
                 </span>
               </div>
+              {currency === 'USDT' && (
+                <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-dark-muted">
+                  <span>Payout Network:</span>
+                  <span className="font-bold text-brand-600 dark:text-brand-400 text-right">
+                    {chain === 'BEP20' ? '🟡 BNB Smart Chain (BEP-20)' : '🔴 TRON Network (TRC-20)'}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between gap-2 text-sm font-bold text-slate-900 dark:text-white pt-2.5 border-t border-slate-200 dark:border-dark-border">
                 <span>Total Deducted from {currency === 'AIRTIME' ? 'NGN Wallet' : 'Wallet'}:</span>
                 <span className={`font-mono text-base text-right font-black ${isInsufficient ? 'text-rose-500 dark:text-rose-400' : 'text-brand-600 dark:text-brand-400'}`}>
