@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Building2, Copy, Check, Coins, Zap, AlertCircle, ExternalLink, RefreshCw, Clock, ShieldAlert, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import { X, Building2, Copy, Check, Coins, AlertCircle, ExternalLink, RefreshCw, Clock, ShieldAlert, ArrowUpRight, CheckCircle2 } from 'lucide-react';
 import api from '../api/client';
-
-const IS_DEV = import.meta.env.DEV; // true locally, false in production build
 
 export default function FundWalletModal({
   isOpen,
@@ -19,10 +17,10 @@ export default function FundWalletModal({
   const [ngnAmount, setNgnAmount] = useState(
     initialAmount ? String(Math.max(1000, Math.ceil(Number(initialAmount)))) : '1000'
   );
-  const [usdtAmount, setUsdtAmount] = useState(
-    initialAmount && defaultCurrency === 'USDT' ? String(Math.max(2, Number(initialAmount))) : '2'
-  );
   const [selectedChain, setSelectedChain] = useState('TRC20');
+  const [usdtAmount, setUsdtAmount] = useState(
+    initialAmount && defaultCurrency === 'USDT' ? String(Math.max(12, Number(initialAmount))) : '15'
+  );
   const [cryptoAddr, setCryptoAddr] = useState('');
   const [copied, setCopied] = useState(null); // which text was copied
   const [loading, setLoading] = useState(false);
@@ -83,7 +81,7 @@ export default function FundWalletModal({
     } catch (err) {
       setMsg({
         type: 'error',
-        text: err.response?.data?.error || 'Could not verify payment status with OxaPay.',
+        text: err.response?.data?.error || 'Could not verify payment status with payment gateway.',
       });
     } finally {
       setCheckingStatus(false);
@@ -124,9 +122,15 @@ export default function FundWalletModal({
   };
 
   const handleCreateOxaPayInvoice = async () => {
-    const amount = parseFloat(usdtAmount) || 10;
-    if (amount < 1) {
-      setMsg({ type: 'error', text: 'Minimum USDT deposit is $1.' });
+    const minAmount = selectedChain === 'TRC20' ? 12 : 1;
+    const amount = parseFloat(usdtAmount) || 0;
+    if (amount < minAmount) {
+      setMsg({
+        type: 'error',
+        text: selectedChain === 'TRC20'
+          ? 'Minimum deposit for USDT (TRC-20) is $12 due to Tron blockchain network limits. For smaller deposits starting from $1, switch to BSC (BEP-20).'
+          : 'Minimum USDT deposit is $1.',
+      });
       return;
     }
     try {
@@ -171,25 +175,6 @@ export default function FundWalletModal({
       setCryptoAddr(res.data.address);
     } catch (err) {
       setMsg({ type: 'error', text: err.response?.data?.error || 'Could not generate deposit address.' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSimulateNgnFund = async () => {
-    const amount = parseFloat(ngnAmount);
-    if (!amount || amount < 1000) {
-      setMsg({ type: 'error', text: 'Minimum NGN deposit is ₦1,000.' });
-      return;
-    }
-    try {
-      setLoading(true);
-      setMsg(null);
-      const res = await api.post('/wallet/fund/ngn', { amountNaira: amount });
-      setMsg({ type: 'success', text: res.data.message });
-      onFunded();
-    } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data?.error || 'Funding failed' });
     } finally {
       setLoading(false);
     }
@@ -364,23 +349,6 @@ export default function FundWalletModal({
                 </div>
               </div>
             )}
-
-            {/* Dev-only sandbox simulation */}
-            {IS_DEV && (
-              <div className="pt-2 border-t border-slate-200 dark:border-dark-border">
-                <p className="text-[10px] text-amber-500 dark:text-amber-400 font-bold mb-1">DEV SANDBOX TEST</p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSimulateNgnFund}
-                    disabled={loading}
-                    className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
-                  >
-                    <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-brand-400" />
-                    <span>Instant Sandbox Credit (₦{Number(ngnAmount || 1000).toLocaleString()})</span>
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
@@ -397,7 +365,12 @@ export default function FundWalletModal({
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => setSelectedChain('TRC20')}
+                      onClick={() => {
+                        setSelectedChain('TRC20');
+                        if (parseFloat(usdtAmount || 0) < 12) {
+                          setUsdtAmount('15');
+                        }
+                      }}
                       className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center justify-center gap-0.5 ${
                         selectedChain === 'TRC20'
                           ? 'border-brand-500 bg-brand-500/10 text-emerald-600 dark:text-brand-400 shadow-sm'
@@ -405,7 +378,7 @@ export default function FundWalletModal({
                       }`}
                     >
                       <span className="font-extrabold text-slate-900 dark:text-white">TRC20</span>
-                      <span className="text-[10px] text-slate-500 dark:text-dark-muted">Tron Network</span>
+                      <span className="text-[10px] text-slate-500 dark:text-dark-muted">Tron (Min $12)</span>
                     </button>
                     <button
                       type="button"
@@ -417,7 +390,7 @@ export default function FundWalletModal({
                       }`}
                     >
                       <span className="font-extrabold text-slate-900 dark:text-white">BEP20</span>
-                      <span className="text-[10px] text-slate-500 dark:text-dark-muted">BNB Smart Chain</span>
+                      <span className="text-[10px] text-slate-500 dark:text-dark-muted">BSC (Min $1)</span>
                     </button>
                   </div>
                 </div>
@@ -428,18 +401,20 @@ export default function FundWalletModal({
                     <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                       Amount to Deposit (USDT)
                     </label>
-                    <span className="text-[10px] text-slate-500 dark:text-dark-muted">Min: $1.00 USDT</span>
+                    <span className="text-[10px] text-slate-500 dark:text-dark-muted font-medium">
+                      Min: {selectedChain === 'TRC20' ? '$12.00 USDT' : '$1.00 USDT'}
+                    </span>
                   </div>
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-dark-muted font-bold text-sm">$</span>
                     <input
                       type="number"
-                      min="1"
+                      min={selectedChain === 'TRC20' ? '12' : '1'}
                       step="any"
                       value={usdtAmount}
                       onChange={(e) => setUsdtAmount(e.target.value)}
                       className="w-full bg-slate-50 dark:bg-dark-bg border border-slate-300 dark:border-dark-border rounded-xl pl-8 pr-16 py-3 text-base sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
-                      placeholder="10.00"
+                      placeholder={selectedChain === 'TRC20' ? '15.00' : '10.00'}
                     />
                     <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500 dark:text-slate-400">
                       USDT
@@ -448,7 +423,7 @@ export default function FundWalletModal({
 
                   {/* Preset quick buttons */}
                   <div className="flex gap-1.5 sm:gap-2 mt-2">
-                    {['5', '10', '25', '50', '100'].map((amt) => (
+                    {(selectedChain === 'TRC20' ? ['15', '25', '50', '100', '250'] : ['5', '10', '25', '50', '100']).map((amt) => (
                       <button
                         key={amt}
                         type="button"
@@ -463,13 +438,20 @@ export default function FundWalletModal({
                       </button>
                     ))}
                   </div>
+
+                  {selectedChain === 'TRC20' && parseFloat(usdtAmount || 0) < 12 && (
+                    <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-2 flex items-center gap-1.5 bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>TRC-20 requires min. $12 due to Tron network gas limits. For smaller deposits, switch to BEP-20 (BSC).</span>
+                    </p>
+                  )}
                 </div>
 
                 {/* Generate Address Button */}
                 <button
                   type="button"
                   onClick={handleCreateOxaPayInvoice}
-                  disabled={loading || parseFloat(usdtAmount) < 1}
+                  disabled={loading || parseFloat(usdtAmount || 0) < (selectedChain === 'TRC20' ? 12 : 1)}
                   className="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-500/20 disabled:opacity-50"
                 >
                   {loading ? (
@@ -486,7 +468,7 @@ export default function FundWalletModal({
                 </button>
 
                 <p className="text-[11px] text-slate-500 dark:text-dark-muted text-center leading-relaxed">
-                  Automated deposit powered by OxaPay. Your wallet will credit automatically as soon as the transaction confirms on the blockchain.
+                  Automated deposit powered by NOWPayments. Your wallet will credit automatically as soon as the transaction confirms on the blockchain.
                 </p>
               </div>
             ) : (
@@ -558,7 +540,7 @@ export default function FundWalletModal({
                       className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors border border-slate-200 dark:border-dark-border mt-2"
                     >
                       <ExternalLink className="w-3.5 h-3.5 text-emerald-600 dark:text-brand-400" />
-                      <span>Open OxaPay Hosted Checkout</span>
+                      <span>Open Hosted Checkout</span>
                     </a>
                   )}
 
@@ -579,7 +561,7 @@ export default function FundWalletModal({
                     {checkingStatus ? (
                       <>
                         <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>Verifying with OxaPay Gateway...</span>
+                        <span>Verifying with Payment Gateway...</span>
                       </>
                     ) : (
                       <>
@@ -610,24 +592,6 @@ export default function FundWalletModal({
                     className="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs rounded-xl transition-all"
                   >
                     Done
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Dev-only sandbox */}
-            {IS_DEV && (
-              <div className="pt-2 border-t border-dark-border">
-                <p className="text-[10px] text-amber-400 font-bold mb-2">⚠ DEV SANDBOX ONLY</p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handleSimulateUsdtFund}
-                    disabled={loading || parseFloat(usdtAmount) < 2}
-                    className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
-                  >
-                    <Zap className="w-3.5 h-3.5 text-brand-400" />
-                    <span>Instant Sandbox Credit (${usdtAmount})</span>
                   </button>
                 </div>
               </div>

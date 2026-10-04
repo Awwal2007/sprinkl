@@ -14,7 +14,9 @@ import {
   Settings,
   Sun,
   Moon,
+  QrCode,
 } from 'lucide-react';
+import ScanQrModal from './ScanQrModal';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSupportStore } from '../store/useSupportStore';
 import { useThemeStore } from '../store/useThemeStore';
@@ -35,6 +37,7 @@ export default function Navbar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
+  const [scanQrOpen, setScanQrOpen] = useState(false);
   const desktopAvatarRef = useRef(null);
   const mobileAvatarRef = useRef(null);
 
@@ -234,6 +237,17 @@ export default function Navbar() {
               )}
             </button>
 
+            {/* Scan QR Button (Desktop) */}
+            <button
+              type="button"
+              onClick={() => setScanQrOpen(true)}
+              className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-dark-card dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-dark-border hover:border-brand-500/40 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm group active:scale-95 cursor-pointer"
+              title="Scan Sprinkl QR Code to claim"
+            >
+              <QrCode className="w-3.5 h-3.5 text-brand-500 group-hover:scale-110 transition-transform" />
+              <span>Scan QR</span>
+            </button>
+
             {isAuthenticated ? (
               /* User Avatar Dropdown (for Desktop) */
               <div className="relative" ref={desktopAvatarRef}>
@@ -345,6 +359,17 @@ export default function Navbar() {
               MOBILE NAVIGATION (< 768px)
              ══════════════════════════════════════════════════════ */}
           <div className="flex md:hidden items-center gap-2">
+            {/* Mobile Scan QR Button */}
+            <button
+              type="button"
+              onClick={() => setScanQrOpen(true)}
+              className="p-2 rounded-xl text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-dark-card/90 dark:hover:bg-slate-800 border border-slate-200 dark:border-dark-border/80 transition-all active:scale-95 cursor-pointer"
+              title="Scan Sprinkl QR Code"
+              aria-label="Scan QR Code"
+            >
+              <QrCode className="w-4 h-4 text-brand-500" />
+            </button>
+
             {/* Mobile Theme Toggle Button */}
             <button
               type="button"
@@ -513,6 +538,24 @@ export default function Navbar() {
                 </button>
               </div>
 
+              {/* Mobile Drawer Scan QR Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileOpen(false);
+                  setScanQrOpen(true);
+                }}
+                className="w-full p-3 rounded-2xl bg-brand-500/10 border border-brand-500/25 text-brand-600 dark:text-brand-400 text-xs font-bold flex items-center justify-between transition-all hover:bg-brand-500/15"
+              >
+                <div className="flex items-center gap-2">
+                  <QrCode className="w-4 h-4 text-brand-500" />
+                  <span>Scan Sprinkl QR Code</span>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider bg-brand-500/20 text-brand-700 dark:text-brand-300 px-2 py-0.5 rounded-full">
+                  Claim
+                </span>
+              </button>
+
               {isAuthenticated ? (
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]">
@@ -646,6 +689,9 @@ export default function Navbar() {
           </div>
         </>
       )}
+
+      {/* Global Sprinkl QR Scanner Modal */}
+      <ScanQrModal isOpen={scanQrOpen} onClose={() => setScanQrOpen(false)} />
     </>
   );
 }

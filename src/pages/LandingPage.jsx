@@ -50,9 +50,11 @@ import Navbar from '../components/Navbar';
 import SEO from '../components/SEO';
 import { useSupportStore } from '../store/useSupportStore';
 import { SprinklSocialBar } from '../components/SocialLinks';
+import ScanQrModal from '../components/ScanQrModal';
 
 export default function LandingPage() {
   const { openChat } = useSupportStore();
+  const [scanQrOpen, setScanQrOpen] = useState(false);
 
   // Calculator state
   const [calcCurrency, setCalcCurrency] = useState('NGN');
@@ -190,22 +192,31 @@ export default function LandingPage() {
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-12">
                 <Link
                   id="hero-cta-signup"
                   to="/signup"
-                  className="w-full sm:w-auto px-8 py-4 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-xl shadow-xl shadow-brand-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full sm:w-auto px-7 py-4 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-xl shadow-xl shadow-brand-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span>Launch a Giveaway Free</span>
                   <ArrowRight className="w-5 h-5 stroke-[2.5]" />
                 </Link>
+                <button
+                  id="hero-cta-scan-qr"
+                  type="button"
+                  onClick={() => setScanQrOpen(true)}
+                  className="w-full sm:w-auto px-6 py-4 bg-brand-500/10 hover:bg-brand-500/20 border border-brand-500/30 text-brand-600 dark:text-brand-400 font-extrabold rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer"
+                >
+                  <QrCode className="w-5 h-5 stroke-[2.2]" />
+                  <span>Scan QR to Claim</span>
+                </button>
                 <a
                   id="hero-cta-calculator"
                   href="#calculator"
-                  className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-dark-card hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-dark-border text-slate-700 dark:text-slate-200 font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm"
+                  className="w-full sm:w-auto px-6 py-4 bg-white dark:bg-dark-card hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-dark-border text-slate-700 dark:text-slate-200 font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm"
                 >
                   <Sliders className="w-4 h-4 text-brand-500 dark:text-brand-400" />
-                  <span>Interactive Calculator</span>
+                  <span>Calculator</span>
                 </a>
               </div>
 
@@ -702,6 +713,15 @@ export default function LandingPage() {
                 <p className="text-xs text-slate-600 dark:text-dark-muted leading-relaxed">
                   Project high-resolution QR codes during live streams on YouTube, Twitch, Twitter Spaces, or physical meetups for instant scanning.
                 </p>
+                <button
+                  type="button"
+                  onClick={() => setScanQrOpen(true)}
+                  className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 dark:text-brand-400 hover:text-brand-500 transition-colors cursor-pointer"
+                >
+                  <QrCode className="w-3.5 h-3.5" />
+                  <span>Scan a Sprinkl QR Code</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
 
               <div className="bg-white dark:bg-dark-card p-6 rounded-2xl border border-slate-200 dark:border-dark-border hover:border-brand-500/40 transition-colors shadow-sm">
@@ -974,6 +994,9 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Sprinkl QR Scanner Modal */}
+      <ScanQrModal isOpen={scanQrOpen} onClose={() => setScanQrOpen(false)} />
     </div>
   );
 }
