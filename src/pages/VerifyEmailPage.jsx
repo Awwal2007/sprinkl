@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { CheckCircle2, AlertCircle, ArrowRight, RefreshCw, Sun, Moon } from 'lucide-react';
+import { CheckCircle2, AlertCircle, ArrowRight, RefreshCw, Sun, Moon, Mail, ShieldCheck } from 'lucide-react';
 import api from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { useThemeStore } from '../store/useThemeStore';
+import { toast } from '../store/useNotificationStore';
 import SEO from '../components/SEO';
 
 export default function VerifyEmailPage() {
@@ -11,19 +12,21 @@ export default function VerifyEmailPage() {
   const token = searchParams.get('token');
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!token);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
+
+  // Manual 6-digit code verification state
+  const [manualEmail, setManualEmail] = useState('');
+  const [codeDigits, setCodeDigits] = useState(['', '', '', '', '', '']);
+  const [codeLoading, setCodeLoading] = useState(false);
+  const codeInputsRef = useRef([]);
 
   const { user, setAuth, accessToken } = useAuthStore();
   const { resolvedTheme, toggleTheme } = useThemeStore();
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      setError('No verification token provided in the link.');
-      return;
-    }
+    if (!token) return;
 
     const verify = async () => {
       try {
@@ -35,6 +38,7 @@ export default function VerifyEmailPage() {
         } else if (user) {
           setAuth({ ...user, emailVerified: true }, accessToken);
         }
+        toast.success('Email successfully verified! Your host account is active.', 'Verified');
       } catch (err) {
         setError(err.response?.data?.error || 'Verification link is invalid or expired.');
       } finally {
@@ -44,6 +48,78 @@ export default function VerifyEmailPage() {
 
     verify();
   }, [token]);
+
+  // Handle manual 6-digit code entry
+  const handleDigitChange = (index, val) => {
+    const digit = val.replace(/\D/g, '').slice(-1);
+    const next = [...codeDigits];
+    next[index] = digit;
+    setCodeDigits(next);
+
+    if (digit && index < 5) {
+      codeInputsRef.current[index + 1]?.focus();
+    }
+
+    if (next.every((d) => d !== '') && manualEmail) {
+      handleManualVerify(next.join(''));
+    }
+  };
+
+  const handleDigitKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !codeDigits[index] && index > 0) {
+      codeInputsRef.current[index - 1]?.focus();
+    }
+  };
+
+  const handleDigitPaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (!pasted) return;
+
+    const next = [...codeDigits];
+    for (let i = 0; i < 6; i++) {
+      next[i] = pasted[i] || '';
+    }
+    setCodeDigits(next);
+    codeInputsRef.current[Math.min(pasted.length, 5)]?.focus();
+
+    if (pasted.length === 6 && manualEmail) {
+      handleManualVerify(pasted);
+    }
+  };
+
+  const handleManualVerify = async (fullCodeParam) => {
+    const fullCode = fullCodeParam || codeDigits.join('');
+    if (!manualEmail.trim()) {
+      setError('Please enter your account email address.');
+      return;
+    }
+    if (fullCode.length !== 6) {
+      setError('Please enter the full 6-digit verification code.');
+      return;
+    }
+
+    setError(null);
+    setCodeLoading(true);
+    try {
+      const res = await api.post('/auth/verify-email', {
+        email: manualEmail.trim(),
+        code: fullCode,
+      });
+
+      setSuccess(true);
+      if (res.data.accessToken && res.data.user) {
+        setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
+      } else if (user) {
+        setAuth({ ...user, emailVerified: true }, accessToken);
+      }
+      toast.success('Email successfully verified! Your host account is active.', 'Verified');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Invalid or expired verification code.');
+    } finally {
+      setCodeLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 relative">
@@ -80,7 +156,7 @@ export default function VerifyEmailPage() {
         )}
 
         {!loading && success && (
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 animate-in fade-in">
             <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 dark:text-emerald-400 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8" />
             </div>
@@ -100,25 +176,103 @@ export default function VerifyEmailPage() {
           </div>
         )}
 
-        {!loading && error && (
-          <div className="space-y-4 py-4">
-            <div className="w-14 h-14 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 flex items-center justify-center mx-auto">
-              <AlertCircle className="w-8 h-8" />
+        {/* Manual 6-Digit Code Entry (if no token or token errored) */}
+        {!loading && !success && (
+          <div className="space-y-5 py-2 animate-in fade-in text-left">
+            <div className="text-center space-y-1">
+              <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 text-brand-600 dark:text-brand-400 flex items-center justify-center mx-auto mb-2.5">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">
+                Verify Your Account
+              </h2>
+              <p className="text-xs text-dark-muted">
+                Enter your email address and the 6-digit verification code from your welcome email.
+              </p>
             </div>
-            <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">Verification Failed</h2>
-            <p className="text-xs text-rose-600 dark:text-rose-400/90 leading-relaxed">{error}</p>
-            <div className="pt-4 flex flex-col gap-2">
-              <Link
-                to="/login"
-                className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-transparent font-semibold text-xs rounded-xl transition-colors"
+
+            {error && (
+              <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-300 text-xs font-medium flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleManualVerify();
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-dark-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    value={manualEmail}
+                    onChange={(e) => setManualEmail(e.target.value)}
+                    placeholder="host@example.com"
+                    className="w-full bg-dark-bg border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                  6-Digit Verification Code
+                </label>
+                <div className="flex items-center justify-between gap-2" onPaste={handleDigitPaste}>
+                  {codeDigits.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      ref={(el) => (codeInputsRef.current[idx] = el)}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleDigitChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleDigitKeyDown(idx, e)}
+                      className={`w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-mono font-black rounded-xl border transition-all focus:outline-none ${
+                        digit
+                          ? 'border-brand-500 bg-brand-500/10 text-brand-600 dark:text-brand-400'
+                          : 'border-dark-border bg-dark-bg text-slate-900 dark:text-white focus:border-brand-500'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className="text-[11px] text-dark-muted text-center mt-2">
+                  Copy the code directly from the email and paste it above.
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                disabled={codeLoading || !manualEmail || codeDigits.join('').length !== 6}
+                className="w-full py-3 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
               >
-                Sign In to Resend Email
-              </Link>
-              <Link
-                to="/"
-                className="text-xs text-dark-muted hover:text-slate-900 dark:hover:text-slate-300 py-1 transition-colors"
-              >
-                Back to Home
+                {codeLoading ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Activating Account…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Verify & Activate Host Account</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="text-center pt-2">
+              <Link to="/login" className="text-xs text-dark-muted hover:text-brand-500 transition-colors">
+                ← Back to Login
               </Link>
             </div>
           </div>
