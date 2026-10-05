@@ -45,3 +45,20 @@ export function leaveSession(sessionId) {
 export function joinAdminRoom(accessToken) {
   if (accessToken) socket.emit('join_admin', accessToken);
 }
+
+/**
+ * Identify connected user for active user tracking.
+ */
+export function identifyUser(token, userId) {
+  if (token || userId) {
+    socket.emit('identify_user', { token, userId });
+  }
+}
+
+/**
+ * Send user heartbeat ping.
+ */
+export function pingUser() {
+  socket.emit('user_ping');
+}
+

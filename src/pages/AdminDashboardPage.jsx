@@ -35,6 +35,8 @@ import {
   Edit3,
   Check,
   X,
+  UserPlus,
+  Plus,
 } from 'lucide-react';
 import api from '../api/client';
 import Navbar from '../components/Navbar';
@@ -287,27 +289,99 @@ export default function AdminDashboardPage() {
   });
 
   // ──────────────────────────────────────────────
-  // 6. USERS & KYC DIRECTORY STATE & QUERY
+  // 6. USERS & ACTIVE USERS DIRECTORY STATE & QUERY
   // ──────────────────────────────────────────────
   const [userPage, setUserPage] = useState(1);
   const [userRoleFilter, setUserRoleFilter] = useState('all');
+  const [userActivityFilter, setUserActivityFilter] = useState('all'); // 'all' | 'online' | 'today' | 'week'
   const [userSearch, setUserSearch] = useState('');
 
   const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = useQuery({
-    queryKey: ['adminUsers', userPage, userRoleFilter, userSearch],
+    queryKey: ['adminUsers', userPage, userRoleFilter, userActivityFilter, userSearch],
     queryFn: async () => {
       const res = await api.get('/admin/users', {
         params: {
           page: userPage,
           limit: 12,
           role: userRoleFilter,
+          activity: userActivityFilter,
           search: userSearch,
         },
       });
       return res.data;
     },
-    enabled: activeTab === 'users',
+    enabled: activeTab === 'users' || activeTab === 'overview',
   });
+
+  // Dedicated Admin Staff Query & Actions
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
+  const [newAdminName, setNewAdminName] = useState('');
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [newAdminRole, setNewAdminRole] = useState('admin');
+  const [creatingAdmin, setCreatingAdmin] = useState(false);
+
+  const { data: adminsData, isLoading: adminsLoading, refetch: refetchAdmins } = useQuery({
+    queryKey: ['adminStaffList'],
+    queryFn: async () => {
+      const res = await api.get('/admin/admins');
+      return res.data;
+    },
+    enabled: activeTab === 'admins' || activeTab === 'overview',
+  });
+
+  const handleCreateAdmin = async (e) => {
+    e.preventDefault();
+    if (!newAdminName.trim() || !newAdminEmail.trim() || !newAdminPassword) {
+      toast.error('Please fill in all administrator fields');
+      return;
+    }
+    if (newAdminPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+
+    setCreatingAdmin(true);
+    try {
+      await api.post('/admin/admins', {
+        fullName: newAdminName.trim(),
+        email: newAdminEmail.trim(),
+        password: newAdminPassword,
+        role: newAdminRole,
+      });
+      toast.success(`Administrator ${newAdminName} created successfully!`, 'Admin Created');
+      setAdminModalOpen(false);
+      setNewAdminName('');
+      setNewAdminEmail('');
+      setNewAdminPassword('');
+      setNewAdminRole('admin');
+      refetchAdmins();
+      refetchReports();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to create admin', 'Error');
+    } finally {
+      setCreatingAdmin(false);
+    }
+  };
+
+  const handleToggleAdminStatus = async (targetAdmin) => {
+    const nextStatus = !targetAdmin.isActive;
+    const confirmed = await confirmDialog({
+      title: `${nextStatus ? 'Activate' : 'Deactivate'} ${targetAdmin.fullName}?`,
+      message: `Are you sure you want to ${nextStatus ? 'activate' : 'deactivate'} this administrator account?`,
+      confirmText: `Yes, ${nextStatus ? 'Activate' : 'Deactivate'}`,
+      confirmVariant: nextStatus ? 'brand' : 'danger',
+    });
+    if (!confirmed) return;
+
+    try {
+      await api.patch(`/admin/admins/${targetAdmin._id}`, { isActive: nextStatus });
+      toast.success(`Admin ${targetAdmin.fullName} status updated`, 'Status Changed');
+      refetchAdmins();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update admin', 'Error');
+    }
+  };
 
   const handleToggleUserRole = async (targetUser) => {
     const newRole = targetUser.role === 'admin' ? 'host' : 'admin';
@@ -534,7 +608,18 @@ export default function AdminDashboardPage() {
             },
             { id: 'transactions', label: 'Provider Transactions', icon: Activity },
             { id: 'claims', label: 'Claims & Winners', icon: Award },
-            { id: 'users', label: 'Users Directory', icon: Users },
+            {
+              id: 'users',
+              label: 'Users Directory',
+              icon: Users,
+              badge: reportData?.users?.activeNow > 0 ? `${reportData?.users?.activeNow} active` : undefined,
+            },
+            {
+              id: 'admins',
+              label: 'Admins & Staff',
+              icon: ShieldCheck,
+              badge: adminsData?.total || reportData?.users?.admins || 0,
+            },
             {
               id: 'kyc',
               label: 'Payment Thresholds',
@@ -575,8 +660,44 @@ export default function AdminDashboardPage() {
         ═══════════════════════════════════════════════════════════════ */}
         {activeTab === 'overview' && (
           <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-150">
-            {/* Platform Revenue & Disbursed Volume KPIs */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {/* Platform Revenue, Disbursed Volume & Active Users KPIs */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+              {/* Active Users Live Pulse Card */}
+              <div
+                onClick={() => {
+                  setActiveTab('users');
+                  setUserActivityFilter('online');
+                  setUserRoleFilter('all');
+                }}
+                className="bg-white dark:bg-dark-card border border-emerald-500/30 hover:border-emerald-500/60 dark:border-emerald-500/30 dark:hover:border-emerald-500/60 rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.99]"
+                title="Click to view live active users"
+              >
+                <div className="absolute top-0 right-0 w-28 h-28 bg-emerald-500/10 blur-2xl pointer-events-none" />
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-[11px] uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    Active Now (Live)
+                  </p>
+                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    Real-time
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-2xl sm:text-3xl font-black text-gray-950 dark:text-white">
+                    {reportData?.users?.activeNow ?? usersData?.stats?.onlineCount ?? 0}
+                  </p>
+                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    online now
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-600 dark:text-slate-300 mt-2 font-medium">
+                  Today: <strong className="text-gray-950 dark:text-white font-bold">{reportData?.users?.activeToday ?? usersData?.stats?.activeTodayCount ?? 0}</strong> &bull; Week: <strong className="text-gray-950 dark:text-white font-bold">{reportData?.users?.activeThisWeek ?? 0}</strong>
+                </p>
+              </div>
+
               {/* NGN Revenue */}
               <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-emerald-500/5 blur-2xl pointer-events-none" />
@@ -620,7 +741,7 @@ export default function AdminDashboardPage() {
                   </span>
                 </div>
                 <p className="text-[11px] text-gray-600 dark:text-slate-300 mt-2 font-medium">
-                  Slots: <strong className="text-gray-950 dark:text-white font-bold">{reportData?.giveaways?.totalSlotsClaimed || 0} / {reportData?.giveaways?.totalSlots || 0}</strong> ({reportData?.giveaways?.claimRate || 0}% conversion)
+                  Slots: <strong className="text-gray-950 dark:text-white font-bold">{reportData?.giveaways?.totalSlotsClaimed || 0} / {reportData?.giveaways?.totalSlots || 0}</strong> ({reportData?.giveaways?.claimRate || 0}%)
                 </p>
               </div>
 
@@ -628,7 +749,7 @@ export default function AdminDashboardPage() {
               <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-5 sm:p-6 shadow-sm dark:shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-28 h-28 bg-purple-500/5 blur-2xl pointer-events-none" />
                 <p className="text-[11px] uppercase tracking-wider text-gray-700 dark:text-slate-300 font-bold mb-1">
-                  Registered Users &amp; Queue
+                  Registered Users &amp; Staff
                 </p>
                 <div className="flex items-baseline gap-2">
                   <p className="text-2xl sm:text-3xl font-black text-gray-950 dark:text-white">
@@ -638,8 +759,8 @@ export default function AdminDashboardPage() {
                     ({reportData?.users?.verified || 0} verified)
                   </span>
                 </div>
-                <p className="text-[11px] text-brand-600 dark:text-brand-400 mt-2 font-bold">
-                  {reportData?.support?.active || 0} active support chat(s)
+                <p className="text-[11px] text-gray-600 dark:text-slate-300 mt-2 font-medium">
+                  Admins: <strong className="text-purple-600 dark:text-purple-400 font-bold">{adminsData?.total || reportData?.users?.admins || 0} staff</strong> &bull; <strong className="text-brand-600 dark:text-brand-400 font-bold">{reportData?.support?.active || 0} chats</strong>
                 </p>
               </div>
             </section>
@@ -1710,6 +1831,30 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
+                {/* Real-time Activity Filter Pills */}
+                <div className="flex items-center gap-1 bg-gray-100 dark:bg-dark-bg p-1 rounded-xl border border-gray-200 dark:border-dark-border text-xs">
+                  {[
+                    { id: 'all', label: 'All Users' },
+                    { id: 'online', label: '🟢 Active Now', count: usersData?.stats?.onlineCount || reportData?.users?.activeNow },
+                    { id: 'today', label: 'Active Today', count: usersData?.stats?.activeTodayCount || reportData?.users?.activeToday },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => {
+                        setUserActivityFilter(f.id);
+                        setUserPage(1);
+                      }}
+                      className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all ${
+                        userActivityFilter === f.id
+                          ? 'bg-white dark:bg-dark-card text-gray-950 dark:text-white shadow-sm'
+                          : 'text-gray-500 dark:text-dark-muted hover:text-gray-950 dark:hover:text-white'
+                      }`}
+                    >
+                      {f.label} {f.count !== undefined && f.count > 0 ? `(${f.count})` : ''}
+                    </button>
+                  ))}
+                </div>
+
                 <input
                   type="text"
                   placeholder="Search user name or email..."
@@ -1765,7 +1910,12 @@ export default function AdminDashboardPage() {
                   {usersData.users.map((u) => (
                     <div key={u._id} className="bg-gray-50 dark:bg-dark-bg rounded-xl border border-gray-200 dark:border-dark-border p-3.5 space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-sm text-gray-950 dark:text-white">{u.fullName}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-sm text-gray-950 dark:text-white">{u.fullName}</span>
+                          {u.isOnline && (
+                            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="Online now"></span>
+                          )}
+                        </div>
                         <span
                           className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
                             u.role === 'admin'
@@ -1781,7 +1931,6 @@ export default function AdminDashboardPage() {
                         <span>NGN: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(u.balances?.NGN?.available || 0, 'NGN')}</strong></span>
                         <span>USDT: <strong className="text-gray-900 dark:text-slate-200">{formatCurrency(u.balances?.USDT?.available || 0, 'USDT')}</strong></span>
                       </div>
-
                     </div>
                   ))}
                 </div>
@@ -1797,14 +1946,25 @@ export default function AdminDashboardPage() {
                         <th className="py-3 px-3">Payment Limit</th>
                         <th className="py-3 px-3">NGN Balance</th>
                         <th className="py-3 px-3">USDT Balance</th>
-
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
                       {usersData.users.map((u) => (
                         <tr key={u._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
                           <td className="py-3 px-3">
-                            <p className="font-bold text-gray-950 dark:text-white">{u.fullName}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-gray-950 dark:text-white">{u.fullName}</p>
+                              {u.isOnline ? (
+                                <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                  Online
+                                </span>
+                              ) : u.lastActiveAt ? (
+                                <span className="text-[10px] text-gray-500 dark:text-slate-400">
+                                  Active {new Date(u.lastActiveAt).toLocaleDateString()}
+                                </span>
+                              ) : null}
+                            </div>
                             <p className="text-[10px] text-gray-600 dark:text-slate-300 font-medium">{u.email}</p>
                           </td>
                           <td className="py-3 px-3">
@@ -1929,6 +2089,191 @@ export default function AdminDashboardPage() {
               </div>
             ) : (
               <p className="text-xs text-gray-500 dark:text-dark-muted py-8 text-center">No users matching search.</p>
+            )}
+          </section>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════
+            TAB: DEDICATED ADMINS & STAFF MANAGEMENT (Admin Model)
+        ═══════════════════════════════════════════════════════════════ */}
+        {activeTab === 'admins' && (
+          <section className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl p-4 sm:p-6 space-y-6 animate-in fade-in duration-150 shadow-sm dark:shadow-none">
+            {/* Header & Action Button */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100 dark:border-dark-border/60">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-gray-950 dark:text-white">Platform Administrators &amp; Staff</h2>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                    Dedicated Admin Model
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-dark-muted mt-0.5">
+                  Decoupled administrative accounts with 2FA protection and granular privileges (Superadmin, Admin, Moderator)
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => refetchAdmins()}
+                  className="p-2 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 transition-all shadow-sm"
+                  title="Refresh admin staff list"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setAdminModalOpen(true)}
+                  className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-sm shadow-purple-500/20 active:scale-95"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Add Administrator</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-gray-50 dark:bg-dark-bg p-3.5 rounded-xl border border-gray-200 dark:border-dark-border">
+                <p className="text-[10px] uppercase tracking-wider font-bold text-gray-500 dark:text-dark-muted">Total Admin Staff</p>
+                <p className="text-xl font-black text-gray-950 dark:text-white mt-1">{adminsData?.total ?? 0}</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-dark-bg p-3.5 rounded-xl border border-gray-200 dark:border-dark-border">
+                <p className="text-[10px] uppercase tracking-wider font-bold text-gray-500 dark:text-dark-muted">Active Accounts</p>
+                <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
+                  {adminsData?.admins?.filter((a) => a.isActive).length ?? 0}
+                </p>
+              </div>
+              <div className="bg-gray-50 dark:bg-dark-bg p-3.5 rounded-xl border border-gray-200 dark:border-dark-border">
+                <p className="text-[10px] uppercase tracking-wider font-bold text-gray-500 dark:text-dark-muted">Superadmins</p>
+                <p className="text-xl font-black text-purple-600 dark:text-purple-400 mt-1">
+                  {adminsData?.admins?.filter((a) => a.role === 'superadmin').length ?? 0}
+                </p>
+              </div>
+              <div className="bg-gray-50 dark:bg-dark-bg p-3.5 rounded-xl border border-gray-200 dark:border-dark-border">
+                <p className="text-[10px] uppercase tracking-wider font-bold text-gray-500 dark:text-dark-muted">Architecture</p>
+                <p className="text-xs font-semibold text-gray-700 dark:text-slate-300 mt-2 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-purple-500" />
+                  Isolated DB Schema
+                </p>
+              </div>
+            </div>
+
+            {/* Administrators Table */}
+            {adminsLoading ? (
+              <TableSkeleton columns={5} rows={4} />
+            ) : (
+              <div className="space-y-4">
+                <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-dark-border shadow-sm">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-dark-muted">
+                        <th className="py-3 px-4">Staff Member</th>
+                        <th className="py-3 px-4">Role</th>
+                        <th className="py-3 px-4">Status</th>
+                        <th className="py-3 px-4">Last Active</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-dark-border text-xs">
+                      {adminsData?.admins && adminsData.admins.length > 0 ? (
+                        adminsData.admins.map((adm) => (
+                          <tr key={adm._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                  {adm.fullName?.charAt(0) || 'A'}
+                                </div>
+                                <div>
+                                  <p className="font-bold text-gray-950 dark:text-white">{adm.fullName}</p>
+                                  <p className="text-[11px] text-gray-500 dark:text-dark-muted">{adm.email}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span
+                                className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border ${
+                                  adm.role === 'superadmin'
+                                    ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30'
+                                    : adm.role === 'moderator'
+                                    ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30'
+                                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                                }`}
+                              >
+                                {adm.role || 'admin'}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span
+                                className={`inline-flex items-center gap-1.5 text-[11px] font-bold ${
+                                  adm.isActive
+                                    ? 'text-emerald-600 dark:text-emerald-400'
+                                    : 'text-gray-400 dark:text-dark-muted'
+                                }`}
+                              >
+                                <span
+                                  className={`h-2 w-2 rounded-full ${
+                                    adm.isActive ? 'bg-emerald-500' : 'bg-gray-400'
+                                  }`}
+                                />
+                                {adm.isActive ? 'Active' : 'Disabled'}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-gray-600 dark:text-slate-300 text-[11px]">
+                              {adm.lastActiveAt
+                                ? new Date(adm.lastActiveAt).toLocaleString()
+                                : adm.lastLoginAt
+                                ? `Logged in ${new Date(adm.lastLoginAt).toLocaleDateString()}`
+                                : 'Never'}
+                            </td>
+                            <td className="py-3.5 px-4 text-right">
+                              <button
+                                onClick={() => handleToggleAdminStatus(adm)}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${
+                                  adm.isActive
+                                    ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                                    : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                                }`}
+                              >
+                                {adm.isActive ? 'Deactivate' : 'Activate'}
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-xs text-gray-500 dark:text-dark-muted">
+                            No dedicated administrators found. Click &quot;Add Administrator&quot; to create one.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Legacy Admin Users notification if any exist */}
+                {adminsData?.legacyAdminUsers && adminsData.legacyAdminUsers.length > 0 && (
+                  <div className="mt-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                      <p className="text-xs font-bold text-amber-700 dark:text-amber-400">
+                        Legacy User-Model Admins Detected ({adminsData.legacyAdminUsers.length})
+                      </p>
+                    </div>
+                    <p className="text-[11px] text-gray-600 dark:text-slate-300">
+                      These users currently have administrative privileges via the User model. For complete isolation, add them as dedicated administrators above and revert their user accounts to standard hosts.
+                    </p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {adminsData.legacyAdminUsers.map((u) => (
+                        <span
+                          key={u._id}
+                          className="text-[10px] font-medium bg-white dark:bg-dark-bg px-2.5 py-1 rounded-lg border border-amber-500/30 text-gray-900 dark:text-white"
+                        >
+                          {u.fullName} ({u.email})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </section>
         )}
@@ -2133,6 +2478,112 @@ export default function AdminDashboardPage() {
           </section>
         )}
       </main>
+
+      {/* ─── ADD ADMINISTRATOR MODAL ─── */}
+      {adminModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-dark-border/60">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                  <UserPlus className="w-4 h-4" />
+                </div>
+                <h3 className="text-base font-bold text-gray-950 dark:text-white">Add Administrator</h3>
+              </div>
+              <button
+                onClick={() => setAdminModalOpen(false)}
+                className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 dark:text-dark-muted dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateAdmin} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newAdminName}
+                  onChange={(e) => setNewAdminName(e.target.value)}
+                  placeholder="e.g. Platform Supervisor"
+                  className="w-full bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                  placeholder="admin@sprinkl.biz"
+                  className="w-full bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                  Temporary Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={newAdminPassword}
+                  onChange={(e) => setNewAdminPassword(e.target.value)}
+                  placeholder="Minimum 8 characters"
+                  className="w-full bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                  Privilege Role
+                </label>
+                <select
+                  value={newAdminRole}
+                  onChange={(e) => setNewAdminRole(e.target.value)}
+                  className="w-full bg-white dark:bg-dark-bg border border-gray-300 dark:border-dark-border rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-purple-500"
+                >
+                  <option value="admin">Administrator (Platform operations &amp; support desk)</option>
+                  <option value="superadmin">Superadmin (Full administrative access &amp; staff management)</option>
+                  <option value="moderator">Moderator (Live support &amp; giveaways monitor only)</option>
+                </select>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAdminModalOpen(false)}
+                  className="px-3.5 py-2 text-xs font-bold text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creatingAdmin}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm shadow-purple-500/20 disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {creatingAdmin ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Creating...</span>
+                    </>
+                  ) : (
+                    <span>Create Administrator</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -16,6 +16,8 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import NotificationCenter from './components/NotificationCenter';
 import SupportChatWidget from './components/SupportChatWidget';
 import { useAuthStore } from './store/useAuthStore';
+import { identifyUser, pingUser } from './lib/socket';
+import api from './api/client';
 
 function isTokenValid(token) {
   if (!token) return false;
@@ -73,6 +75,28 @@ function AdminRoute({ children }) {
 }
 
 export default function App() {
+  const token = useAuthStore((state) => state.accessToken);
+  const user = useAuthStore((state) => state.user);
+
+  // Register online presence via Socket.IO & send periodic heartbeat
+  React.useEffect(() => {
+    if (!token) return;
+
+    // Identify with real-time socket layer
+    identifyUser(token, user?.id || user?._id);
+
+    // Initial heartbeat
+    api.post('/auth/heartbeat').catch(() => {});
+
+    // Periodic heartbeat every 60s
+    const timer = setInterval(() => {
+      pingUser();
+      api.post('/auth/heartbeat').catch(() => {});
+    }, 60000);
+
+    return () => clearInterval(timer);
+  }, [token, user?.id, user?._id]);
+
   return (
     <>
       <NotificationCenter />
