@@ -731,17 +731,17 @@ export default function PublicClaimPage() {
                   </p>
                 </div>
 
-                {/* Important Personal Wallet Warning Card */}
+                {/* Wallet Notice & Exchange Minimums Advisory */}
                 <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-200 text-xs space-y-1.5 shadow-sm">
                   <div className="flex items-center gap-2 font-bold">
                     <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                    <span>Personal Self-Custody Wallet Required</span>
+                    <span>Wallet Notice &amp; Exchange Minimums</span>
                   </div>
-                  <p className="text-[11px] leading-relaxed text-slate-700 dark:text-amber-200/90">
-                    ⚠️ <strong>Do NOT use fintech or exchange deposit addresses</strong> (Spenda, Roqqu, Binance, Bybit, OKX, Coinbase, KuCoin).
-                  </p>
                   <p className="text-[11px] leading-relaxed font-semibold text-emerald-700 dark:text-brand-400">
-                    ✅ <strong>Supported wallets:</strong> Trust Wallet, MetaMask, TronLink, Phantom, or Exodus.
+                    ✅ <strong>Recommended:</strong> Personal wallets like Trust Wallet, MetaMask, TronLink, Phantom, or Exodus (receives any amount with $0 minimum).
+                  </p>
+                  <p className="text-[11px] leading-relaxed text-slate-700 dark:text-amber-200/90">
+                    ⚠️ <strong>Using an exchange (Binance, Bybit, KuCoin, OKX)?</strong> Ensure your claim amount meets your exchange&apos;s minimum deposit threshold (often $1 – $5 USDT), or your exchange may not credit the deposit.
                   </p>
                 </div>
 
