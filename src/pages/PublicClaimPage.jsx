@@ -122,8 +122,11 @@ export default function PublicClaimPage() {
               }
             } catch { }
             setAlreadyClaimed(null);
+            const reason = res.data?.claim?.failureReason;
             setError(
-              'Your previous payout attempt was rejected (likely an exchange deposit or contract address). Please enter a personal self-custody wallet address below.'
+              reason
+                ? `Previous payout failed: ${reason}`
+                : 'Your previous payout attempt could not be processed. Please check your wallet address and try again.'
             );
           }
         })
