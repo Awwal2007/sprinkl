@@ -5,6 +5,7 @@ import { Gift, ShieldCheck, CheckCircle2, AlertCircle, Building2, Coins, ArrowRi
 import api from '../api/client';
 import SEO from '../components/SEO';
 import { SocialShareButtons } from '../components/SocialLinks';
+import { getDeviceFingerprint } from '../lib/fingerprint';
 
 const detectCarrier = (phone) => {
   if (!phone) return null;
@@ -26,19 +27,6 @@ const detectCarrier = (phone) => {
   if (gloPrefixes.includes(prefix)) return 'GLO';
   if (nineMobilePrefixes.includes(prefix)) return '9MOBILE';
   return null;
-};
-
-const getDeviceFingerprint = () => {
-  try {
-    let fp = localStorage.getItem('sprinkl_device_id');
-    if (!fp) {
-      fp = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now().toString(36);
-      localStorage.setItem('sprinkl_device_id', fp);
-    }
-    return fp;
-  } catch {
-    return 'dev_' + Math.random().toString(36).substring(2, 11);
-  }
 };
 
 export default function PublicClaimPage() {
@@ -266,7 +254,7 @@ export default function PublicClaimPage() {
         };
       }
 
-      payload.deviceFingerprint = getDeviceFingerprint();
+      payload.deviceFingerprint = await getDeviceFingerprint();
 
       const res = await api.post(`/g/${slug}/claim`, payload);
       const claimId = res.data.claim.id;
