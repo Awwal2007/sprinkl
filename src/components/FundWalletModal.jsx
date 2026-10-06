@@ -28,17 +28,17 @@ export default function FundWalletModal({
   const [checkingStatus, setCheckingStatus] = useState(false);
   const [msg, setMsg] = useState(null);
   const [localDva, setLocalDva] = useState(dva);
-  const [oxapayInvoice, setOxapayInvoice] = useState(null);
+  const [nowpaymentsInvoice, setNowpaymentsInvoice] = useState(null);
 
-  // Auto-poll OxaPay status while invoice is open
+  // Auto-poll NOWPayments status while invoice is open
   useEffect(() => {
-    if (!oxapayInvoice?.trackId || !isOpen) return;
+    if (!nowpaymentsInvoice?.trackId || !isOpen) return;
 
     let isMounted = true;
     const interval = setInterval(async () => {
       try {
-        const res = await api.post('/wallet/fund/oxapay-check-status', {
-          trackId: oxapayInvoice.trackId,
+        const res = await api.post('/wallet/fund/nowpayments-check-status', {
+          trackId: nowpaymentsInvoice.trackId,
         });
         if (isMounted && res.data?.credited) {
           setMsg({
@@ -56,15 +56,15 @@ export default function FundWalletModal({
       isMounted = false;
       clearInterval(interval);
     };
-  }, [oxapayInvoice?.trackId, isOpen]);
+  }, [nowpaymentsInvoice?.trackId, isOpen]);
 
   const handleManualCheckStatus = async () => {
-    if (!oxapayInvoice?.trackId) return;
+    if (!nowpaymentsInvoice?.trackId) return;
     try {
       setCheckingStatus(true);
       setMsg(null);
-      const res = await api.post('/wallet/fund/oxapay-check-status', {
-        trackId: oxapayInvoice.trackId,
+      const res = await api.post('/wallet/fund/nowpayments-check-status', {
+        trackId: nowpaymentsInvoice.trackId,
       });
       if (res.data?.credited) {
         setMsg({
@@ -121,7 +121,7 @@ export default function FundWalletModal({
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const handleCreateOxaPayInvoice = async () => {
+  const handleCreateNowpaymentsInvoice = async () => {
     const minAmount = selectedChain === 'TRC20' ? 12 : 1;
     const amount = parseFloat(usdtAmount) || 0;
     if (amount < minAmount) {
@@ -136,12 +136,12 @@ export default function FundWalletModal({
     try {
       setLoading(true);
       setMsg(null);
-      setOxapayInvoice(null);
-      const res = await api.post('/wallet/fund/oxapay-invoice', {
+      setNowpaymentsInvoice(null);
+      const res = await api.post('/wallet/fund/nowpayments-invoice', {
         amountUsdt: amount,
         chain: selectedChain,
       });
-      setOxapayInvoice(res.data.invoice);
+      setNowpaymentsInvoice(res.data.invoice);
     } catch (err) {
       setMsg({
         type: 'error',
@@ -352,10 +352,10 @@ export default function FundWalletModal({
           </div>
         )}
 
-        {/* ──────────── USDT VIEW (OxaPay Live Gateway) ──────────── */}
+        {/* ──────────── USDT VIEW (NOWPayments Live Gateway) ──────────── */}
         {currency === 'USDT' && (
           <div className="space-y-4 animate-in fade-in">
-            {!oxapayInvoice ? (
+            {!nowpaymentsInvoice ? (
               <div className="space-y-4">
                 {/* Network Selector */}
                 <div>
@@ -450,7 +450,7 @@ export default function FundWalletModal({
                 {/* Generate Address Button */}
                 <button
                   type="button"
-                  onClick={handleCreateOxaPayInvoice}
+                  onClick={handleCreateNowpaymentsInvoice}
                   disabled={loading || parseFloat(usdtAmount || 0) < (selectedChain === 'TRC20' ? 12 : 1)}
                   className="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand-500/20 disabled:opacity-50"
                 >
@@ -478,23 +478,23 @@ export default function FundWalletModal({
                   <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-dark-border/60">
                     <span className="text-xs text-slate-500 dark:text-dark-muted font-bold">Send Exactly</span>
                     <span className="text-sm font-black text-slate-900 dark:text-white font-mono">
-                      {oxapayInvoice.amount} USDT
+                      {nowpaymentsInvoice.amount} USDT
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-dark-border/60">
                     <span className="text-xs text-slate-500 dark:text-dark-muted font-bold">Network</span>
                     <span className="text-xs font-black text-emerald-600 dark:text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20">
-                      {oxapayInvoice.network || selectedChain}
+                      {nowpaymentsInvoice.network || selectedChain}
                     </span>
                   </div>
 
                   {/* QR Code */}
-                  {oxapayInvoice.qrCode && (
+                  {nowpaymentsInvoice.qrCode && (
                     <div className="py-2 flex flex-col items-center">
                       <div className="p-2.5 bg-white rounded-xl shadow-lg inline-block border border-slate-200">
                         <img
-                          src={oxapayInvoice.qrCode}
+                          src={nowpaymentsInvoice.qrCode}
                           alt="USDT Deposit QR"
                           className="w-40 h-40 object-contain mx-auto"
                         />
@@ -506,18 +506,18 @@ export default function FundWalletModal({
                   )}
 
                   {/* Payment Address */}
-                  {oxapayInvoice.payAddress && (
+                  {nowpaymentsInvoice.payAddress && (
                     <div className="space-y-1.5 text-left">
                       <span className="text-[10px] text-slate-500 dark:text-dark-muted font-bold uppercase tracking-wider block">
-                        Deposit Address ({oxapayInvoice.network || selectedChain}):
+                        Deposit Address ({nowpaymentsInvoice.network || selectedChain}):
                       </span>
                       <div className="flex items-center justify-between gap-2 p-2.5 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-dark-border">
                         <span className="text-xs font-mono font-bold text-emerald-600 dark:text-brand-400 break-all select-all">
-                          {oxapayInvoice.payAddress}
+                          {nowpaymentsInvoice.payAddress}
                         </span>
                         <button
                           type="button"
-                          onClick={() => handleCopy(oxapayInvoice.payAddress, 'usdt-address')}
+                          onClick={() => handleCopy(nowpaymentsInvoice.payAddress, 'usdt-address')}
                           className="flex items-center gap-1 text-[11px] text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-200 dark:bg-slate-800 px-2.5 py-1.5 rounded-lg shrink-0 transition-colors"
                         >
                           {copied === 'usdt-address' ? (
@@ -532,9 +532,9 @@ export default function FundWalletModal({
                   )}
 
                   {/* Hosted Checkout Link (if available) */}
-                  {oxapayInvoice.payLink && (
+                  {nowpaymentsInvoice.payLink && (
                     <a
-                      href={oxapayInvoice.payLink}
+                      href={nowpaymentsInvoice.payLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors border border-slate-200 dark:border-dark-border mt-2"
@@ -547,7 +547,7 @@ export default function FundWalletModal({
                   <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-[11px] leading-relaxed flex items-start gap-2 text-left">
                     <Clock className="w-4 h-4 shrink-0 mt-0.5 text-amber-500 dark:text-amber-400" />
                     <span>
-                      Only send <strong>USDT</strong> via <strong>{oxapayInvoice.network || selectedChain}</strong>. Your balance updates automatically upon blockchain confirmation.
+                      Only send <strong>USDT</strong> via <strong>{nowpaymentsInvoice.network || selectedChain}</strong>. Your balance updates automatically upon blockchain confirmation.
                     </span>
                   </div>
 
@@ -576,7 +576,7 @@ export default function FundWalletModal({
                   <button
                     type="button"
                     onClick={() => {
-                      setOxapayInvoice(null);
+                      setNowpaymentsInvoice(null);
                       setMsg(null);
                     }}
                     className="text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white underline transition-colors"
