@@ -60,15 +60,56 @@ function ProtectedRoute({ children }) {
 }
 
 function AdminRoute({ children }) {
-  const user = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.accessToken);
+  const [authStatus, setAuthStatus] = React.useState('checking'); // 'checking' | 'authorized' | 'unauthorized'
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
+  React.useEffect(() => {
+    let isMounted = true;
+
+    if (!token) {
+      setAuthStatus('unauthorized');
+      return;
+    }
+
+    // Zero-trust verification: Never trust client-side localStorage/cookies for administrative privileges.
+    // Query the server directly with the cryptographic JWT token to verify genuine admin authority.
+    api
+      .get('/auth/me')
+      .then((res) => {
+        if (!isMounted) return;
+        const isAdmin = res.data?.isAdmin === true || res.data?.user?.role === 'admin';
+        if (isAdmin) {
+          setAuthStatus('authorized');
+        } else {
+          setAuthStatus('unauthorized');
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setAuthStatus('unauthorized');
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [token]);
+
+  // While validating credentials with the server, do not render any admin page contents
+  if (authStatus === 'checking') {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-mono text-slate-400">Verifying administrator access...</span>
+        </div>
+      </div>
+    );
   }
 
-  if (user?.role !== 'admin') {
-    return <Navigate to="/dashboard" replace />;
+  // If not a verified admin, immediately kick out and redirect to homepage ('/')
+  if (authStatus !== 'authorized') {
+    return <Navigate to="/" replace />;
   }
 
   return children;
