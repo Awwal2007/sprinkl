@@ -76,7 +76,11 @@ export default function LoginPage() {
       setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
       const userName = res.data.user?.fullName || res.data.user?.email?.split('@')[0] || 'Host';
       toast.success(`Welcome back, ${userName}! Signed in successfully.`, 'Signed In');
-      navigate('/dashboard');
+      if (res.data.user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       const errMsg = err.response?.data?.error || 'Login failed. Please check credentials.';
       const isUnverified = err.response?.status === 403 && err.response?.data?.emailVerified === false;
@@ -158,7 +162,11 @@ export default function LoginPage() {
       setAuth(res.data.user, res.data.accessToken, res.data.refreshToken);
       const userName = res.data.user?.fullName || res.data.user?.email?.split('@')[0] || 'Host';
       toast.success(`Welcome back, ${userName}! Signed in successfully.`, 'Signed In');
-      navigate('/dashboard');
+      if (res.data.user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       const errMsg = err.response?.data?.error || 'Invalid or expired verification code.';
       setError(errMsg);
