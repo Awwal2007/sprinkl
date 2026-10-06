@@ -55,14 +55,6 @@ export default function ClaimSuccessPage() {
     }
   }, [isFailed, slug]);
 
-  const isAddressError = Boolean(
-    claim?.failureReason &&
-      (claim.failureReason.toLowerCase().includes('contract') ||
-        claim.failureReason.toLowerCase().includes('invalid_address') ||
-        claim.failureReason.toLowerCase().includes('exchange') ||
-        claim.failureReason.toLowerCase().includes('invalid wallet'))
-  );
-
   const handleRetry = () => {
     try {
       localStorage.removeItem(`sprinkl_claimed_${slug}`);
@@ -92,16 +84,14 @@ export default function ClaimSuccessPage() {
         <div className="space-y-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             {isFailed
-              ? (isAddressError ? 'Wallet Rejected' : 'Payout Failed')
+              ? 'Payout Failed'
               : isPaid
               ? (claim?.currency === 'AIRTIME' ? 'Airtime Recharged!' : 'Claim Paid!')
               : (claim?.currency === 'AIRTIME' ? 'Recharge Dispatched!' : 'Claim Submitted!')}
           </h1>
           <p className="text-xs text-slate-500 dark:text-dark-muted">
             {isFailed
-              ? (isAddressError
-                  ? 'The wallet address provided cannot receive automated payouts.'
-                  : 'The payout transfer could not be completed by the provider.')
+              ? 'The payout transfer could not be completed.'
               : claim?.currency === 'AIRTIME'
               ? `Airtime credit has been dispatched to ${claim?.destination?.phoneNumber || 'your phone'} (${claim?.destination?.network || 'VTU'}).`
               : claim?.successMessage || 'Funds transfer initiated directly to your destination.'}
@@ -113,14 +103,12 @@ export default function ClaimSuccessPage() {
           <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/25 text-rose-700 dark:text-rose-300 text-xs text-left space-y-3 shadow-sm">
             <div className="flex items-center gap-2 font-bold text-rose-600 dark:text-rose-400">
               <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{isAddressError ? 'Exchange / Contract Address Rejected' : 'Error Reason'}</span>
+              <span>Payout Notice</span>
             </div>
 
-            {isAddressError ? (
-              <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
-                Automated payout gateways strictly reject transfers to <strong>fintech &amp; exchange deposit addresses</strong> (e.g. Spenda, Roqqu, Binance, Bybit, OKX) or smart contract wallets. Your slot has been returned to the giveaway!
-              </p>
-            ) : null}
+            <p className="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300">
+              The automated payout could not be completed. Your prize slot has been returned to the giveaway so you can try again with a valid wallet address or bank account!
+            </p>
 
             {claim?.failureReason && (
               <div className="p-2.5 rounded-xl bg-black/5 dark:bg-black/30 border border-rose-500/15 font-mono text-[11px] leading-relaxed break-words text-rose-700 dark:text-rose-300">
@@ -134,7 +122,7 @@ export default function ClaimSuccessPage() {
               className="w-full py-3 px-4 bg-brand-500 hover:bg-brand-400 active:scale-[0.98] text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-md touch-manipulation cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>{isAddressError ? 'Try Again With Personal Wallet' : 'Try Again'}</span>
+              <span>Try Claim Again</span>
             </button>
           </div>
         )}
