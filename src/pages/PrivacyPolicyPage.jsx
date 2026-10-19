@@ -272,7 +272,7 @@ export default function PrivacyPolicyPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-dark-border py-8 text-center text-xs text-slate-500 dark:text-dark-muted bg-white/50 dark:bg-transparent">
         <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>&copy; 2026 Sprinkl.biz. All rights reserved.</p>
+          <p>&copy; 2026 Sprinkl. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link to="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">
               Home

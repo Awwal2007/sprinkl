@@ -143,7 +143,7 @@ export default function Navbar() {
                 </span>
               </div>
               <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-dark-muted font-medium -mt-0.5 hidden sm:block">
-                Sprinkl.biz
+                Automated Giveaways
               </p>
             </div>
           </Link>

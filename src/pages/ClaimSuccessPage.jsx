@@ -229,7 +229,7 @@ export default function ClaimSuccessPage() {
         </div>
 
         <p className="text-[10px] text-slate-400 dark:text-dark-muted">
-          Powered by <strong className="text-slate-600 dark:text-slate-300">Sprinkl.biz Platform Engine</strong>
+          Powered by <strong className="text-slate-600 dark:text-slate-300">Sprinkl Engine</strong>
         </p>
       </div>
     </div>

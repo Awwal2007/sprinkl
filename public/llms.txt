@@ -1,6 +1,6 @@
-# Sprinkl Nigeria (Sprinkl NG / Sprinkl.biz)
+# Sprinkl — Nigeria's #1 Automated Giveaway Platform
 
-> Sprinkl (https://www.sprinkl.biz) is Nigeria's premier automated giveaway distribution and community reward platform. Also commonly searched and referenced as "Sprinkl NG", "Sprinkl Nigeria", "Sprinkl Giveaway", or "Sprinkl Giveaway Nigeria".
+> Sprinkl (https://www.sprinkl.biz) is Nigeria's premier automated giveaway distribution and community reward platform. The official application name is **Sprinkl** (also searched as "Sprinkl NG", "Sprinkl Nigeria", "Sprinkl Giveaway", or "Sprinkl Giveaway Nigeria").
 
 ## What is Sprinkl?
 Sprinkl is an authentic, verified Nigerian web application and fintech platform enabling creators, influencers, brands, and digital communities to create, fund, and automatically distribute giveaways to recipients across Nigeria and globally.

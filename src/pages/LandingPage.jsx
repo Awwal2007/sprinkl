@@ -144,10 +144,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-900 dark:text-slate-100 selection:bg-brand-500 selection:text-slate-950 font-sans transition-colors duration-150">
       <SEO
-        title="Sprinkl — Automated Cash & Crypto Giveaways in Nigeria"
-        description="Sprinkl Nigeria (Sprinkl NG / Sprinkl.biz) is Nigeria's official automated giveaway platform. Pay winners directly to bank accounts (NGN), crypto wallets (USDT), or instant VTU airtime (MTN, Airtel, Glo, 9mobile). Zero double-claims guaranteed."
+        title="Sprinkl — Automated Cash, Crypto & Airtime Giveaways in Nigeria"
+        description="Sprinkl is Nigeria's #1 automated giveaway platform. Pay winners directly to bank accounts (NGN), crypto wallets (USDT), or instant VTU airtime (MTN, Airtel, Glo, 9mobile). Zero double-claims guaranteed."
         canonical="/"
-        keywords="sprinkl, sprinkl ng, sprinkl nigeria, sprinkl giveaway, sprinkl giveaway nigeria, sprinkl giveaway ng, sprinkl.biz, sprinkl biz, sprinkl cash drop nigeria, sprinkl airtime nigeria, sprinkl legit nigeria, giveaway platform Nigeria, VTU airtime giveaway, airtime drop Nigeria, MTN airtime giveaway, Airtel airtime giveaway, Glo airtime drop, 9mobile recharge Nigeria, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria"
+        keywords="sprinkl, sprinkl ng, sprinkl nigeria, sprinkl giveaway, sprinkl giveaway nigeria, sprinkl giveaway ng, sprinkl cash drop nigeria, sprinkl airtime nigeria, sprinkl legit nigeria, giveaway platform Nigeria, VTU airtime giveaway, airtime drop Nigeria, MTN airtime giveaway, Airtel airtime giveaway, Glo airtime drop, 9mobile recharge Nigeria, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria"
         breadcrumbs={[{ name: 'Home', path: '/' }]}
       />
       <Navbar />
@@ -167,7 +167,7 @@ export default function LandingPage() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/25 text-brand-600 dark:text-brand-400 text-xs font-bold mb-6 tracking-wide shadow-inner">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Multi-Rail Giveaway Platform: NGN Banks • VTU Airtime • USDT Crypto</span>
+                <span>Sprinkl — Multi-Rail Giveaway Platform: NGN Banks • VTU Airtime • USDT Crypto</span>
               </div>
 
               {/* Main Heading (Single H1 for SEO) */}
@@ -175,7 +175,7 @@ export default function LandingPage() {
                 id="hero-heading"
                 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 leading-[1.08]"
               >
-                Send Cash & Crypto Giveaways{' '}
+                Send Cash, Airtime &amp; Crypto Giveaways{' '}
                 <br className="hidden sm:inline" />
                 <span className="text-emerald-600 dark:text-emerald-400 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-200 bg-clip-text text-transparent font-extrabold inline-block drop-shadow-sm">
                   With Zero Double-Claims.
@@ -979,7 +979,7 @@ export default function LandingPage() {
           </div>
 
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-            <p>&copy; 2026 Sprinkl.biz. All rights reserved.</p>
+            <p>&copy; 2026 Sprinkl. All rights reserved.</p>
             <div className="flex items-center gap-6">
               <Link to="/privacy" className="hover:text-slate-900 dark:hover:text-slate-300 transition-colors">
                 Privacy Policy
