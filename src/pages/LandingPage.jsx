@@ -145,7 +145,7 @@ export default function LandingPage() {
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-900 dark:text-slate-100 selection:bg-brand-500 selection:text-slate-950 font-sans transition-colors duration-150">
       <SEO
         title="Sprinkl — Automated Cash, Crypto & Airtime Giveaways in Nigeria"
-        description="Sprinkl is Nigeria's #1 automated giveaway platform. Pay winners directly to bank accounts (NGN), crypto wallets (USDT), or instant VTU airtime (MTN, Airtel, Glo, 9mobile). Zero double-claims guaranteed."
+        description="Launch automated giveaways in Nigeria with Sprinkl. Instant payouts to bank accounts (NGN), USDT crypto wallets, or VTU mobile airtime. 100% fraud-proof."
         canonical="/"
         keywords="sprinkl, sprinkl ng, sprinkl nigeria, sprinkl giveaway, sprinkl giveaway nigeria, sprinkl giveaway ng, sprinkl cash drop nigeria, sprinkl airtime nigeria, sprinkl legit nigeria, giveaway platform Nigeria, VTU airtime giveaway, airtime drop Nigeria, MTN airtime giveaway, Airtel airtime giveaway, Glo airtime drop, 9mobile recharge Nigeria, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria"
         breadcrumbs={[{ name: 'Home', path: '/' }]}

@@ -18,6 +18,33 @@ export default function SEO({
     ? canonical
     : `${BASE_URL}${canonical.startsWith('/') ? canonical : `/${canonical}`}`;
 
+  // Deduplicate any static HTML fallback tags once React mounts to prevent Bing / Google flagging multiple tags
+  React.useEffect(() => {
+    const descriptions = document.querySelectorAll('meta[name="description"]');
+    if (descriptions.length > 1) {
+      let keptFirst = false;
+      descriptions.forEach((el) => {
+        if (!keptFirst) {
+          keptFirst = true;
+        } else {
+          el.remove();
+        }
+      });
+    }
+
+    const canonicals = document.querySelectorAll('link[rel="canonical"]');
+    if (canonicals.length > 1) {
+      let keptFirst = false;
+      canonicals.forEach((el) => {
+        if (!keptFirst) {
+          keptFirst = true;
+        } else {
+          el.remove();
+        }
+      });
+    }
+  }, [description, fullCanonical]);
+
   return (
     <Helmet>
       {/* App Identity */}
