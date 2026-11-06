@@ -5,7 +5,7 @@ const BASE_URL = 'https://www.sprinkl.biz';
 
 export default function SEO({
   title = 'Sprinkl — Automated Cash, Crypto & Airtime Giveaways in Nigeria',
-  description = "Sprinkl is Nigeria's #1 automated giveaway platform. Pay winners directly to bank accounts (NGN), crypto wallets (USDT), or instant VTU mobile airtime (MTN, Airtel, Glo, 9mobile). Zero double-claims.",
+  description = 'Launch automated giveaways in Nigeria with Sprinkl. Instant payouts to bank accounts (NGN), USDT crypto wallets, or VTU mobile airtime. 100% fraud-proof.',
   canonical = '/',
   keywords = 'sprinkl, sprinkl ng, sprinkl nigeria, sprinkl giveaway, giveaway platform Nigeria, VTU airtime giveaway, airtime drop Nigeria, MTN airtime giveaway, Airtel airtime giveaway, Glo airtime drop, 9mobile recharge Nigeria, automated giveaway platform, cash giveaway Nigeria, crypto giveaway platform, NGN giveaway, USDT giveaway Nigeria',
   ogImage = 'https://www.sprinkl.biz/og-sprinkl.png?v=3',
